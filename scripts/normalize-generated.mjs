@@ -7,7 +7,7 @@ const moduleName = 'github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go'
 function filesUnder(directory) {
   const result = [];
   for (const name of readdirSync(directory)) {
-    if (['.openapi-generator', 'node_modules', 'target', 'dist'].includes(name)) continue;
+    if (['.openapi-generator', '.gradle', 'build', 'node_modules', 'target', 'dist'].includes(name)) continue;
     const file = join(directory, name);
     if (statSync(file).isDirectory()) result.push(...filesUnder(file));
     else result.push(file);
@@ -22,15 +22,52 @@ for (const file of filesUnder('packages')) {
     .replaceAll('https://github.com/GIT_USER_ID/GIT_REPO_ID.git', repoUrl)
     .replaceAll('github.com/GIT_USER_ID/GIT_REPO_ID', moduleName)
     .replaceAll('GIT_USER_ID', 'TimeLogic-API-LLC')
-    .replaceAll('GIT_REPO_ID', 'timelogic-api-sdks');
+    .replaceAll('GIT_REPO_ID', 'timelogic-api-sdks')
+    .replace(/date = "\d{4}-\d{2}-\d{2}T[^\"]+\[Etc\/UTC\]"/g, 'date = "1970-01-01T00:00:00Z[Etc/UTC]"')
+    .replace(/- Build date: .*/g, '- Build date: 1970-01-01T00:00:00Z[Etc/UTC]');
   if (normalized !== original) writeFileSync(file, normalized);
 }
 
+const csharpSolutionPath = 'packages/csharp/TimeLogic.DirectApi.sln';
+const csharpFixedProjectGuid = '{0F073C98-0C47-4A15-B71F-D69526FB4A50}';
+let csharpSolution = readFileSync(csharpSolutionPath, 'utf8');
+const csharpGeneratedProjectGuid = csharpSolution.match(/Project\("\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC\}"\) = "TimeLogic\.DirectApi", "[^"]+", "(\{[A-F0-9-]+\})"/)?.[1];
+if (csharpGeneratedProjectGuid && csharpGeneratedProjectGuid !== csharpFixedProjectGuid) {
+  csharpSolution = csharpSolution.replaceAll(csharpGeneratedProjectGuid, csharpFixedProjectGuid);
+}
+writeFileSync(csharpSolutionPath, csharpSolution);
+
 const goMod = 'packages/go/go.mod';
-let go = readFileSync(goMod, 'utf8').replace('github.com/GIT_USER_ID/GIT_REPO_ID', moduleName);
-if (!go.includes('gopkg.in/validator.v2')) go = go.replace('require (\n)', 'require (\n\tgopkg.in/validator.v2 v2.0.1\n)');
-if (!go.includes('github.com/stretchr/testify')) go = go.replace('require (\n', 'require (\n\tgithub.com/stretchr/testify v1.11.1\n');
-writeFileSync(goMod, go);
+writeFileSync(goMod, `module ${moduleName}
+
+go 1.18
+
+require (
+\tgithub.com/stretchr/testify v1.11.1
+\tgopkg.in/validator.v2 v2.0.1
+)
+
+require (
+\tgithub.com/davecgh/go-spew v1.1.1 // indirect
+\tgithub.com/pmezard/go-difflib v1.0.0 // indirect
+\tgopkg.in/yaml.v3 v3.0.1 // indirect
+)
+`);
+writeFileSync('packages/go/go.sum', `github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
+github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/kr/pretty v0.2.1 h1:Fmg33tUaq4/8ym9TJN1x7sLJnHVwhP33CNkpYV/7rwI=
+github.com/kr/text v0.1.0 h1:45sCR5RtlFHMR4UwH9sdQ5TC8v0qDQCHnXt+kaKSTVE=
+github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
+github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=
+github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
+gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
+gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c h1:Hei/4ADfdWqJk1ZMxUNpqntNwaWcugrBjAiHlqqRiVk=
+gopkg.in/validator.v2 v2.0.1 h1:xF0KWyGWXm/LM2G1TrEjqOu4pa6coO9AlWSf3msVfDY=
+gopkg.in/validator.v2 v2.0.1/go.mod h1:lIUZBlB3Im4s/eYp39Ry/wkR02yOPhZ9IwIRBjuPuG8=
+gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
+gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
+`);
 
 const pythonBulk = 'packages/python/timelogic_direct_api/models/time_payload_bulk_response.py';
 writeFileSync(pythonBulk, `# coding: utf-8
@@ -583,6 +620,24 @@ object TransportConfiguration {
         }
         return client
     }
+}
+`);
+
+writeFileSync('packages/swift/Package.resolved', `{
+  "object": {
+    "pins": [
+      {
+        "package": "AnyCodable",
+        "repositoryURL": "https://github.com/Flight-School/AnyCodable",
+        "state": {
+          "branch": null,
+          "revision": "862808b2070cd908cb04f9aafe7de83d35f81b05",
+          "version": "0.6.7"
+        }
+      }
+    ]
+  },
+  "version": 1
 }
 `);
 

@@ -50,7 +50,7 @@ import com.timelogic.direct.JSON;
 /**
  * DstResponse
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-08-04T00:37:38.170561276Z[Etc/UTC]", comments = "Generator version: 7.10.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "1970-01-01T00:00:00Z[Etc/UTC]", comments = "Generator version: 7.10.0")
 public class DstResponse {
   public static final String SERIALIZED_NAME_UNIX = "unix";
   @SerializedName(SERIALIZED_NAME_UNIX)

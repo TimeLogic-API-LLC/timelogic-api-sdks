@@ -6,6 +6,9 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const image = process.env.OPENAPI_GENERATOR_IMAGE ?? 'openapitools/openapi-generator-cli:v7.10.0';
 const targets = JSON.parse(readFileSync(path.join(root, 'config/generators.json'), 'utf8'));
+const dockerUserArgs = typeof process.getuid === 'function' && typeof process.getgid === 'function'
+  ? ['--user', `${process.getuid()}:${process.getgid()}`]
+  : [];
 
 if (!existsSync(path.join(root, 'openapi/openapi.yaml'))) throw new Error('openapi/openapi.yaml is missing');
 
@@ -34,6 +37,7 @@ for (const target of targets) {
   console.log(`Generating ${target.id} SDK...`);
   await run([
     'run', '--rm',
+    ...dockerUserArgs,
     '-v', `${root}:/local`,
     image, 'generate',
     '-i', '/local/openapi/openapi.yaml',

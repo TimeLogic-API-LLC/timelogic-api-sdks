@@ -2,7 +2,7 @@
 
 TimeLogic API — Direct Customer Access
 - API version: 1.0.0
-  - Build date: 2026-08-04T00:37:38.170561276Z[Etc/UTC]
+  - Build date: 1970-01-01T00:00:00Z[Etc/UTC]
   - Generator version: 7.10.0
 
 Public direct-access contract for the TimeLogic gateway.
