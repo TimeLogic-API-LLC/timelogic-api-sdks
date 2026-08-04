@@ -1,0 +1,46 @@
+name: SDK CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate-generate-test:
+    name: Validate, generate, and test
+    runs-on: ubuntu-latest
+    env:
+      TIMELOGIC_SDK_TEST_BASE_URL: ${{ vars.TIMELOGIC_SDK_TEST_BASE_URL || 'https://api.timelogicapi.com' }}
+      TIMELOGIC_SDK_TEST_API_KEY: ${{ secrets.TIMELOGIC_SDK_TEST_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run validate
+      - run: npm run generate
+      - run: npm run verify-generated
+      - run: npm run test:contract
+      - name: Ensure generated output is committed
+        run: git diff --exit-code -- openapi packages config
+
+  package-smoke:
+    name: Package smoke tests (${{ matrix.language }})
+    needs: validate-generate-test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [typescript, python, rust, go, java, csharp, php, ruby, kotlin, swift]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify generated package directory
+        shell: bash
+        run: test -d "packages/${{ matrix.language }}"
+      - name: Show package contents
+        run: find "packages/${{ matrix.language }}" -maxdepth 2 -type f | sort | head -80

@@ -1,0 +1,14 @@
+{
+  "name": "@timelogic/sdk-generation",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "validate": "node scripts/validate.mjs",
+    "generate": "node scripts/generate-all.mjs",
+    "verify-generated": "node scripts/verify-generated.mjs",
+    "test:contract": "node scripts/test-contract.mjs"
+  },
+  "devDependencies": {
+    "@apidevtools/swagger-parser": "^12.0.0"
+  }
+}

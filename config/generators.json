@@ -1,0 +1,12 @@
+[
+  { "id": "typescript", "generator": "typescript-fetch", "output": "packages/typescript", "required": ["package.json", "src"] },
+  { "id": "python", "generator": "python", "output": "packages/python", "required": ["setup.py"] },
+  { "id": "rust", "generator": "rust", "output": "packages/rust", "required": ["Cargo.toml"] },
+  { "id": "go", "generator": "go", "output": "packages/go", "required": ["go.mod"] },
+  { "id": "java", "generator": "java", "output": "packages/java", "required": ["pom.xml"] },
+  { "id": "csharp", "generator": "csharp", "output": "packages/csharp", "required": ["src/TimeLogic.DirectApi/TimeLogic.DirectApi.csproj"] },
+  { "id": "php", "generator": "php", "output": "packages/php", "required": ["composer.json"] },
+  { "id": "ruby", "generator": "ruby", "output": "packages/ruby", "required": ["Gemfile"] },
+  { "id": "kotlin", "generator": "kotlin", "output": "packages/kotlin", "required": ["build.gradle"] },
+  { "id": "swift", "generator": "swift5", "output": "packages/swift", "required": ["Package.swift"] }
+]

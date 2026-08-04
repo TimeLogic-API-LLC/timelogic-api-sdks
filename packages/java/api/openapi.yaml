@@ -1,0 +1,4565 @@
+openapi: 3.0.3
+info:
+  description: |-
+    Public direct-access contract for the TimeLogic gateway.
+
+    This public spec excludes `/healthz` and the shared clock asset routes. It keeps `/.well-known/time-api-public-key`, `/v1/time/clock`, and signed JSON response controls because public consumers may need them.
+
+    Authentication:
+    - direct access supports `Authorization: Bearer <token>`, `X-API-Key`, and `api_key` query credentials
+    - RapidAPI access uses `X-RapidAPI-Key` and `X-RapidAPI-Host`; the SDKs expose this as a `rapidApi` transport option that accepts only the RapidAPI key
+
+    Behavioral notes:
+    - all documented operations are `GET`
+    - only one selector family may be used at a time
+    - current and convert support bulk only through one comma-separated `tz`, `ip`, or `offset` selector
+    - add, diff, calendar, dst, elapsed, timezone, and clock are single-target routes
+    - credentials are extracted in Authorization, X-API-Key, then api_key query order; conflicting values are rejected
+    - the first server is the default direct API host. The second server is the RapidAPI gateway and can be selected or overridden by SDK configuration
+    - `sign` is available on supported JSON routes and is not supported on `/v1/time/clock`
+  title: TimeLogic API — Direct Customer Access
+  version: 1.0.0
+servers:
+- description: Default direct customer API host; override `host` for a customer-specific
+    domain or subdomain.
+  url: "https://{host}"
+  variables:
+    host:
+      default: api.timelogicapi.com
+      description: HTTPS hostname serving this API.
+- description: RapidAPI gateway; SDKs select this when rapidApi is enabled.
+  url: "https://{rapidapiHost}"
+  variables:
+    rapidapiHost:
+      default: timelogic-api-world-time-timezones-time-calculations.p.rapidapi.com
+      description: RapidAPI gateway hostname. Override for a compatible proxy or test
+        gateway.
+security:
+- directBearerAuth: []
+- directApiKeyHeader: []
+- directApiKeyQuery: []
+- rapidApiKey: []
+  rapidApiHost: []
+tags:
+- description: Public verification and support routes.
+  name: Utility
+- description: "Time, timezone, calendar, and duration operations."
+  name: Time
+paths:
+  /.well-known/time-api-public-key:
+    get:
+      description: |-
+        Unauthenticated JWKS endpoint for verifying signed JSON responses.
+
+        The public gateway proxies this route to the dedicated `time-signing` worker. For compatibility with client tooling, the gateway serves the JWKS body as standard `application/json`.
+
+        Use this endpoint together with the detached signature headers returned on supported `sign=true` JSON responses:
+        - `X-TimeLogic-Key-Id`
+        - `X-TimeLogic-Signature`
+        - `X-TimeLogic-Signature-Alg`
+        - `X-TimeLogic-Signature-Timestamp`
+        - `X-TimeLogic-Content-SHA256` - `X-TimeLogic-Signature-Input`
+        `X-TimeLogic-Signature-Input` is the exact Base64URL-encoded UTF-8 `v1` envelope. It signs the path and query (including `sign=true`), but deliberately excludes the scheme, host, and `Content-Type` so proxy normalization cannot change the signed bytes.
+
+        Behavior:
+        - without a query string, the response returns the full retained JWKS set
+        - the active Ed25519 key is listed first
+        - `kid=<key-id>` returns only the matching retained public key
+        - historical public keys may remain published after rotation so older signed responses can still be verified
+      operationId: getPublicSigningKey
+      parameters:
+      - description: "Optional signing key identifier filter, for example `ed25519-2026-07-19`.\
+          \ When present, the response returns only the matching retained public key."
+        explode: true
+        in: query
+        name: kid
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                currentKeySet:
+                  $ref: '#/components/examples/JwksExample'
+                currentKeyByKid:
+                  $ref: '#/components/examples/JwksSingleKeyExample'
+              schema:
+                $ref: '#/components/schemas/JwksResponse'
+          description: Ed25519 signing key set. The active key is listed first.
+        "404":
+          content:
+            application/json:
+              examples:
+                missingKid:
+                  $ref: '#/components/examples/SigningKeyNotFoundExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: No retained signing key exists for the requested `kid`.
+        "500":
+          content:
+            application/json:
+              examples:
+                internalError:
+                  $ref: '#/components/examples/InternalErrorExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Signing public keys are not configured or could not be loaded.
+      security: []
+      summary: Public signing key set
+      tags:
+      - Utility
+      x-accepts:
+      - application/json
+  /v1/time/current:
+    get:
+      description: |-
+        Returns current time data for a single target, or a bulk array when exactly one of `tz`, `ip`, or `offset` is supplied as a comma-separated list.
+
+        Target selector rules:
+        - Use at most one selector family per request: `tz`, `ip`, `lat` + `lon`, `offset`, or `auto_tz=true`.
+        - If no selector is provided, the response defaults to UTC with `timezone=null` and `iso_local=null`.
+        - Bulk mode is available only through one comma-separated `tz`, `ip`, or `offset` selector and cannot be combined with any other selector.
+
+        Example:
+        - Single target: `/v1/time/current?tz=America/New_York`
+        - For bulk, provide one comma-separated `tz`, `ip`, or `offset` value, for example `/v1/time/current?tz=America/New_York,Europe/London,Asia/Tokyo`.
+      operationId: getCurrentTime
+      parameters:
+      - description: "IANA timezone name. On bulk-capable routes, a comma-separated\
+          \ list enables bulk mode."
+        example: America/New_York
+        explode: true
+        in: query
+        name: tz
+        required: false
+        schema:
+          maxLength: 64
+          type: string
+        style: form
+      - description: "IP address. On bulk-capable routes, a comma-separated list enables\
+          \ bulk mode."
+        example: 8.8.8.8
+        explode: true
+        in: query
+        name: ip
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Latitude. Must be provided together with `lon`.
+        example: 40.7128
+        explode: true
+        in: query
+        name: lat
+        required: false
+        schema:
+          format: double
+          maximum: 90
+          minimum: -90
+          type: number
+        style: form
+      - description: Longitude. Must be provided together with `lat`.
+        example: -74.006
+        explode: true
+        in: query
+        name: lon
+        required: false
+        schema:
+          format: double
+          maximum: 180
+          minimum: -180
+          type: number
+        style: form
+      - description: "Fixed UTC offset in `+HH:MM` or `-HH:MM` format. On bulk-capable\
+          \ routes, a comma-separated list enables bulk mode."
+        example: -04:00
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+          type: string
+        style: form
+      - description: Set to `true` to resolve using the caller IP from Cloudflare
+          headers.
+        example: true
+        explode: true
+        in: query
+        name: auto_tz
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: "Custom date/time format template using supported `strftime`-style\
+          \ directives such as `%Y-%m-%d %H:%M:%S`. Reference: [strftime](https://strftime.net/)."
+        example: '%Y-%m-%d %H:%M:%S'
+        explode: true
+        in: query
+        name: format
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Set to exactly `true` to ask the gateway to sign the final JSON\
+          \ response. Every authenticated JSON response, including errors, then includes\
+          \ signing headers. Not supported on `/v1/time/clock`."
+        example: true
+        explode: true
+        in: query
+        name: sign
+        required: false
+        schema:
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                singleTarget:
+                  $ref: '#/components/examples/CurrentSingleExample'
+                bulkByTimezone:
+                  $ref: '#/components/examples/CurrentBulkExample'
+                bulkPartialFailure:
+                  $ref: '#/components/examples/CurrentBulkPartialFailureExample'
+              schema:
+                $ref: '#/components/schemas/getCurrentTime_200_response'
+          description: Current time payload or bulk array.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+            X-TimeLogic-Signature:
+              $ref: '#/components/headers/XTimeLogicSignature'
+            X-TimeLogic-Key-Id:
+              $ref: '#/components/headers/XTimeLogicKeyId'
+            X-TimeLogic-Signature-Alg:
+              $ref: '#/components/headers/XTimeLogicSignatureAlg'
+            X-TimeLogic-Signature-Timestamp:
+              $ref: '#/components/headers/XTimeLogicSignatureTimestamp'
+            X-TimeLogic-Content-SHA256:
+              $ref: '#/components/headers/XTimeLogicContentSha256'
+            X-TimeLogic-Signature-Input:
+              $ref: '#/components/headers/XTimeLogicSignatureInput'
+        "400":
+          content:
+            application/json:
+              examples:
+                invalidParameter:
+                  $ref: '#/components/examples/InvalidParameterExample'
+                ambiguousTarget:
+                  $ref: '#/components/examples/AmbiguousTargetExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid or ambiguous request parameters.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "401":
+          content:
+            application/json:
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/UnauthorizedExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Missing or invalid authentication.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: The key or customer subscription is not active.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: The cached monthly quota state is exceeded.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+            X-TimeLogic-Quota-State:
+              $ref: '#/components/headers/XTimeLogicQuotaState'
+        "405":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Only `GET` is supported.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "500":
+          content:
+            application/json:
+              examples:
+                internalError:
+                  $ref: '#/components/examples/InternalErrorExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: "Internal server error, including signing failures."
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "501":
+          content:
+            application/json:
+              examples:
+                dependencyNotReady:
+                  $ref: '#/components/examples/DependencyNotReadyExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: A required resolver or dependency is not configured or not
+            ready.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "502":
+          content:
+            application/json:
+              examples:
+                upstreamFailure:
+                  $ref: '#/components/examples/UpstreamFailureExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Gateway failed to forward the request to the core worker.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+      summary: Get the current time for a target
+      tags:
+      - Time
+      x-accepts:
+      - application/json
+  /v1/time/convert:
+    get:
+      description: |
+        Converts one required input timestamp into a single target or a bulk array.
+
+        Input timestamp forms:
+        - `unix=1711300000`
+        - `unix_ms=1711300000000`
+        - `iso=2026-04-16T09:00:00Z`
+        - `iso=2026-04-16T09:00:00&source_tz=America/New_York`
+        - `iso=2026-04-16T09:00:00&source_ip=8.8.8.8`
+        - `iso=2026-04-16T09:00:00&source_lat=40.7128&source_lon=-74.0060`
+        - `iso=2026-04-16T09:00:00&source_offset=-05:00`
+
+        Target selector forms:
+        - `tz=America/New_York`
+        - `ip=8.8.8.8`
+        - `lat=40.7128&lon=-74.0060`
+        - `offset=-04:00`
+        - `auto_tz=true`
+        - `utc=true`
+
+        Incompatible combinations:
+        - exactly one input timestamp form
+        - exactly one target selector family
+        - use at most one of `source_tz`, `source_ip`, `source_lat`/`source_lon`, or `source_offset`
+        - local-ISO companion selectors are valid only with `iso=...` that has no explicit offset
+        - bulk is allowed only through one comma-separated `tz`, `ip`, or `offset` selector
+
+        Examples:
+        - Single target: `/v1/time/convert?iso=2026-04-16T09:00:00&source_tz=America/New_York&tz=Europe/London`
+        - Bulk target set: `/v1/time/convert?unix=1711300000&offset=-04:00,+00:00,+09:00`
+      operationId: convertTime
+      parameters:
+      - example: 1711300000
+        explode: true
+        in: query
+        name: unix
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - example: 1711300000000
+        explode: true
+        in: query
+        name: unix_ms
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - description: "ISO-8601 timestamp. To supply a local wall-clock time without\
+          \ an explicit offset, pair it with one of `source_tz=Area/City`, `source_ip=...`,\
+          \ `source_lat=...&source_lon=...`, or `source_offset=±HH:MM`."
+        example: 2024-03-24T15:00:00
+        explode: true
+        in: query
+        name: iso
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+        example: America/New_York
+        explode: true
+        in: query
+        name: source_tz
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+          Resolves that local wall-clock time through the timezone mapped from this
+          IP address.
+        example: 8.8.8.8
+        explode: true
+        in: query
+        name: source_ip
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+          Provide together with `source_lon` to resolve that local wall-clock time
+          through the timezone mapped from these coordinates.
+        example: 40.7128
+        explode: true
+        in: query
+        name: source_lat
+        required: false
+        schema:
+          format: double
+          maximum: 90
+          minimum: -90
+          type: number
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+          Provide together with `source_lat`.
+        example: -74.006
+        explode: true
+        in: query
+        name: source_lon
+        required: false
+        schema:
+          format: double
+          maximum: 180
+          minimum: -180
+          type: number
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+          Interprets that local wall-clock time at this fixed UTC offset.
+        example: -05:00
+        explode: true
+        in: query
+        name: source_offset
+        required: false
+        schema:
+          pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+          type: string
+        style: form
+      - description: "IANA timezone name. On bulk-capable routes, a comma-separated\
+          \ list enables bulk mode."
+        example: America/New_York
+        explode: true
+        in: query
+        name: tz
+        required: false
+        schema:
+          maxLength: 64
+          type: string
+        style: form
+      - description: "IP address. On bulk-capable routes, a comma-separated list enables\
+          \ bulk mode."
+        example: 8.8.8.8
+        explode: true
+        in: query
+        name: ip
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Latitude. Must be provided together with `lon`.
+        example: 40.7128
+        explode: true
+        in: query
+        name: lat
+        required: false
+        schema:
+          format: double
+          maximum: 90
+          minimum: -90
+          type: number
+        style: form
+      - description: Longitude. Must be provided together with `lat`.
+        example: -74.006
+        explode: true
+        in: query
+        name: lon
+        required: false
+        schema:
+          format: double
+          maximum: 180
+          minimum: -180
+          type: number
+        style: form
+      - description: "Fixed UTC offset in `+HH:MM` or `-HH:MM` format. On bulk-capable\
+          \ routes, a comma-separated list enables bulk mode."
+        example: -04:00
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+          type: string
+        style: form
+      - description: Set to `true` to resolve using the caller IP from Cloudflare
+          headers.
+        example: true
+        explode: true
+        in: query
+        name: auto_tz
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: Set to `true` to force UTC on routes that support it.
+        example: true
+        explode: true
+        in: query
+        name: utc
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: "Custom date/time format template using supported `strftime`-style\
+          \ directives such as `%Y-%m-%d %H:%M:%S`. Reference: [strftime](https://strftime.net/)."
+        example: '%Y-%m-%d %H:%M:%S'
+        explode: true
+        in: query
+        name: format
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Set to exactly `true` to ask the gateway to sign the final JSON\
+          \ response. Every authenticated JSON response, including errors, then includes\
+          \ signing headers. Not supported on `/v1/time/clock`."
+        example: true
+        explode: true
+        in: query
+        name: sign
+        required: false
+        schema:
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                singleTarget:
+                  $ref: '#/components/examples/ConvertSingleExample'
+                bulkByOffset:
+                  $ref: '#/components/examples/ConvertBulkExample'
+                bulkPartialFailure:
+                  $ref: '#/components/examples/ConvertBulkPartialFailureExample'
+              schema:
+                $ref: '#/components/schemas/getCurrentTime_200_response'
+          description: Converted time payload or bulk array.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+            X-TimeLogic-Signature:
+              $ref: '#/components/headers/XTimeLogicSignature'
+            X-TimeLogic-Key-Id:
+              $ref: '#/components/headers/XTimeLogicKeyId'
+            X-TimeLogic-Signature-Alg:
+              $ref: '#/components/headers/XTimeLogicSignatureAlg'
+            X-TimeLogic-Signature-Timestamp:
+              $ref: '#/components/headers/XTimeLogicSignatureTimestamp'
+            X-TimeLogic-Content-SHA256:
+              $ref: '#/components/headers/XTimeLogicContentSha256'
+            X-TimeLogic-Signature-Input:
+              $ref: '#/components/headers/XTimeLogicSignatureInput'
+        "400":
+          content:
+            application/json:
+              examples:
+                invalidParameter:
+                  $ref: '#/components/examples/InvalidParameterExample'
+                ambiguousTarget:
+                  $ref: '#/components/examples/AmbiguousTargetExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid or ambiguous request parameters.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "401":
+          content:
+            application/json:
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/UnauthorizedExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Missing or invalid authentication.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: The key or customer subscription is not active.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: The cached monthly quota state is exceeded.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+            X-TimeLogic-Quota-State:
+              $ref: '#/components/headers/XTimeLogicQuotaState'
+        "405":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Only `GET` is supported.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "500":
+          content:
+            application/json:
+              examples:
+                internalError:
+                  $ref: '#/components/examples/InternalErrorExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: "Internal server error, including signing failures."
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "501":
+          content:
+            application/json:
+              examples:
+                dependencyNotReady:
+                  $ref: '#/components/examples/DependencyNotReadyExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: A required resolver or dependency is not configured or not
+            ready.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "502":
+          content:
+            application/json:
+              examples:
+                upstreamFailure:
+                  $ref: '#/components/examples/UpstreamFailureExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Gateway failed to forward the request to the core worker.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+      summary: Convert a timestamp into a target timezone or offset
+      tags:
+      - Time
+      x-accepts:
+      - application/json
+  /v1/time/diff:
+    get:
+      description: |
+        Computes the duration between `from` and `to`.
+
+        Required query fields: `from` and `to` only. Do not send every optional companion field.
+        For each side, choose one supported specifier form. A `from_*` or `to_*` companion is
+        allowed only when that side uses `iso=...` with no explicit offset; use at most one
+        companion selector, except that coordinate input requires its paired latitude and longitude.
+
+        `from` and `to` are embedded specifier strings.
+
+        Accepted specifier forms:
+        - `from=now`
+        - `from=unix=1711300000`
+        - `from=unix_ms=1711300000000`
+        - `from=iso=2026-04-16T09:00:00`
+        - `from=tz=America/New_York`
+        - `from=ip=8.8.8.8`
+        - `from=offset=-05:00`
+        - the same forms are accepted for `to`
+
+        Timezone hint pairings:
+        - `from_tz` only with `from=iso=...` that has no explicit offset
+        - `from_ip`, `from_lat`/`from_lon`, and `from_offset` only with `from=iso=...` that has no explicit offset
+        - `to_tz` only with `to=iso=...` that has no explicit offset
+        - `to_ip`, `to_lat`/`to_lon`, and `to_offset` only with `to=iso=...` that has no explicit offset
+
+        Selector semantics:
+        - `tz=...`, `ip=...`, and `offset=...` inside `from` or `to` mean the current request-time instant resolved through that selector
+        - those selector forms do not represent an arbitrary local wall-clock time
+        - returned duration magnitudes are absolute; use `direction` to see whether `to` is after, before, or the same instant as `from`
+
+        Business-day rules:
+        - `holiday_country` and `holiday_subdivision` require `business_days=true`
+        - `holiday_subdivision` also requires `holiday_country`
+
+        Examples:
+        - Selector-current instant: `/v1/time/diff?from=unix=1711300000&to=tz=America/New_York`
+        - Wall-clock pairing: `/v1/time/diff?from=iso=2026-04-16T09:00:00&from_tz=America/New_York&to=iso=2026-04-16T09:00:00&to_tz=Europe/London`
+        - Wall-clock via selector: `/v1/time/diff?from=iso=2026-01-01T12:00:00&from_ip=8.8.8.8&to=iso=2026-01-01T12:00:00&to_offset=-05:00`
+      operationId: diffTime
+      parameters:
+      - description: "Time specifier. Supported forms are `now`, `unix=<seconds>`,\
+          \ `unix_ms=<milliseconds>`, `iso=<ISO-8601>`, `offset=±HH:MM`, `tz=<IANA\
+          \ timezone>`, and `ip=<IP address>`. For `tz=...`, `ip=...`, and `offset=...`,\
+          \ the specifier means the current request-time instant resolved through\
+          \ that selector. To express a local wall-clock time, use `from=iso=...`\
+          \ together with one of `from_tz`, `from_ip`, `from_lat`+`from_lon`, or `from_offset`."
+        explode: true
+        in: query
+        name: from
+        required: true
+        schema:
+          type: string
+        style: form
+      - description: "Time specifier. Supported forms are `now`, `unix=<seconds>`,\
+          \ `unix_ms=<milliseconds>`, `iso=<ISO-8601>`, `offset=±HH:MM`, `tz=<IANA\
+          \ timezone>`, and `ip=<IP address>`. For `tz=...`, `ip=...`, and `offset=...`,\
+          \ the specifier means the current request-time instant resolved through\
+          \ that selector. To express a local wall-clock time, use `to=iso=...` together\
+          \ with one of `to_tz`, `to_ip`, `to_lat`+`to_lon`, or `to_offset`."
+        explode: true
+        in: query
+        name: to
+        required: true
+        schema:
+          type: string
+        style: form
+      - description: Used only with `from=iso=...` when the ISO value has no explicit
+          offset.
+        explode: true
+        in: query
+        name: from_tz
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Used only with `from=iso=...` when the ISO value has no explicit
+          offset. Resolves that local wall-clock time through the timezone mapped
+          from this IP address.
+        example: 8.8.8.8
+        explode: true
+        in: query
+        name: from_ip
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Used only with `from=iso=...` when the ISO value has no explicit
+          offset. Provide together with `from_lon` to resolve that local wall-clock
+          time through the timezone mapped from these coordinates.
+        example: 40.7128
+        explode: true
+        in: query
+        name: from_lat
+        required: false
+        schema:
+          format: double
+          maximum: 90
+          minimum: -90
+          type: number
+        style: form
+      - description: Used only with `from=iso=...` when the ISO value has no explicit
+          offset. Provide together with `from_lat`.
+        example: -74.006
+        explode: true
+        in: query
+        name: from_lon
+        required: false
+        schema:
+          format: double
+          maximum: 180
+          minimum: -180
+          type: number
+        style: form
+      - description: Used only with `from=iso=...` when the ISO value has no explicit
+          offset. Interprets that local wall-clock time at this fixed UTC offset.
+        example: -05:00
+        explode: true
+        in: query
+        name: from_offset
+        required: false
+        schema:
+          pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+          type: string
+        style: form
+      - description: Used only with `to=iso=...` when the ISO value has no explicit
+          offset.
+        explode: true
+        in: query
+        name: to_tz
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Used only with `to=iso=...` when the ISO value has no explicit
+          offset. Resolves that local wall-clock time through the timezone mapped
+          from this IP address.
+        example: 8.8.8.8
+        explode: true
+        in: query
+        name: to_ip
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Used only with `to=iso=...` when the ISO value has no explicit
+          offset. Provide together with `to_lon` to resolve that local wall-clock
+          time through the timezone mapped from these coordinates.
+        example: 40.7128
+        explode: true
+        in: query
+        name: to_lat
+        required: false
+        schema:
+          format: double
+          maximum: 90
+          minimum: -90
+          type: number
+        style: form
+      - description: Used only with `to=iso=...` when the ISO value has no explicit
+          offset. Provide together with `to_lat`.
+        example: -74.006
+        explode: true
+        in: query
+        name: to_lon
+        required: false
+        schema:
+          format: double
+          maximum: 180
+          minimum: -180
+          type: number
+        style: form
+      - description: Used only with `to=iso=...` when the ISO value has no explicit
+          offset. Interprets that local wall-clock time at this fixed UTC offset.
+        example: -05:00
+        explode: true
+        in: query
+        name: to_offset
+        required: false
+        schema:
+          pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+          type: string
+        style: form
+      - description: "Custom duration format template using `%days`, `%hours`, `%minutes`,\
+          \ and `%seconds`."
+        example: '%daysd %hoursh %minutesm %secondss'
+        explode: true
+        in: query
+        name: format
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Set to `true` to enable weekday/business-day counting.
+        example: true
+        explode: true
+        in: query
+        name: business_days
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: ISO 3166-1 alpha-2 holiday calendar country code. Requires `business_days=true`.
+        example: US
+        explode: true
+        in: query
+        name: holiday_country
+        required: false
+        schema:
+          pattern: "^[A-Z]{2}$"
+          type: string
+        style: form
+      - description: "Holiday calendar subdivision code from the upstream `python-holidays`\
+          \ calendar, for example `CA` or `ENG`. Requires `holiday_country` and `business_days=true`."
+        example: CA
+        explode: true
+        in: query
+        name: holiday_subdivision
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Set to exactly `true` to ask the gateway to sign the final JSON\
+          \ response. Every authenticated JSON response, including errors, then includes\
+          \ signing headers. Not supported on `/v1/time/clock`."
+        example: true
+        explode: true
+        in: query
+        name: sign
+        required: false
+        schema:
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                duration:
+                  $ref: '#/components/examples/DiffExample'
+              schema:
+                $ref: '#/components/schemas/DiffResponse'
+          description: Duration result.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+            X-TimeLogic-Signature:
+              $ref: '#/components/headers/XTimeLogicSignature'
+            X-TimeLogic-Key-Id:
+              $ref: '#/components/headers/XTimeLogicKeyId'
+            X-TimeLogic-Signature-Alg:
+              $ref: '#/components/headers/XTimeLogicSignatureAlg'
+            X-TimeLogic-Signature-Timestamp:
+              $ref: '#/components/headers/XTimeLogicSignatureTimestamp'
+            X-TimeLogic-Content-SHA256:
+              $ref: '#/components/headers/XTimeLogicContentSha256'
+            X-TimeLogic-Signature-Input:
+              $ref: '#/components/headers/XTimeLogicSignatureInput'
+        "400":
+          content:
+            application/json:
+              examples:
+                invalidParameter:
+                  $ref: '#/components/examples/InvalidParameterExample'
+                ambiguousTarget:
+                  $ref: '#/components/examples/AmbiguousTargetExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid or ambiguous request parameters.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "401":
+          content:
+            application/json:
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/UnauthorizedExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Missing or invalid authentication.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: The key or customer subscription is not active.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: The cached monthly quota state is exceeded.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+            X-TimeLogic-Quota-State:
+              $ref: '#/components/headers/XTimeLogicQuotaState'
+        "405":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Only `GET` is supported.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "500":
+          content:
+            application/json:
+              examples:
+                internalError:
+                  $ref: '#/components/examples/InternalErrorExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: "Internal server error, including signing failures."
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "501":
+          content:
+            application/json:
+              examples:
+                dependencyNotReady:
+                  $ref: '#/components/examples/DependencyNotReadyExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: A required resolver or dependency is not configured or not
+            ready.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "502":
+          content:
+            application/json:
+              examples:
+                upstreamFailure:
+                  $ref: '#/components/examples/UpstreamFailureExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Gateway failed to forward the request to the core worker.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+      summary: Difference between two instants
+      tags:
+      - Time
+      x-accepts:
+      - application/json
+  /v1/time/add:
+    get:
+      description: |
+        Adds `seconds`, `minutes`, `hours`, and `days` to an optional base timestamp.
+
+        Input timestamp forms:
+        - `unix=1711300000`
+        - `unix_ms=1711300000000`
+        - `iso=2026-04-16T09:00:00Z`
+        - `iso=2026-04-16T09:00:00&source_tz=America/New_York`
+        - `iso=2026-04-16T09:00:00&source_ip=8.8.8.8`
+        - `iso=2026-04-16T09:00:00&source_lat=40.7128&source_lon=-74.0060`
+        - `iso=2026-04-16T09:00:00&source_offset=-05:00`
+        - if no input timestamp is provided, the base timestamp defaults to the request time
+
+        Modifiers:
+        - `seconds=30`
+        - `minutes=15`
+        - `hours=2`
+        - `days=7`
+
+        Target selector forms:
+        - `tz=America/New_York`
+        - `ip=8.8.8.8`
+        - `lat=40.7128&lon=-74.0060`
+        - `offset=-04:00`
+        - `auto_tz=true`
+        - `utc=true`
+
+        Incompatible combinations:
+        - at most one input timestamp form
+        - at most one target selector family
+        - use at most one of `source_tz`, `source_ip`, `source_lat`/`source_lon`, or `source_offset`
+        - local-ISO companion selectors are valid only with `iso=...` that has no explicit offset
+        - bulk is not supported on this route
+
+        Examples:
+        - `/v1/time/add?iso=2026-04-16T09:00:00&source_tz=America/New_York&days=1&tz=Europe/London`
+        - `/v1/time/add?minutes=30&utc=true`
+      operationId: addTime
+      parameters:
+      - example: 1711300000
+        explode: true
+        in: query
+        name: unix
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - example: 1711300000000
+        explode: true
+        in: query
+        name: unix_ms
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - description: "ISO-8601 timestamp. To supply a local wall-clock time without\
+          \ an explicit offset, pair it with one of `source_tz=Area/City`, `source_ip=...`,\
+          \ `source_lat=...&source_lon=...`, or `source_offset=±HH:MM`."
+        example: 2024-03-24T15:00:00
+        explode: true
+        in: query
+        name: iso
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+        example: America/New_York
+        explode: true
+        in: query
+        name: source_tz
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+          Resolves that local wall-clock time through the timezone mapped from this
+          IP address.
+        example: 8.8.8.8
+        explode: true
+        in: query
+        name: source_ip
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+          Provide together with `source_lon` to resolve that local wall-clock time
+          through the timezone mapped from these coordinates.
+        example: 40.7128
+        explode: true
+        in: query
+        name: source_lat
+        required: false
+        schema:
+          format: double
+          maximum: 90
+          minimum: -90
+          type: number
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+          Provide together with `source_lat`.
+        example: -74.006
+        explode: true
+        in: query
+        name: source_lon
+        required: false
+        schema:
+          format: double
+          maximum: 180
+          minimum: -180
+          type: number
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+          Interprets that local wall-clock time at this fixed UTC offset.
+        example: -05:00
+        explode: true
+        in: query
+        name: source_offset
+        required: false
+        schema:
+          pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+          type: string
+        style: form
+      - example: 30
+        explode: true
+        in: query
+        name: seconds
+        required: false
+        schema:
+          type: integer
+        style: form
+      - example: 15
+        explode: true
+        in: query
+        name: minutes
+        required: false
+        schema:
+          type: integer
+        style: form
+      - example: 2
+        explode: true
+        in: query
+        name: hours
+        required: false
+        schema:
+          type: integer
+        style: form
+      - example: 7
+        explode: true
+        in: query
+        name: days
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: "IANA timezone name. On bulk-capable routes, a comma-separated\
+          \ list enables bulk mode."
+        example: America/New_York
+        explode: true
+        in: query
+        name: tz
+        required: false
+        schema:
+          maxLength: 64
+          type: string
+        style: form
+      - description: "IP address. On bulk-capable routes, a comma-separated list enables\
+          \ bulk mode."
+        example: 8.8.8.8
+        explode: true
+        in: query
+        name: ip
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Latitude. Must be provided together with `lon`.
+        example: 40.7128
+        explode: true
+        in: query
+        name: lat
+        required: false
+        schema:
+          format: double
+          maximum: 90
+          minimum: -90
+          type: number
+        style: form
+      - description: Longitude. Must be provided together with `lat`.
+        example: -74.006
+        explode: true
+        in: query
+        name: lon
+        required: false
+        schema:
+          format: double
+          maximum: 180
+          minimum: -180
+          type: number
+        style: form
+      - description: "Fixed UTC offset in `+HH:MM` or `-HH:MM` format. On bulk-capable\
+          \ routes, a comma-separated list enables bulk mode."
+        example: -04:00
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+          type: string
+        style: form
+      - description: Set to `true` to resolve using the caller IP from Cloudflare
+          headers.
+        example: true
+        explode: true
+        in: query
+        name: auto_tz
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: Set to `true` to force UTC on routes that support it.
+        example: true
+        explode: true
+        in: query
+        name: utc
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: "Custom date/time format template using supported `strftime`-style\
+          \ directives such as `%Y-%m-%d %H:%M:%S`. Reference: [strftime](https://strftime.net/)."
+        example: '%Y-%m-%d %H:%M:%S'
+        explode: true
+        in: query
+        name: format
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Set to exactly `true` to ask the gateway to sign the final JSON\
+          \ response. Every authenticated JSON response, including errors, then includes\
+          \ signing headers. Not supported on `/v1/time/clock`."
+        example: true
+        explode: true
+        in: query
+        name: sign
+        required: false
+        schema:
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                adjustedTime:
+                  $ref: '#/components/examples/AddExample'
+              schema:
+                $ref: '#/components/schemas/TimePayload'
+          description: Adjusted timestamp payload.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+            X-TimeLogic-Signature:
+              $ref: '#/components/headers/XTimeLogicSignature'
+            X-TimeLogic-Key-Id:
+              $ref: '#/components/headers/XTimeLogicKeyId'
+            X-TimeLogic-Signature-Alg:
+              $ref: '#/components/headers/XTimeLogicSignatureAlg'
+            X-TimeLogic-Signature-Timestamp:
+              $ref: '#/components/headers/XTimeLogicSignatureTimestamp'
+            X-TimeLogic-Content-SHA256:
+              $ref: '#/components/headers/XTimeLogicContentSha256'
+            X-TimeLogic-Signature-Input:
+              $ref: '#/components/headers/XTimeLogicSignatureInput'
+        "400":
+          content:
+            application/json:
+              examples:
+                invalidParameter:
+                  $ref: '#/components/examples/InvalidParameterExample'
+                ambiguousTarget:
+                  $ref: '#/components/examples/AmbiguousTargetExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid or ambiguous request parameters.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "401":
+          content:
+            application/json:
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/UnauthorizedExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Missing or invalid authentication.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: The key or customer subscription is not active.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: The cached monthly quota state is exceeded.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+            X-TimeLogic-Quota-State:
+              $ref: '#/components/headers/XTimeLogicQuotaState'
+        "405":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Only `GET` is supported.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "500":
+          content:
+            application/json:
+              examples:
+                internalError:
+                  $ref: '#/components/examples/InternalErrorExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: "Internal server error, including signing failures."
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "501":
+          content:
+            application/json:
+              examples:
+                dependencyNotReady:
+                  $ref: '#/components/examples/DependencyNotReadyExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: A required resolver or dependency is not configured or not
+            ready.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "502":
+          content:
+            application/json:
+              examples:
+                upstreamFailure:
+                  $ref: '#/components/examples/UpstreamFailureExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Gateway failed to forward the request to the core worker.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+      summary: Add modifiers to a timestamp
+      tags:
+      - Time
+      x-accepts:
+      - application/json
+  /v1/time/calendar:
+    get:
+      description: |
+        Returns calendar fields for an optional timestamp and target.
+
+        Input timestamp forms:
+        - `unix=1711300000`
+        - `unix_ms=1711300000000`
+        - `iso=2026-04-16T09:00:00Z`
+        - `iso=2026-04-16T09:00:00&source_tz=America/New_York`
+        - `iso=2026-04-16T09:00:00&source_ip=8.8.8.8`
+        - `iso=2026-04-16T09:00:00&source_lat=40.7128&source_lon=-74.0060`
+        - `iso=2026-04-16T09:00:00&source_offset=-05:00`
+        - if no input timestamp is provided, the request time is used
+
+        Target selector forms:
+        - `tz=America/New_York`
+        - `ip=8.8.8.8`
+        - `lat=40.7128&lon=-74.0060`
+        - `offset=-04:00`
+        - `auto_tz=true`
+
+        Additional flags:
+        - `week=true` adds `week_number`
+
+        Incompatible combinations:
+        - at most one input timestamp form
+        - at most one target selector family
+        - use at most one of `source_tz`, `source_ip`, `source_lat`/`source_lon`, or `source_offset`
+        - local-ISO companion selectors are valid only with `iso=...` that has no explicit offset
+        - bulk is not supported on this route
+
+        Examples:
+        - `/v1/time/calendar?iso=2026-04-16T09:00:00&source_tz=America/New_York&tz=Europe/London&week=true`
+        - `/v1/time/calendar?unix=1711300000&auto_tz=true`
+      operationId: getCalendar
+      parameters:
+      - example: 1711300000
+        explode: true
+        in: query
+        name: unix
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - example: 1711300000000
+        explode: true
+        in: query
+        name: unix_ms
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - description: "ISO-8601 timestamp. To supply a local wall-clock time without\
+          \ an explicit offset, pair it with one of `source_tz=Area/City`, `source_ip=...`,\
+          \ `source_lat=...&source_lon=...`, or `source_offset=±HH:MM`."
+        example: 2024-03-24T15:00:00
+        explode: true
+        in: query
+        name: iso
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+        example: America/New_York
+        explode: true
+        in: query
+        name: source_tz
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+          Resolves that local wall-clock time through the timezone mapped from this
+          IP address.
+        example: 8.8.8.8
+        explode: true
+        in: query
+        name: source_ip
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+          Provide together with `source_lon` to resolve that local wall-clock time
+          through the timezone mapped from these coordinates.
+        example: 40.7128
+        explode: true
+        in: query
+        name: source_lat
+        required: false
+        schema:
+          format: double
+          maximum: 90
+          minimum: -90
+          type: number
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+          Provide together with `source_lat`.
+        example: -74.006
+        explode: true
+        in: query
+        name: source_lon
+        required: false
+        schema:
+          format: double
+          maximum: 180
+          minimum: -180
+          type: number
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+          Interprets that local wall-clock time at this fixed UTC offset.
+        example: -05:00
+        explode: true
+        in: query
+        name: source_offset
+        required: false
+        schema:
+          pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+          type: string
+        style: form
+      - description: "IANA timezone name. On bulk-capable routes, a comma-separated\
+          \ list enables bulk mode."
+        example: America/New_York
+        explode: true
+        in: query
+        name: tz
+        required: false
+        schema:
+          maxLength: 64
+          type: string
+        style: form
+      - description: "IP address. On bulk-capable routes, a comma-separated list enables\
+          \ bulk mode."
+        example: 8.8.8.8
+        explode: true
+        in: query
+        name: ip
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Latitude. Must be provided together with `lon`.
+        example: 40.7128
+        explode: true
+        in: query
+        name: lat
+        required: false
+        schema:
+          format: double
+          maximum: 90
+          minimum: -90
+          type: number
+        style: form
+      - description: Longitude. Must be provided together with `lat`.
+        example: -74.006
+        explode: true
+        in: query
+        name: lon
+        required: false
+        schema:
+          format: double
+          maximum: 180
+          minimum: -180
+          type: number
+        style: form
+      - description: "Fixed UTC offset in `+HH:MM` or `-HH:MM` format. On bulk-capable\
+          \ routes, a comma-separated list enables bulk mode."
+        example: -04:00
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+          type: string
+        style: form
+      - description: Set to `true` to resolve using the caller IP from Cloudflare
+          headers.
+        example: true
+        explode: true
+        in: query
+        name: auto_tz
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: "Custom date/time format template using supported `strftime`-style\
+          \ directives such as `%Y-%m-%d %H:%M:%S`. Reference: [strftime](https://strftime.net/)."
+        example: '%Y-%m-%d %H:%M:%S'
+        explode: true
+        in: query
+        name: format
+        required: false
+        schema:
+          type: string
+        style: form
+      - example: true
+        explode: true
+        in: query
+        name: week
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: "Set to exactly `true` to ask the gateway to sign the final JSON\
+          \ response. Every authenticated JSON response, including errors, then includes\
+          \ signing headers. Not supported on `/v1/time/clock`."
+        example: true
+        explode: true
+        in: query
+        name: sign
+        required: false
+        schema:
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                calendarProjection:
+                  $ref: '#/components/examples/CalendarExample'
+              schema:
+                $ref: '#/components/schemas/CalendarResponse'
+          description: Calendar payload.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+            X-TimeLogic-Signature:
+              $ref: '#/components/headers/XTimeLogicSignature'
+            X-TimeLogic-Key-Id:
+              $ref: '#/components/headers/XTimeLogicKeyId'
+            X-TimeLogic-Signature-Alg:
+              $ref: '#/components/headers/XTimeLogicSignatureAlg'
+            X-TimeLogic-Signature-Timestamp:
+              $ref: '#/components/headers/XTimeLogicSignatureTimestamp'
+            X-TimeLogic-Content-SHA256:
+              $ref: '#/components/headers/XTimeLogicContentSha256'
+            X-TimeLogic-Signature-Input:
+              $ref: '#/components/headers/XTimeLogicSignatureInput'
+        "400":
+          content:
+            application/json:
+              examples:
+                invalidParameter:
+                  $ref: '#/components/examples/InvalidParameterExample'
+                ambiguousTarget:
+                  $ref: '#/components/examples/AmbiguousTargetExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid or ambiguous request parameters.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "401":
+          content:
+            application/json:
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/UnauthorizedExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Missing or invalid authentication.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: The key or customer subscription is not active.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: The cached monthly quota state is exceeded.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+            X-TimeLogic-Quota-State:
+              $ref: '#/components/headers/XTimeLogicQuotaState'
+        "405":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Only `GET` is supported.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "500":
+          content:
+            application/json:
+              examples:
+                internalError:
+                  $ref: '#/components/examples/InternalErrorExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: "Internal server error, including signing failures."
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "501":
+          content:
+            application/json:
+              examples:
+                dependencyNotReady:
+                  $ref: '#/components/examples/DependencyNotReadyExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: A required resolver or dependency is not configured or not
+            ready.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "502":
+          content:
+            application/json:
+              examples:
+                upstreamFailure:
+                  $ref: '#/components/examples/UpstreamFailureExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Gateway failed to forward the request to the core worker.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+      summary: Calendar projection for a target instant
+      tags:
+      - Time
+      x-accepts:
+      - application/json
+  /v1/time/dst:
+    get:
+      description: |-
+        Returns daylight-saving status for the selected target.
+
+        Target selector rules:
+        - Use at most one selector family: `tz`, `ip`, `lat` + `lon`, `offset`, or `auto_tz=true`.
+        - If no selector is provided, the response defaults to UTC.
+        - Bulk is not supported on this route.
+        - `next=true` adds `next_transition` when the resolver provides a transition timestamp.
+
+        Example:
+        - `/v1/time/dst?tz=America/New_York&next=true`
+      operationId: getDst
+      parameters:
+      - description: "IANA timezone name. On bulk-capable routes, a comma-separated\
+          \ list enables bulk mode."
+        example: America/New_York
+        explode: true
+        in: query
+        name: tz
+        required: false
+        schema:
+          maxLength: 64
+          type: string
+        style: form
+      - description: "IP address. On bulk-capable routes, a comma-separated list enables\
+          \ bulk mode."
+        example: 8.8.8.8
+        explode: true
+        in: query
+        name: ip
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Latitude. Must be provided together with `lon`.
+        example: 40.7128
+        explode: true
+        in: query
+        name: lat
+        required: false
+        schema:
+          format: double
+          maximum: 90
+          minimum: -90
+          type: number
+        style: form
+      - description: Longitude. Must be provided together with `lat`.
+        example: -74.006
+        explode: true
+        in: query
+        name: lon
+        required: false
+        schema:
+          format: double
+          maximum: 180
+          minimum: -180
+          type: number
+        style: form
+      - description: "Fixed UTC offset in `+HH:MM` or `-HH:MM` format. On bulk-capable\
+          \ routes, a comma-separated list enables bulk mode."
+        example: -04:00
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+          type: string
+        style: form
+      - description: Set to `true` to resolve using the caller IP from Cloudflare
+          headers.
+        example: true
+        explode: true
+        in: query
+        name: auto_tz
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: "Custom date/time format template using supported `strftime`-style\
+          \ directives such as `%Y-%m-%d %H:%M:%S`. Reference: [strftime](https://strftime.net/)."
+        example: '%Y-%m-%d %H:%M:%S'
+        explode: true
+        in: query
+        name: format
+        required: false
+        schema:
+          type: string
+        style: form
+      - example: true
+        explode: true
+        in: query
+        name: next
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: "Set to exactly `true` to ask the gateway to sign the final JSON\
+          \ response. Every authenticated JSON response, including errors, then includes\
+          \ signing headers. Not supported on `/v1/time/clock`."
+        example: true
+        explode: true
+        in: query
+        name: sign
+        required: false
+        schema:
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                dstStatus:
+                  $ref: '#/components/examples/DstExample'
+              schema:
+                $ref: '#/components/schemas/DstResponse'
+          description: DST payload.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+            X-TimeLogic-Signature:
+              $ref: '#/components/headers/XTimeLogicSignature'
+            X-TimeLogic-Key-Id:
+              $ref: '#/components/headers/XTimeLogicKeyId'
+            X-TimeLogic-Signature-Alg:
+              $ref: '#/components/headers/XTimeLogicSignatureAlg'
+            X-TimeLogic-Signature-Timestamp:
+              $ref: '#/components/headers/XTimeLogicSignatureTimestamp'
+            X-TimeLogic-Content-SHA256:
+              $ref: '#/components/headers/XTimeLogicContentSha256'
+            X-TimeLogic-Signature-Input:
+              $ref: '#/components/headers/XTimeLogicSignatureInput'
+        "400":
+          content:
+            application/json:
+              examples:
+                invalidParameter:
+                  $ref: '#/components/examples/InvalidParameterExample'
+                ambiguousTarget:
+                  $ref: '#/components/examples/AmbiguousTargetExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid or ambiguous request parameters.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "401":
+          content:
+            application/json:
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/UnauthorizedExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Missing or invalid authentication.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: The key or customer subscription is not active.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: The cached monthly quota state is exceeded.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+            X-TimeLogic-Quota-State:
+              $ref: '#/components/headers/XTimeLogicQuotaState'
+        "405":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Only `GET` is supported.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "500":
+          content:
+            application/json:
+              examples:
+                internalError:
+                  $ref: '#/components/examples/InternalErrorExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: "Internal server error, including signing failures."
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "501":
+          content:
+            application/json:
+              examples:
+                dependencyNotReady:
+                  $ref: '#/components/examples/DependencyNotReadyExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: A required resolver or dependency is not configured or not
+            ready.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "502":
+          content:
+            application/json:
+              examples:
+                upstreamFailure:
+                  $ref: '#/components/examples/UpstreamFailureExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Gateway failed to forward the request to the core worker.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+      summary: Daylight-saving status for a target
+      tags:
+      - Time
+      x-accepts:
+      - application/json
+  /v1/time/clock:
+    get:
+      description: |
+        Returns an embeddable HTML clock fragment.
+
+        Input timestamp forms:
+        - `unix=1711300000`
+        - `unix_ms=1711300000000`
+        - `iso=2026-04-16T09:00:00Z`
+        - `iso=2026-04-16T09:00:00&source_tz=America/New_York`
+
+        Target selector forms:
+        - `tz=America/New_York`
+        - `ip=8.8.8.8`
+        - `lat=40.7128&lon=-74.0060`
+        - `offset=-04:00`
+
+        Incompatible combinations:
+        - `style` is required and must be one of the 30 names in the `style` enum
+        - at most one input timestamp form
+        - at most one target selector family
+        - use at most one of `source_tz`, `source_ip`, `source_lat`/`source_lon`, or `source_offset`
+        - local-ISO companion selectors are valid only with `iso=...` that has no explicit offset
+        - this route is single-target only; comma-separated `tz`, `ip`, and `offset` values are rejected
+        - `auto_tz` is not supported on this route
+        - `sign` is not supported on this route
+
+        Examples:
+        - Digital: `/v1/time/clock?style=digital-dashboard&iso=2026-04-16T09:00:00&source_tz=America/New_York&tz=Europe/London`
+        - Analog: `/v1/time/clock?style=analog-station&offset=-04:00`
+      operationId: getClock
+      parameters:
+      - description: Clock style name. Valid values are enumerated here; there is
+          no separate style discovery endpoint.
+        explode: true
+        in: query
+        name: style
+        required: true
+        schema:
+          enum:
+          - analog-station
+          - analog-aviation
+          - analog-bauhaus
+          - analog-graphite
+          - analog-arctic
+          - analog-brass
+          - analog-marine
+          - analog-grid
+          - analog-slate
+          - analog-executive
+          - digital-segment-red
+          - digital-segment-amber
+          - digital-segment-ice
+          - digital-terminal-green
+          - digital-terminal-white
+          - digital-broadcast
+          - digital-dashboard
+          - digital-control-room
+          - digital-slate
+          - digital-onyx
+          - digital-frost
+          - digital-card
+          - digital-glass
+          - digital-matrix
+          - digital-timetable
+          - digital-split-flap
+          - digital-cyan
+          - digital-emerald
+          - digital-monolith
+          - digital-minimal
+          type: string
+        style: form
+      - example: 1711300000
+        explode: true
+        in: query
+        name: unix
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - example: 1711300000000
+        explode: true
+        in: query
+        name: unix_ms
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - description: "ISO-8601 timestamp. To supply a local wall-clock time without\
+          \ an explicit offset, pair it with one of `source_tz=Area/City`, `source_ip=...`,\
+          \ `source_lat=...&source_lon=...`, or `source_offset=±HH:MM`."
+        example: 2024-03-24T15:00:00
+        explode: true
+        in: query
+        name: iso
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+        example: America/New_York
+        explode: true
+        in: query
+        name: source_tz
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+          Resolves that local wall-clock time through the timezone mapped from this
+          IP address.
+        example: 8.8.8.8
+        explode: true
+        in: query
+        name: source_ip
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+          Provide together with `source_lon` to resolve that local wall-clock time
+          through the timezone mapped from these coordinates.
+        example: 40.7128
+        explode: true
+        in: query
+        name: source_lat
+        required: false
+        schema:
+          format: double
+          maximum: 90
+          minimum: -90
+          type: number
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+          Provide together with `source_lat`.
+        example: -74.006
+        explode: true
+        in: query
+        name: source_lon
+        required: false
+        schema:
+          format: double
+          maximum: 180
+          minimum: -180
+          type: number
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+          Interprets that local wall-clock time at this fixed UTC offset.
+        example: -05:00
+        explode: true
+        in: query
+        name: source_offset
+        required: false
+        schema:
+          pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+          type: string
+        style: form
+      - description: "IANA timezone name. On bulk-capable routes, a comma-separated\
+          \ list enables bulk mode."
+        example: America/New_York
+        explode: true
+        in: query
+        name: tz
+        required: false
+        schema:
+          maxLength: 64
+          type: string
+        style: form
+      - description: "IP address. On bulk-capable routes, a comma-separated list enables\
+          \ bulk mode."
+        example: 8.8.8.8
+        explode: true
+        in: query
+        name: ip
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Latitude. Must be provided together with `lon`.
+        example: 40.7128
+        explode: true
+        in: query
+        name: lat
+        required: false
+        schema:
+          format: double
+          maximum: 90
+          minimum: -90
+          type: number
+        style: form
+      - description: Longitude. Must be provided together with `lat`.
+        example: -74.006
+        explode: true
+        in: query
+        name: lon
+        required: false
+        schema:
+          format: double
+          maximum: 180
+          minimum: -180
+          type: number
+        style: form
+      - description: "Fixed UTC offset in `+HH:MM` or `-HH:MM` format. On bulk-capable\
+          \ routes, a comma-separated list enables bulk mode."
+        example: -04:00
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+          type: string
+        style: form
+      - description: "Custom date/time format template using supported `strftime`-style\
+          \ directives such as `%Y-%m-%d %H:%M:%S`. Reference: [strftime](https://strftime.net/)."
+        example: '%Y-%m-%d %H:%M:%S'
+        explode: true
+        in: query
+        name: format
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            text/html:
+              examples:
+                digitalDashboard:
+                  $ref: '#/components/examples/ClockDigitalHtmlExample'
+                analogStation:
+                  $ref: '#/components/examples/ClockAnalogHtmlExample'
+              schema:
+                type: string
+          description: Embeddable HTML clock fragment.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+            Cache-Control:
+              description: Clock HTML is uncached so the bootstrap always reflects
+                the current request.
+              example: no-store
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "400":
+          content:
+            application/json:
+              examples:
+                invalidStyle:
+                  $ref: '#/components/examples/ClockInvalidStyleExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid clock style or unsupported selector combination.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "401":
+          content:
+            application/json:
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/UnauthorizedExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Missing or invalid authentication.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: The key or customer subscription is not active.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: The cached monthly quota state is exceeded.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+            X-TimeLogic-Quota-State:
+              $ref: '#/components/headers/XTimeLogicQuotaState'
+        "405":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Only `GET` is supported.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "500":
+          content:
+            application/json:
+              examples:
+                internalError:
+                  $ref: '#/components/examples/InternalErrorExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: "Internal server error, including signing failures."
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "501":
+          content:
+            application/json:
+              examples:
+                dependencyNotReady:
+                  $ref: '#/components/examples/DependencyNotReadyExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: A required resolver or dependency is not configured or not
+            ready.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "502":
+          content:
+            application/json:
+              examples:
+                upstreamFailure:
+                  $ref: '#/components/examples/UpstreamFailureExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Gateway failed to forward the request to the core worker.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+      summary: Render a live HTML clock
+      tags:
+      - Time
+      x-accepts:
+      - application/json
+      - text/html
+  /v1/time/elapsed:
+    get:
+      description: |
+        Computes elapsed or remaining duration relative to one required reference timestamp.
+
+        Reference timestamp forms:
+        - `unix=1711300000`
+        - `unix_ms=1711300000000`
+        - `iso=2026-04-16T09:00:00Z`
+        - `iso=2026-04-16T09:00:00&source_tz=America/New_York`
+        - `iso=2026-04-16T09:00:00&source_ip=8.8.8.8`
+        - `iso=2026-04-16T09:00:00&source_lat=40.7128&source_lon=-74.0060`
+        - `iso=2026-04-16T09:00:00&source_offset=-05:00`
+
+        Compare timestamp forms:
+        - `compare_unix=1711213600`
+        - `compare_unix_ms=1711213600000`
+        - `compare_iso=2026-04-16T09:00:00Z`
+        - `compare_iso=2026-04-16T09:00:00&compare_source_tz=Europe/London`
+        - `compare_iso=2026-04-16T09:00:00&compare_source_ip=8.8.8.8`
+        - `compare_iso=2026-04-16T09:00:00&compare_source_lat=40.7128&compare_source_lon=-74.0060`
+        - `compare_iso=2026-04-16T09:00:00&compare_source_offset=-05:00`
+
+        Compare selector forms:
+        - `tz=America/New_York`
+        - `ip=8.8.8.8`
+        - `lat=40.7128&lon=-74.0060`
+        - `offset=-04:00`
+        - `auto_tz=true`
+
+        Incompatible combinations:
+        - exactly one reference timestamp form
+        - use either one compare timestamp form or one compare selector family, not both
+        - use at most one of `source_tz`, `source_ip`, `source_lat`/`source_lon`, or `source_offset`
+        - use at most one of `compare_source_tz`, `compare_source_ip`, `compare_source_lat`/`compare_source_lon`, or `compare_source_offset`
+        - local-ISO companion selectors are valid only with `iso=...` that has no explicit offset
+        - compare local-ISO companion selectors are valid only with `compare_iso=...` that has no explicit offset
+        - if no compare input is provided, the comparison defaults to the request time
+
+        Business-day rules:
+        - `holiday_country` and `holiday_subdivision` require `business_days=true`
+        - `holiday_subdivision` also requires `holiday_country`
+
+        Examples:
+        - Timestamp-to-timestamp: `/v1/time/elapsed?iso=2026-04-16T09:00:00&source_tz=America/New_York&compare_iso=2026-04-16T09:00:00&compare_source_tz=Europe/London`
+        - Timestamp-to-selector: `/v1/time/elapsed?unix=1711300000&tz=America/New_York&business_days=true`
+      operationId: getElapsed
+      parameters:
+      - example: 1711300000
+        explode: true
+        in: query
+        name: unix
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - example: 1711300000000
+        explode: true
+        in: query
+        name: unix_ms
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - description: "ISO-8601 timestamp. To supply a local wall-clock time without\
+          \ an explicit offset, pair it with one of `source_tz=Area/City`, `source_ip=...`,\
+          \ `source_lat=...&source_lon=...`, or `source_offset=±HH:MM`."
+        example: 2024-03-24T15:00:00
+        explode: true
+        in: query
+        name: iso
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+        example: America/New_York
+        explode: true
+        in: query
+        name: source_tz
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+          Resolves that local wall-clock time through the timezone mapped from this
+          IP address.
+        example: 8.8.8.8
+        explode: true
+        in: query
+        name: source_ip
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+          Provide together with `source_lon` to resolve that local wall-clock time
+          through the timezone mapped from these coordinates.
+        example: 40.7128
+        explode: true
+        in: query
+        name: source_lat
+        required: false
+        schema:
+          format: double
+          maximum: 90
+          minimum: -90
+          type: number
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+          Provide together with `source_lat`.
+        example: -74.006
+        explode: true
+        in: query
+        name: source_lon
+        required: false
+        schema:
+          format: double
+          maximum: 180
+          minimum: -180
+          type: number
+        style: form
+      - description: Used only with `iso=...` when the ISO value has no explicit offset.
+          Interprets that local wall-clock time at this fixed UTC offset.
+        example: -05:00
+        explode: true
+        in: query
+        name: source_offset
+        required: false
+        schema:
+          pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+          type: string
+        style: form
+      - example: 1711213600
+        explode: true
+        in: query
+        name: compare_unix
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - example: 1711213600000
+        explode: true
+        in: query
+        name: compare_unix_ms
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - description: "ISO-8601 comparison timestamp. To supply a local wall-clock\
+          \ time without an explicit offset, pair it with one of `compare_source_tz=Area/City`,\
+          \ `compare_source_ip=...`, `compare_source_lat=...&compare_source_lon=...`,\
+          \ or `compare_source_offset=±HH:MM`."
+        example: 2024-03-23T15:00:00
+        explode: true
+        in: query
+        name: compare_iso
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Used only with `compare_iso=...` when the ISO value has no explicit
+          offset.
+        example: America/New_York
+        explode: true
+        in: query
+        name: compare_source_tz
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Used only with `compare_iso=...` when the ISO value has no explicit
+          offset. Resolves that local wall-clock time through the timezone mapped
+          from this IP address.
+        example: 8.8.8.8
+        explode: true
+        in: query
+        name: compare_source_ip
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Used only with `compare_iso=...` when the ISO value has no explicit
+          offset. Provide together with `compare_source_lon` to resolve that local
+          wall-clock time through the timezone mapped from these coordinates.
+        example: 40.7128
+        explode: true
+        in: query
+        name: compare_source_lat
+        required: false
+        schema:
+          format: double
+          maximum: 90
+          minimum: -90
+          type: number
+        style: form
+      - description: Used only with `compare_iso=...` when the ISO value has no explicit
+          offset. Provide together with `compare_source_lat`.
+        example: -74.006
+        explode: true
+        in: query
+        name: compare_source_lon
+        required: false
+        schema:
+          format: double
+          maximum: 180
+          minimum: -180
+          type: number
+        style: form
+      - description: Used only with `compare_iso=...` when the ISO value has no explicit
+          offset. Interprets that local wall-clock time at this fixed UTC offset.
+        example: -05:00
+        explode: true
+        in: query
+        name: compare_source_offset
+        required: false
+        schema:
+          pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+          type: string
+        style: form
+      - description: "IANA timezone name. On bulk-capable routes, a comma-separated\
+          \ list enables bulk mode."
+        example: America/New_York
+        explode: true
+        in: query
+        name: tz
+        required: false
+        schema:
+          maxLength: 64
+          type: string
+        style: form
+      - description: "IP address. On bulk-capable routes, a comma-separated list enables\
+          \ bulk mode."
+        example: 8.8.8.8
+        explode: true
+        in: query
+        name: ip
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Latitude. Must be provided together with `lon`.
+        example: 40.7128
+        explode: true
+        in: query
+        name: lat
+        required: false
+        schema:
+          format: double
+          maximum: 90
+          minimum: -90
+          type: number
+        style: form
+      - description: Longitude. Must be provided together with `lat`.
+        example: -74.006
+        explode: true
+        in: query
+        name: lon
+        required: false
+        schema:
+          format: double
+          maximum: 180
+          minimum: -180
+          type: number
+        style: form
+      - description: "Fixed UTC offset in `+HH:MM` or `-HH:MM` format. On bulk-capable\
+          \ routes, a comma-separated list enables bulk mode."
+        example: -04:00
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+          type: string
+        style: form
+      - description: Set to `true` to resolve using the caller IP from Cloudflare
+          headers.
+        example: true
+        explode: true
+        in: query
+        name: auto_tz
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: "Custom duration format template using `%days`, `%hours`, `%minutes`,\
+          \ and `%seconds`."
+        example: '%daysd %hoursh %minutesm %secondss'
+        explode: true
+        in: query
+        name: format
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Set to `true` to enable weekday/business-day counting.
+        example: true
+        explode: true
+        in: query
+        name: business_days
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: ISO 3166-1 alpha-2 holiday calendar country code. Requires `business_days=true`.
+        example: US
+        explode: true
+        in: query
+        name: holiday_country
+        required: false
+        schema:
+          pattern: "^[A-Z]{2}$"
+          type: string
+        style: form
+      - description: "Holiday calendar subdivision code from the upstream `python-holidays`\
+          \ calendar, for example `CA` or `ENG`. Requires `holiday_country` and `business_days=true`."
+        example: CA
+        explode: true
+        in: query
+        name: holiday_subdivision
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Set to exactly `true` to ask the gateway to sign the final JSON\
+          \ response. Every authenticated JSON response, including errors, then includes\
+          \ signing headers. Not supported on `/v1/time/clock`."
+        example: true
+        explode: true
+        in: query
+        name: sign
+        required: false
+        schema:
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                remainingDuration:
+                  $ref: '#/components/examples/ElapsedExample'
+              schema:
+                $ref: '#/components/schemas/ElapsedResponse'
+          description: Elapsed-duration result.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+            X-TimeLogic-Signature:
+              $ref: '#/components/headers/XTimeLogicSignature'
+            X-TimeLogic-Key-Id:
+              $ref: '#/components/headers/XTimeLogicKeyId'
+            X-TimeLogic-Signature-Alg:
+              $ref: '#/components/headers/XTimeLogicSignatureAlg'
+            X-TimeLogic-Signature-Timestamp:
+              $ref: '#/components/headers/XTimeLogicSignatureTimestamp'
+            X-TimeLogic-Content-SHA256:
+              $ref: '#/components/headers/XTimeLogicContentSha256'
+            X-TimeLogic-Signature-Input:
+              $ref: '#/components/headers/XTimeLogicSignatureInput'
+        "400":
+          content:
+            application/json:
+              examples:
+                invalidParameter:
+                  $ref: '#/components/examples/InvalidParameterExample'
+                ambiguousTarget:
+                  $ref: '#/components/examples/AmbiguousTargetExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid or ambiguous request parameters.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "401":
+          content:
+            application/json:
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/UnauthorizedExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Missing or invalid authentication.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: The key or customer subscription is not active.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: The cached monthly quota state is exceeded.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+            X-TimeLogic-Quota-State:
+              $ref: '#/components/headers/XTimeLogicQuotaState'
+        "405":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Only `GET` is supported.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "500":
+          content:
+            application/json:
+              examples:
+                internalError:
+                  $ref: '#/components/examples/InternalErrorExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: "Internal server error, including signing failures."
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "501":
+          content:
+            application/json:
+              examples:
+                dependencyNotReady:
+                  $ref: '#/components/examples/DependencyNotReadyExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: A required resolver or dependency is not configured or not
+            ready.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "502":
+          content:
+            application/json:
+              examples:
+                upstreamFailure:
+                  $ref: '#/components/examples/UpstreamFailureExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Gateway failed to forward the request to the core worker.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+      summary: Time elapsed since or remaining until a reference instant
+      tags:
+      - Time
+      x-accepts:
+      - application/json
+  /v1/timezone:
+    get:
+      description: |-
+        Resolves timezone metadata for a single target.
+
+        Target selector rules:
+        - Use exactly one selector family: `tz`, `ip`, `lat` + `lon`, `offset`, or `auto_tz=true`.
+        - Bulk is not supported on this route.
+        - `offset` queries return a specialized payload that includes `matching_zones` for the request-time offset match.
+
+        Examples:
+        - Single target: `/v1/timezone?tz=America/New_York`
+        - Offset match: `/v1/timezone?offset=-04:00`
+      operationId: getTimezone
+      parameters:
+      - description: "IANA timezone name. On bulk-capable routes, a comma-separated\
+          \ list enables bulk mode."
+        example: America/New_York
+        explode: true
+        in: query
+        name: tz
+        required: false
+        schema:
+          maxLength: 64
+          type: string
+        style: form
+      - description: "IP address. On bulk-capable routes, a comma-separated list enables\
+          \ bulk mode."
+        example: 8.8.8.8
+        explode: true
+        in: query
+        name: ip
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Latitude. Must be provided together with `lon`.
+        example: 40.7128
+        explode: true
+        in: query
+        name: lat
+        required: false
+        schema:
+          format: double
+          maximum: 90
+          minimum: -90
+          type: number
+        style: form
+      - description: Longitude. Must be provided together with `lat`.
+        example: -74.006
+        explode: true
+        in: query
+        name: lon
+        required: false
+        schema:
+          format: double
+          maximum: 180
+          minimum: -180
+          type: number
+        style: form
+      - description: "Fixed UTC offset in `+HH:MM` or `-HH:MM` format. On bulk-capable\
+          \ routes, a comma-separated list enables bulk mode."
+        example: -04:00
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+          type: string
+        style: form
+      - description: Set to `true` to resolve using the caller IP from Cloudflare
+          headers.
+        example: true
+        explode: true
+        in: query
+        name: auto_tz
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: "Set to exactly `true` to ask the gateway to sign the final JSON\
+          \ response. Every authenticated JSON response, including errors, then includes\
+          \ signing headers. Not supported on `/v1/time/clock`."
+        example: true
+        explode: true
+        in: query
+        name: sign
+        required: false
+        schema:
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                resolvedTimezone:
+                  $ref: '#/components/examples/TimezoneResolvedExample'
+                offsetMatches:
+                  $ref: '#/components/examples/TimezoneOffsetExample'
+              schema:
+                $ref: '#/components/schemas/getTimezone_200_response'
+          description: Resolved timezone payload.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+            X-TimeLogic-Signature:
+              $ref: '#/components/headers/XTimeLogicSignature'
+            X-TimeLogic-Key-Id:
+              $ref: '#/components/headers/XTimeLogicKeyId'
+            X-TimeLogic-Signature-Alg:
+              $ref: '#/components/headers/XTimeLogicSignatureAlg'
+            X-TimeLogic-Signature-Timestamp:
+              $ref: '#/components/headers/XTimeLogicSignatureTimestamp'
+            X-TimeLogic-Content-SHA256:
+              $ref: '#/components/headers/XTimeLogicContentSha256'
+            X-TimeLogic-Signature-Input:
+              $ref: '#/components/headers/XTimeLogicSignatureInput'
+        "400":
+          content:
+            application/json:
+              examples:
+                invalidParameter:
+                  $ref: '#/components/examples/InvalidParameterExample'
+                ambiguousTarget:
+                  $ref: '#/components/examples/AmbiguousTargetExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid or ambiguous request parameters.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "401":
+          content:
+            application/json:
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/UnauthorizedExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Missing or invalid authentication.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: The key or customer subscription is not active.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: The cached monthly quota state is exceeded.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+            X-TimeLogic-Quota-State:
+              $ref: '#/components/headers/XTimeLogicQuotaState'
+        "405":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Only `GET` is supported.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "500":
+          content:
+            application/json:
+              examples:
+                internalError:
+                  $ref: '#/components/examples/InternalErrorExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: "Internal server error, including signing failures."
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "501":
+          content:
+            application/json:
+              examples:
+                dependencyNotReady:
+                  $ref: '#/components/examples/DependencyNotReadyExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: A required resolver or dependency is not configured or not
+            ready.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+        "502":
+          content:
+            application/json:
+              examples:
+                upstreamFailure:
+                  $ref: '#/components/examples/UpstreamFailureExample'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Gateway failed to forward the request to the core worker.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+      summary: Resolve timezone information for a target
+      tags:
+      - Time
+      x-accepts:
+      - application/json
+components:
+  examples:
+    JwksExample:
+      summary: Current JWKS response with the active signing key
+      value:
+        keys:
+        - kty: OKP
+          crv: Ed25519
+          alg: EdDSA
+          use: sig
+          kid: ed25519-2026-07-19
+          key_ops:
+          - verify
+          ext: true
+          x: LUuZFwpGBGvPS-4vJdLM21_IreJqea-aoyXRhGfH3dI
+    JwksSingleKeyExample:
+      summary: Current `kid`-filtered JWKS response
+      value:
+        keys:
+        - kty: OKP
+          crv: Ed25519
+          alg: EdDSA
+          use: sig
+          kid: ed25519-2026-07-19
+          key_ops:
+          - verify
+          ext: true
+          x: LUuZFwpGBGvPS-4vJdLM21_IreJqea-aoyXRhGfH3dI
+    SigningKeyNotFoundExample:
+      summary: Requested signing key was not retained
+      value:
+        error:
+          code: NOT_FOUND
+          message: No signing key found for kid 'ed25519-2025-12-31'.
+        request_id: 0f8fad5b-d9cb-469f-a165-70867728950e
+        timestamp: 2026-07-02T16:00:44.666Z
+    CurrentSingleExample:
+      summary: Single-target time payload
+      value:
+        unix: 1776274247
+        unix_ms: 1776274247883
+        utc: 2026-04-15T17:30:47Z
+        iso_local: 2026-04-15T13:30:47-04:00
+        rfc2822: "Wed, 15 Apr 2026 13:30:47 -0400"
+        human: "April 15, 2026, 1:30 PM America/New_York"
+        day_number: 4
+        day_short: Wed
+        day_full: Wednesday
+        timezone: America/New_York
+        formatted: 2026-04-15 13:30
+    CurrentBulkExample:
+      summary: Bulk current-time response
+      value:
+      - unix: 1776274247
+        unix_ms: 1776274247883
+        utc: 2026-04-15T17:30:47Z
+        iso_local: 2026-04-15T13:30:47-04:00
+        rfc2822: "Wed, 15 Apr 2026 13:30:47 -0400"
+        human: "April 15, 2026, 1:30 PM America/New_York"
+        day_number: 4
+        day_short: Wed
+        day_full: Wednesday
+        timezone: America/New_York
+      - unix: 1776274247
+        unix_ms: 1776274247883
+        utc: 2026-04-15T17:30:47Z
+        iso_local: 2026-04-15T18:30:47+01:00
+        rfc2822: "Wed, 15 Apr 2026 18:30:47 +0100"
+        human: "April 15, 2026, 6:30 PM Europe/London"
+        day_number: 4
+        day_short: Wed
+        day_full: Wednesday
+        timezone: Europe/London
+    BulkErrorExample:
+      summary: Per-item bulk failure wrapper
+      value:
+        error:
+          code: INVALID_PARAMETER
+          message: Unsupported timezone identifier.
+        request_id: 0f8fad5b-d9cb-469f-a165-70867728950e
+        item: Mars/Olympus
+    CurrentBulkPartialFailureExample:
+      summary: Bulk current-time response with a per-item failure
+      value:
+      - unix: 1776274247
+        unix_ms: 1776274247883
+        utc: 2026-04-15T17:30:47Z
+        iso_local: 2026-04-15T13:30:47-04:00
+        rfc2822: "Wed, 15 Apr 2026 13:30:47 -0400"
+        human: "April 15, 2026, 1:30 PM America/New_York"
+        day_number: 4
+        day_short: Wed
+        day_full: Wednesday
+        timezone: America/New_York
+      - error:
+          code: INVALID_PARAMETER
+          message: Unsupported timezone identifier.
+        request_id: 0f8fad5b-d9cb-469f-a165-70867728950e
+        item: Mars/Olympus
+    ConvertSingleExample:
+      summary: Converted timestamp payload
+      value:
+        unix: 1711300000
+        unix_ms: 1711300000000
+        utc: 2024-03-24T17:06:40Z
+        iso_local: 2024-03-24T13:06:40-04:00
+        rfc2822: "Sun, 24 Mar 2024 13:06:40 -0400"
+        human: "March 24, 2024, 1:06 PM America/New_York"
+        day_number: 1
+        day_short: Sun
+        day_full: Sunday
+        timezone: America/New_York
+        formatted: 2024-03-24 13:06
+    ConvertBulkExample:
+      summary: Bulk convert response
+      value:
+      - unix: 1711300000
+        unix_ms: 1711300000000
+        utc: 2024-03-24T17:06:40Z
+        iso_local: 2024-03-24T13:06:40-04:00
+        rfc2822: "Sun, 24 Mar 2024 13:06:40 -0400"
+        human: "March 24, 2024, 1:06 PM America/New_York"
+        day_number: 1
+        day_short: Sun
+        day_full: Sunday
+        timezone: America/New_York
+      - unix: 1711300000
+        unix_ms: 1711300000000
+        utc: 2024-03-24T17:06:40Z
+        iso_local: 2024-03-24T17:06:40+00:00
+        rfc2822: "Sun, 24 Mar 2024 17:06:40 +0000"
+        human: "March 24, 2024, 5:06 PM UTC+00:00"
+        day_number: 1
+        day_short: Sun
+        day_full: Sunday
+        timezone: null
+    ConvertBulkPartialFailureExample:
+      summary: Bulk convert response with a per-item failure
+      value:
+      - unix: 1711300000
+        unix_ms: 1711300000000
+        utc: 2024-03-24T17:06:40Z
+        iso_local: 2024-03-24T13:06:40-04:00
+        rfc2822: "Sun, 24 Mar 2024 13:06:40 -0400"
+        human: "March 24, 2024, 1:06 PM America/New_York"
+        day_number: 1
+        day_short: Sun
+        day_full: Sunday
+        timezone: America/New_York
+      - error:
+          code: INVALID_PARAMETER
+          message: Unsupported timezone identifier.
+        request_id: 0f8fad5b-d9cb-469f-a165-70867728950e
+        item: Mars/Olympus
+    DiffExample:
+      summary: Duration between two instants
+      value:
+        seconds: 3600
+        minutes: 60
+        hours: 1
+        days: 0
+        direction: forward
+        human: 1 hour
+        formatted: 1h 0m 0s
+        business_days: 0
+        from:
+          unix_ms: 1711300000000
+        to:
+          unix_ms: 1711303600000
+    AddExample:
+      summary: Adjusted timestamp payload
+      value:
+        unix: 1711386400
+        unix_ms: 1711386400000
+        utc: 2024-03-25T17:06:40Z
+        iso_local: 2024-03-25T13:06:40-04:00
+        rfc2822: "Mon, 25 Mar 2024 13:06:40 -0400"
+        human: "March 25, 2024, 1:06 PM America/New_York"
+        day_number: 2
+        day_short: Mon
+        day_full: Monday
+        timezone: America/New_York
+        formatted: 2024-03-25 13:06
+    CalendarExample:
+      summary: Calendar projection with week number
+      value:
+        unix: 1776274247
+        unix_ms: 1776274247883
+        utc: 2026-04-15T17:30:47Z
+        iso_local: 2026-04-15T13:30:47-04:00
+        rfc2822: "Wed, 15 Apr 2026 13:30:47 -0400"
+        human: "April 15, 2026, 1:30 PM America/New_York"
+        day_number: 4
+        day_short: Wed
+        day_full: Wednesday
+        timezone: America/New_York
+        year: 2026
+        month: 4
+        month_name: April
+        day: 15
+        week_number: 16
+    DstExample:
+      summary: DST status with next transition
+      value:
+        unix: 1776274247
+        unix_ms: 1776274247883
+        utc: 2026-04-15T17:30:47Z
+        iso_local: 2026-04-15T13:30:47-04:00
+        rfc2822: "Wed, 15 Apr 2026 13:30:47 -0400"
+        human: "April 15, 2026, 1:30 PM America/New_York"
+        day_number: 4
+        day_short: Wed
+        day_full: Wednesday
+        timezone: America/New_York
+        dst_active: true
+        next_transition: 2026-11-01T02:00:00-04:00
+    ClockDigitalHtmlExample:
+      summary: Abbreviated digital clock HTML fragment
+      value: "<div class=\"timelogic-clock-host\" data-timelogic-clock></div><script\
+        \ type=\"application/json\">{\"version\":\"v1\",\"style\":\"digital-dashboard\"\
+        ,\"unix_ms\":1776274247883,\"timezone_label\":\"America/New_York\",\"refresh\"\
+        :{\"path\":\"/v1/time/current\",\"selector\":{\"kind\":\"tz\",\"tz\":\"America/New_York\"\
+        }}}</script><link rel=\"stylesheet\" href=\"/v1/time/clock/assets/v1/clock.css\"\
+        ><script src=\"/v1/time/clock/assets/v1/clock.js\"></script>"
+    ClockAnalogHtmlExample:
+      summary: Abbreviated analog clock HTML fragment
+      value: "<div class=\"timelogic-clock-host\" data-timelogic-clock></div><script\
+        \ type=\"application/json\">{\"version\":\"v1\",\"style\":\"analog-station\"\
+        ,\"unix_ms\":1776274247883,\"timezone_label\":\"UTC\",\"refresh\":{\"path\"\
+        :\"/v1/time/current\",\"selector\":{\"kind\":\"none\"}}}</script><link rel=\"\
+        stylesheet\" href=\"/v1/time/clock/assets/v1/clock.css\"><script src=\"/v1/time/clock/assets/v1/clock.js\"\
+        ></script>"
+    ElapsedExample:
+      summary: Remaining duration with business-day count
+      value:
+        seconds: 172800
+        minutes: 2880
+        hours: 48
+        days: 2
+        human: 2 days left
+        direction: left
+        formatted: 2d 0h 0m 0s
+        business_days: 2
+    TimezoneResolvedExample:
+      summary: Resolved timezone payload
+      value:
+        unix: 1776274247
+        unix_ms: 1776274247883
+        utc: 2026-04-15T17:30:47Z
+        iso_local: 2026-04-15T13:30:47-04:00
+        rfc2822: "Wed, 15 Apr 2026 13:30:47 -0400"
+        human: "April 15, 2026, 1:30 PM America/New_York"
+        day_number: 4
+        day_short: Wed
+        day_full: Wednesday
+        timezone: America/New_York
+        offset: -240
+        dst: true
+    TimezoneOffsetExample:
+      summary: Offset match response with matching zones
+      value:
+        unix: 1776274247
+        unix_ms: 1776274247883
+        utc: 2026-04-15T17:30:47Z
+        iso_local: 2026-04-15T13:30:47-04:00
+        rfc2822: "Wed, 15 Apr 2026 13:30:47 -0400"
+        human: "April 15, 2026, 1:30 PM UTC-04:00"
+        day_number: 4
+        day_short: Wed
+        day_full: Wednesday
+        timezone: null
+        offset: -240
+        dst: false
+        matching_zones:
+        - unix: 1776274247
+          unix_ms: 1776274247883
+          utc: 2026-04-15T17:30:47Z
+          iso_local: 2026-04-15T13:30:47-04:00
+          rfc2822: "Wed, 15 Apr 2026 13:30:47 -0400"
+          human: "April 15, 2026, 1:30 PM America/New_York"
+          day_number: 4
+          day_short: Wed
+          day_full: Wednesday
+          timezone: America/New_York
+          offset: -240
+          dst: true
+        - unix: 1776274247
+          unix_ms: 1776274247883
+          utc: 2026-04-15T17:30:47Z
+          iso_local: 2026-04-15T13:30:47-04:00
+          rfc2822: "Wed, 15 Apr 2026 13:30:47 -0400"
+          human: "April 15, 2026, 1:30 PM America/Toronto"
+          day_number: 4
+          day_short: Wed
+          day_full: Wednesday
+          timezone: America/Toronto
+          offset: -240
+          dst: true
+    InvalidParameterExample:
+      summary: Generic invalid-parameter error
+      value:
+        error:
+          code: INVALID_PARAMETER
+          message: Invalid offset. Use +HH:MM or -HH:MM.
+        request_id: 0f8fad5b-d9cb-469f-a165-70867728950e
+    AmbiguousTargetExample:
+      summary: Ambiguous target selector error
+      value:
+        error:
+          code: AMBIGUOUS_TARGET
+          message: "Ambiguous target selectors. Provide only one of tz, ip, lat/lon,\
+            \ offset, auto_tz."
+        request_id: 0f8fad5b-d9cb-469f-a165-70867728950e
+    ClockInvalidStyleExample:
+      summary: Invalid clock style error
+      value:
+        error:
+          code: INVALID_PARAMETER
+          message: Clock endpoint requires a valid named style.
+          details:
+            valid_styles:
+            - analog-station
+            - analog-aviation
+            - digital-dashboard
+        request_id: 0f8fad5b-d9cb-469f-a165-70867728950e
+    UnauthorizedExample:
+      summary: Unauthenticated gateway rejection
+      value:
+        error:
+          code: UNAUTHORIZED
+          message: Missing Authorization bearer token.
+        request_id: 0f8fad5b-d9cb-469f-a165-70867728950e
+    DependencyNotReadyExample:
+      summary: Missing resolver binding
+      value:
+        error:
+          code: DEPENDENCY_NOT_READY
+          message: Timezone resolver binding is not configured.
+        request_id: 0f8fad5b-d9cb-469f-a165-70867728950e
+    InternalErrorExample:
+      summary: Internal gateway or core failure
+      value:
+        error:
+          code: INTERNAL_ERROR
+          message: Internal server error.
+        request_id: 0f8fad5b-d9cb-469f-a165-70867728950e
+    UpstreamFailureExample:
+      summary: Core forwarding failure
+      value:
+        error:
+          code: INTERNAL_ERROR
+          message: Failed to forward request to core worker.
+          details:
+            cause: upstream failure
+        request_id: 0f8fad5b-d9cb-469f-a165-70867728950e
+  headers:
+    XRequestId:
+      description: Gateway-generated or forwarded request identifier.
+      example: f3eb6ec5-77a8-454f-8b6a-5c68aabe7abb
+      explode: false
+      schema:
+        type: string
+      style: simple
+    XTimeLogicSignature:
+      description: Base64 Ed25519 detached signature for signed JSON responses.
+      example: vbk1uI/2SaHwARiXyoZye4CG4OM4MG0NNqFfwZ4WzAQFdAYupZ0S6JT0KUzdc7/1PD5vtLLgQJFbM1+vUvD4CQ==
+      explode: false
+      schema:
+        type: string
+      style: simple
+    XTimeLogicKeyId:
+      description: Signing key identifier used for `X-TimeLogic-Signature`.
+      example: ed25519-2026-07-19
+      explode: false
+      schema:
+        type: string
+      style: simple
+    XTimeLogicSignatureAlg:
+      description: Signature algorithm.
+      example: Ed25519
+      explode: false
+      schema:
+        enum:
+        - Ed25519
+        type: string
+      style: simple
+    XTimeLogicSignatureTimestamp:
+      description: UNIX seconds used in the signing envelope.
+      example: "1776274247"
+      explode: false
+      schema:
+        pattern: ^-?\d+$
+        type: string
+      style: simple
+    XTimeLogicSignatureInput:
+      description: "Base64URL-encoded exact UTF-8 v1 signing input. Decode this value\
+        \ and verify X-TimeLogic-Signature over the decoded bytes; it includes the\
+        \ signed path and query, including sign=true, and deliberately excludes scheme,\
+        \ host, and Content-Type."
+      explode: false
+      schema:
+        type: string
+      style: simple
+    XTimeLogicCustomerId:
+      description: Authenticated customer identifier.
+      explode: false
+      schema:
+        type: string
+      style: simple
+    XTimeLogicPlan:
+      description: Authenticated customer plan.
+      explode: false
+      schema:
+        type: string
+      style: simple
+    XTimeLogicQuotaLimit:
+      description: "Monthly quota limit, or unlimited."
+      explode: false
+      schema:
+        type: string
+      style: simple
+    XTimeLogicQuotaState:
+      description: Cached quota state.
+      explode: false
+      schema:
+        enum:
+        - active
+        - exceeded
+        type: string
+      style: simple
+    XTimeLogicContentSha256:
+      description: Standard Base64 SHA-256 hash of the exact UTF-8 JSON response body
+        bytes.
+      example: bP2ZOTQo23TTmTlt3RkxPk82gAZ5GpeWogsxgOhRAkg=
+      explode: false
+      schema:
+        type: string
+      style: simple
+  parameters:
+    SignFlag:
+      description: "Set to exactly `true` to ask the gateway to sign the final JSON\
+        \ response. Every authenticated JSON response, including errors, then includes\
+        \ signing headers. Not supported on `/v1/time/clock`."
+      example: true
+      explode: true
+      in: query
+      name: sign
+      required: false
+      schema:
+        type: boolean
+      style: form
+    Format:
+      description: "Custom date/time format template using supported `strftime`-style\
+        \ directives such as `%Y-%m-%d %H:%M:%S`. Reference: [strftime](https://strftime.net/)."
+      example: '%Y-%m-%d %H:%M:%S'
+      explode: true
+      in: query
+      name: format
+      required: false
+      schema:
+        type: string
+      style: form
+    DurationFormat:
+      description: "Custom duration format template using `%days`, `%hours`, `%minutes`,\
+        \ and `%seconds`."
+      example: '%daysd %hoursh %minutesm %secondss'
+      explode: true
+      in: query
+      name: format
+      required: false
+      schema:
+        type: string
+      style: form
+    TzSelector:
+      description: "IANA timezone name. On bulk-capable routes, a comma-separated\
+        \ list enables bulk mode."
+      example: America/New_York
+      explode: true
+      in: query
+      name: tz
+      required: false
+      schema:
+        maxLength: 64
+        type: string
+      style: form
+    IpSelector:
+      description: "IP address. On bulk-capable routes, a comma-separated list enables\
+        \ bulk mode."
+      example: 8.8.8.8
+      explode: true
+      in: query
+      name: ip
+      required: false
+      schema:
+        type: string
+      style: form
+    LatSelector:
+      description: Latitude. Must be provided together with `lon`.
+      example: 40.7128
+      explode: true
+      in: query
+      name: lat
+      required: false
+      schema:
+        format: double
+        maximum: 90
+        minimum: -90
+        type: number
+      style: form
+    LonSelector:
+      description: Longitude. Must be provided together with `lat`.
+      example: -74.006
+      explode: true
+      in: query
+      name: lon
+      required: false
+      schema:
+        format: double
+        maximum: 180
+        minimum: -180
+        type: number
+      style: form
+    OffsetSelector:
+      description: "Fixed UTC offset in `+HH:MM` or `-HH:MM` format. On bulk-capable\
+        \ routes, a comma-separated list enables bulk mode."
+      example: -04:00
+      explode: true
+      in: query
+      name: offset
+      required: false
+      schema:
+        pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+        type: string
+      style: form
+    AutoTzSelector:
+      description: Set to `true` to resolve using the caller IP from Cloudflare headers.
+      example: true
+      explode: true
+      in: query
+      name: auto_tz
+      required: false
+      schema:
+        type: boolean
+      style: form
+    UtcFlag:
+      description: Set to `true` to force UTC on routes that support it.
+      example: true
+      explode: true
+      in: query
+      name: utc
+      required: false
+      schema:
+        type: boolean
+      style: form
+    Unix:
+      example: 1711300000
+      explode: true
+      in: query
+      name: unix
+      required: false
+      schema:
+        format: int64
+        type: integer
+      style: form
+    UnixMs:
+      example: 1711300000000
+      explode: true
+      in: query
+      name: unix_ms
+      required: false
+      schema:
+        format: int64
+        type: integer
+      style: form
+    Iso:
+      description: "ISO-8601 timestamp. To supply a local wall-clock time without\
+        \ an explicit offset, pair it with one of `source_tz=Area/City`, `source_ip=...`,\
+        \ `source_lat=...&source_lon=...`, or `source_offset=±HH:MM`."
+      example: 2024-03-24T15:00:00
+      explode: true
+      in: query
+      name: iso
+      required: false
+      schema:
+        type: string
+      style: form
+    SourceTz:
+      description: Used only with `iso=...` when the ISO value has no explicit offset.
+      example: America/New_York
+      explode: true
+      in: query
+      name: source_tz
+      required: false
+      schema:
+        type: string
+      style: form
+    SourceIp:
+      description: Used only with `iso=...` when the ISO value has no explicit offset.
+        Resolves that local wall-clock time through the timezone mapped from this
+        IP address.
+      example: 8.8.8.8
+      explode: true
+      in: query
+      name: source_ip
+      required: false
+      schema:
+        type: string
+      style: form
+    SourceLat:
+      description: Used only with `iso=...` when the ISO value has no explicit offset.
+        Provide together with `source_lon` to resolve that local wall-clock time through
+        the timezone mapped from these coordinates.
+      example: 40.7128
+      explode: true
+      in: query
+      name: source_lat
+      required: false
+      schema:
+        format: double
+        maximum: 90
+        minimum: -90
+        type: number
+      style: form
+    SourceLon:
+      description: Used only with `iso=...` when the ISO value has no explicit offset.
+        Provide together with `source_lat`.
+      example: -74.006
+      explode: true
+      in: query
+      name: source_lon
+      required: false
+      schema:
+        format: double
+        maximum: 180
+        minimum: -180
+        type: number
+      style: form
+    SourceOffset:
+      description: Used only with `iso=...` when the ISO value has no explicit offset.
+        Interprets that local wall-clock time at this fixed UTC offset.
+      example: -05:00
+      explode: true
+      in: query
+      name: source_offset
+      required: false
+      schema:
+        pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+        type: string
+      style: form
+    CompareUnix:
+      example: 1711213600
+      explode: true
+      in: query
+      name: compare_unix
+      required: false
+      schema:
+        format: int64
+        type: integer
+      style: form
+    CompareUnixMs:
+      example: 1711213600000
+      explode: true
+      in: query
+      name: compare_unix_ms
+      required: false
+      schema:
+        format: int64
+        type: integer
+      style: form
+    CompareIso:
+      description: "ISO-8601 comparison timestamp. To supply a local wall-clock time\
+        \ without an explicit offset, pair it with one of `compare_source_tz=Area/City`,\
+        \ `compare_source_ip=...`, `compare_source_lat=...&compare_source_lon=...`,\
+        \ or `compare_source_offset=±HH:MM`."
+      example: 2024-03-23T15:00:00
+      explode: true
+      in: query
+      name: compare_iso
+      required: false
+      schema:
+        type: string
+      style: form
+    CompareSourceTz:
+      description: Used only with `compare_iso=...` when the ISO value has no explicit
+        offset.
+      example: America/New_York
+      explode: true
+      in: query
+      name: compare_source_tz
+      required: false
+      schema:
+        type: string
+      style: form
+    CompareSourceIp:
+      description: Used only with `compare_iso=...` when the ISO value has no explicit
+        offset. Resolves that local wall-clock time through the timezone mapped from
+        this IP address.
+      example: 8.8.8.8
+      explode: true
+      in: query
+      name: compare_source_ip
+      required: false
+      schema:
+        type: string
+      style: form
+    CompareSourceLat:
+      description: Used only with `compare_iso=...` when the ISO value has no explicit
+        offset. Provide together with `compare_source_lon` to resolve that local wall-clock
+        time through the timezone mapped from these coordinates.
+      example: 40.7128
+      explode: true
+      in: query
+      name: compare_source_lat
+      required: false
+      schema:
+        format: double
+        maximum: 90
+        minimum: -90
+        type: number
+      style: form
+    CompareSourceLon:
+      description: Used only with `compare_iso=...` when the ISO value has no explicit
+        offset. Provide together with `compare_source_lat`.
+      example: -74.006
+      explode: true
+      in: query
+      name: compare_source_lon
+      required: false
+      schema:
+        format: double
+        maximum: 180
+        minimum: -180
+        type: number
+      style: form
+    CompareSourceOffset:
+      description: Used only with `compare_iso=...` when the ISO value has no explicit
+        offset. Interprets that local wall-clock time at this fixed UTC offset.
+      example: -05:00
+      explode: true
+      in: query
+      name: compare_source_offset
+      required: false
+      schema:
+        pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+        type: string
+      style: form
+    FromSpecifier:
+      description: "Time specifier. Supported forms are `now`, `unix=<seconds>`, `unix_ms=<milliseconds>`,\
+        \ `iso=<ISO-8601>`, `offset=±HH:MM`, `tz=<IANA timezone>`, and `ip=<IP address>`.\
+        \ For `tz=...`, `ip=...`, and `offset=...`, the specifier means the current\
+        \ request-time instant resolved through that selector. To express a local\
+        \ wall-clock time, use `from=iso=...` together with one of `from_tz`, `from_ip`,\
+        \ `from_lat`+`from_lon`, or `from_offset`."
+      explode: true
+      in: query
+      name: from
+      required: true
+      schema:
+        type: string
+      style: form
+    ToSpecifier:
+      description: "Time specifier. Supported forms are `now`, `unix=<seconds>`, `unix_ms=<milliseconds>`,\
+        \ `iso=<ISO-8601>`, `offset=±HH:MM`, `tz=<IANA timezone>`, and `ip=<IP address>`.\
+        \ For `tz=...`, `ip=...`, and `offset=...`, the specifier means the current\
+        \ request-time instant resolved through that selector. To express a local\
+        \ wall-clock time, use `to=iso=...` together with one of `to_tz`, `to_ip`,\
+        \ `to_lat`+`to_lon`, or `to_offset`."
+      explode: true
+      in: query
+      name: to
+      required: true
+      schema:
+        type: string
+      style: form
+    FromTz:
+      description: Used only with `from=iso=...` when the ISO value has no explicit
+        offset.
+      explode: true
+      in: query
+      name: from_tz
+      required: false
+      schema:
+        type: string
+      style: form
+    FromIp:
+      description: Used only with `from=iso=...` when the ISO value has no explicit
+        offset. Resolves that local wall-clock time through the timezone mapped from
+        this IP address.
+      example: 8.8.8.8
+      explode: true
+      in: query
+      name: from_ip
+      required: false
+      schema:
+        type: string
+      style: form
+    FromLat:
+      description: Used only with `from=iso=...` when the ISO value has no explicit
+        offset. Provide together with `from_lon` to resolve that local wall-clock
+        time through the timezone mapped from these coordinates.
+      example: 40.7128
+      explode: true
+      in: query
+      name: from_lat
+      required: false
+      schema:
+        format: double
+        maximum: 90
+        minimum: -90
+        type: number
+      style: form
+    FromLon:
+      description: Used only with `from=iso=...` when the ISO value has no explicit
+        offset. Provide together with `from_lat`.
+      example: -74.006
+      explode: true
+      in: query
+      name: from_lon
+      required: false
+      schema:
+        format: double
+        maximum: 180
+        minimum: -180
+        type: number
+      style: form
+    FromOffset:
+      description: Used only with `from=iso=...` when the ISO value has no explicit
+        offset. Interprets that local wall-clock time at this fixed UTC offset.
+      example: -05:00
+      explode: true
+      in: query
+      name: from_offset
+      required: false
+      schema:
+        pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+        type: string
+      style: form
+    ToTz:
+      description: Used only with `to=iso=...` when the ISO value has no explicit
+        offset.
+      explode: true
+      in: query
+      name: to_tz
+      required: false
+      schema:
+        type: string
+      style: form
+    ToIp:
+      description: Used only with `to=iso=...` when the ISO value has no explicit
+        offset. Resolves that local wall-clock time through the timezone mapped from
+        this IP address.
+      example: 8.8.8.8
+      explode: true
+      in: query
+      name: to_ip
+      required: false
+      schema:
+        type: string
+      style: form
+    ToLat:
+      description: Used only with `to=iso=...` when the ISO value has no explicit
+        offset. Provide together with `to_lon` to resolve that local wall-clock time
+        through the timezone mapped from these coordinates.
+      example: 40.7128
+      explode: true
+      in: query
+      name: to_lat
+      required: false
+      schema:
+        format: double
+        maximum: 90
+        minimum: -90
+        type: number
+      style: form
+    ToLon:
+      description: Used only with `to=iso=...` when the ISO value has no explicit
+        offset. Provide together with `to_lat`.
+      example: -74.006
+      explode: true
+      in: query
+      name: to_lon
+      required: false
+      schema:
+        format: double
+        maximum: 180
+        minimum: -180
+        type: number
+      style: form
+    ToOffset:
+      description: Used only with `to=iso=...` when the ISO value has no explicit
+        offset. Interprets that local wall-clock time at this fixed UTC offset.
+      example: -05:00
+      explode: true
+      in: query
+      name: to_offset
+      required: false
+      schema:
+        pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+        type: string
+      style: form
+    BusinessDays:
+      description: Set to `true` to enable weekday/business-day counting.
+      example: true
+      explode: true
+      in: query
+      name: business_days
+      required: false
+      schema:
+        type: boolean
+      style: form
+    HolidayCountry:
+      description: ISO 3166-1 alpha-2 holiday calendar country code. Requires `business_days=true`.
+      example: US
+      explode: true
+      in: query
+      name: holiday_country
+      required: false
+      schema:
+        pattern: "^[A-Z]{2}$"
+        type: string
+      style: form
+    HolidaySubdivision:
+      description: "Holiday calendar subdivision code from the upstream `python-holidays`\
+        \ calendar, for example `CA` or `ENG`. Requires `holiday_country` and `business_days=true`."
+      example: CA
+      explode: true
+      in: query
+      name: holiday_subdivision
+      required: false
+      schema:
+        type: string
+      style: form
+    SecondsModifier:
+      example: 30
+      explode: true
+      in: query
+      name: seconds
+      required: false
+      schema:
+        type: integer
+      style: form
+    MinutesModifier:
+      example: 15
+      explode: true
+      in: query
+      name: minutes
+      required: false
+      schema:
+        type: integer
+      style: form
+    HoursModifier:
+      example: 2
+      explode: true
+      in: query
+      name: hours
+      required: false
+      schema:
+        type: integer
+      style: form
+    DaysModifier:
+      example: 7
+      explode: true
+      in: query
+      name: days
+      required: false
+      schema:
+        type: integer
+      style: form
+    WeekFlag:
+      example: true
+      explode: true
+      in: query
+      name: week
+      required: false
+      schema:
+        type: boolean
+      style: form
+    NextFlag:
+      example: true
+      explode: true
+      in: query
+      name: next
+      required: false
+      schema:
+        type: boolean
+      style: form
+    Style:
+      description: Clock style name. Valid values are enumerated here; there is no
+        separate style discovery endpoint.
+      explode: true
+      in: query
+      name: style
+      required: true
+      schema:
+        enum:
+        - analog-station
+        - analog-aviation
+        - analog-bauhaus
+        - analog-graphite
+        - analog-arctic
+        - analog-brass
+        - analog-marine
+        - analog-grid
+        - analog-slate
+        - analog-executive
+        - digital-segment-red
+        - digital-segment-amber
+        - digital-segment-ice
+        - digital-terminal-green
+        - digital-terminal-white
+        - digital-broadcast
+        - digital-dashboard
+        - digital-control-room
+        - digital-slate
+        - digital-onyx
+        - digital-frost
+        - digital-card
+        - digital-glass
+        - digital-matrix
+        - digital-timetable
+        - digital-split-flap
+        - digital-cyan
+        - digital-emerald
+        - digital-monolith
+        - digital-minimal
+        type: string
+      style: form
+  responses:
+    Unauthorized:
+      content:
+        application/json:
+          examples:
+            unauthorized:
+              $ref: '#/components/examples/UnauthorizedExample'
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+      description: Missing or invalid authentication.
+    AuthenticatedBadRequest:
+      content:
+        application/json:
+          examples:
+            invalidParameter:
+              $ref: '#/components/examples/InvalidParameterExample'
+            ambiguousTarget:
+              $ref: '#/components/examples/AmbiguousTargetExample'
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+      description: Invalid or ambiguous request parameters.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/XRequestId'
+    MethodNotAllowed:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+      description: Only `GET` is supported.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/XRequestId'
+    DependencyNotReady:
+      content:
+        application/json:
+          examples:
+            dependencyNotReady:
+              $ref: '#/components/examples/DependencyNotReadyExample'
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+      description: A required resolver or dependency is not configured or not ready.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/XRequestId'
+    InternalError:
+      content:
+        application/json:
+          examples:
+            internalError:
+              $ref: '#/components/examples/InternalErrorExample'
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+      description: "Internal server error, including signing failures."
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/XRequestId'
+    UpstreamFailure:
+      content:
+        application/json:
+          examples:
+            upstreamFailure:
+              $ref: '#/components/examples/UpstreamFailureExample'
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+      description: Gateway failed to forward the request to the core worker.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/XRequestId'
+    SubscriptionInactive:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+      description: The key or customer subscription is not active.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/XRequestId'
+    QuotaExceeded:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+      description: The cached monthly quota state is exceeded.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/XRequestId'
+        X-TimeLogic-Quota-State:
+          $ref: '#/components/headers/XTimeLogicQuotaState'
+  schemas:
+    ApiError:
+      example:
+        code: AMBIGUOUS_TARGET
+        details: ""
+        message: message
+      properties:
+        code:
+          enum:
+          - AMBIGUOUS_TARGET
+          - MISSING_TARGET
+          - INVALID_PARAMETER
+          - INVALID_TIMESTAMP
+          - DEPENDENCY_NOT_READY
+          - SIGNING_NOT_READY
+          - UNAUTHORIZED
+          - INVALID_AUTH
+          - METHOD_NOT_ALLOWED
+          - NOT_FOUND
+          - INTERNAL_ERROR
+          - SUBSCRIPTION_INACTIVE
+          - QUOTA_EXCEEDED
+          type: string
+        message:
+          type: string
+        details:
+          description: Optional implementation-specific detail payload.
+          nullable: true
+      required:
+      - code
+      - message
+      type: object
+    ErrorResponse:
+      example:
+        error:
+          code: AMBIGUOUS_TARGET
+          details: ""
+          message: message
+        request_id: request_id
+        timestamp: 2000-01-23T04:56:07.000+00:00
+      properties:
+        error:
+          $ref: '#/components/schemas/ApiError'
+        request_id:
+          type: string
+        timestamp:
+          description: Intentionally omitted from public API error responses to avoid
+            exposing request timing; use request_id for support correlation.
+          format: date-time
+          type: string
+      required:
+      - error
+      - request_id
+      type: object
+    BulkError:
+      allOf:
+      - $ref: '#/components/schemas/ErrorResponse'
+      - properties:
+          item:
+            type: string
+        required:
+        - item
+        type: object
+      description: Per-item error wrapper used inside bulk arrays returned by bulk-capable
+        routes.
+    TimePayload:
+      description: Canonical single-target time payload.
+      example:
+        unix_ms: 6
+        utc: 2000-01-23T04:56:07.000+00:00
+        day_full: day_full
+        timezone: timezone
+        formatted: formatted
+        day_short: day_short
+        day_number: 1
+        rfc2822: rfc2822
+        human: human
+        unix: 0
+        iso_local: iso_local
+      properties:
+        unix:
+          format: int64
+          type: integer
+        unix_ms:
+          format: int64
+          type: integer
+        utc:
+          format: date-time
+          type: string
+        iso_local:
+          nullable: true
+          type: string
+        rfc2822:
+          type: string
+        human:
+          type: string
+        day_number:
+          maximum: 7
+          minimum: 1
+          type: integer
+        day_short:
+          type: string
+        day_full:
+          type: string
+        timezone:
+          nullable: true
+          type: string
+        formatted:
+          type: string
+      required:
+      - day_full
+      - day_number
+      - day_short
+      - human
+      - iso_local
+      - rfc2822
+      - timezone
+      - unix
+      - unix_ms
+      - utc
+      title: Single time payload
+      type: object
+    TimePayloadBulkItem:
+      description: "One bulk array item, either a successful time payload or a per-item\
+        \ bulk error."
+      oneOf:
+      - $ref: '#/components/schemas/TimePayload'
+      - $ref: '#/components/schemas/BulkError'
+      title: Bulk time payload item
+    TimePayloadBulkResponse:
+      description: "Bulk response array returned when `/v1/time/current` or `/v1/time/convert`\
+        \ receives one comma-separated `tz`, `ip`, or `offset` selector."
+      items:
+        $ref: '#/components/schemas/TimePayloadBulkItem'
+      title: Bulk time payload array
+      type: array
+    DiffEndpointRef:
+      description: Resolved endpoint reference for diff calculations. This object
+        intentionally includes only the resolved epoch-millisecond instant.
+      example:
+        unix_ms: 2
+      properties:
+        unix_ms:
+          format: int64
+          type: integer
+      required:
+      - unix_ms
+      type: object
+    DiffResponse:
+      example:
+        business_days: 5
+        seconds: 0
+        hours: 1
+        minutes: 6
+        formatted: formatted
+        days: 5
+        from:
+          unix_ms: 2
+        to:
+          unix_ms: 2
+        human: human
+        direction: forward
+      properties:
+        seconds:
+          type: integer
+        minutes:
+          type: integer
+        hours:
+          type: integer
+        days:
+          type: integer
+        direction:
+          description: '`forward` means `to` is after `from`. `backward` means `to`
+            is before `from`. `same` means both sides resolve to the same instant.'
+          enum:
+          - forward
+          - backward
+          - same
+          type: string
+        human:
+          type: string
+        formatted:
+          type: string
+        business_days:
+          type: integer
+        from:
+          $ref: '#/components/schemas/DiffEndpointRef'
+        to:
+          $ref: '#/components/schemas/DiffEndpointRef'
+      required:
+      - days
+      - direction
+      - from
+      - hours
+      - human
+      - minutes
+      - seconds
+      - to
+      type: object
+    CalendarResponse:
+      allOf:
+      - $ref: '#/components/schemas/TimePayload'
+      - properties:
+          year:
+            type: integer
+          month:
+            type: integer
+          month_name:
+            type: string
+          day:
+            type: integer
+          week_number:
+            type: integer
+        required:
+        - day
+        - month
+        - month_name
+        - year
+        type: object
+      example:
+        month_name: month_name
+        utc: 2000-01-23T04:56:07.000+00:00
+        day_full: day_full
+        year: 5
+        timezone: timezone
+        formatted: formatted
+        rfc2822: rfc2822
+        unix_ms: 6
+        month: 5
+        day_short: day_short
+        day_number: 1
+        week_number: 7
+        human: human
+        day: 2
+        unix: 0
+        iso_local: iso_local
+    DstResponse:
+      allOf:
+      - $ref: '#/components/schemas/TimePayload'
+      - properties:
+          dst_active:
+            type: boolean
+          next_transition:
+            format: date-time
+            nullable: true
+            type: string
+        required:
+        - dst_active
+        type: object
+      example:
+        utc: 2000-01-23T04:56:07.000+00:00
+        day_full: day_full
+        timezone: timezone
+        formatted: formatted
+        rfc2822: rfc2822
+        next_transition: 2000-01-23T04:56:07.000+00:00
+        unix_ms: 6
+        dst_active: true
+        day_short: day_short
+        day_number: 1
+        human: human
+        unix: 0
+        iso_local: iso_local
+    ElapsedResponse:
+      example:
+        business_days: 5
+        seconds: 0
+        hours: 1
+        minutes: 6
+        formatted: formatted
+        days: 5
+        human: human
+        direction: left
+      properties:
+        seconds:
+          type: integer
+        minutes:
+          type: integer
+        hours:
+          type: integer
+        days:
+          type: integer
+        human:
+          type: string
+        direction:
+          description: '`left` means the target instant is still in the future. `passed`
+            means the target instant is already in the past.'
+          enum:
+          - left
+          - passed
+          type: string
+        formatted:
+          type: string
+        business_days:
+          type: integer
+      required:
+      - days
+      - direction
+      - hours
+      - human
+      - minutes
+      - seconds
+      type: object
+    TimezoneResolvedResponse:
+      allOf:
+      - $ref: '#/components/schemas/TimePayload'
+      - properties:
+          offset:
+            type: integer
+          dst:
+            type: boolean
+        required:
+        - dst
+        - offset
+        type: object
+      description: Standard single-target timezone resolution payload.
+      example:
+        offset: 5
+        dst: true
+        utc: 2000-01-23T04:56:07.000+00:00
+        day_full: day_full
+        timezone: timezone
+        formatted: formatted
+        rfc2822: rfc2822
+        unix_ms: 6
+        day_short: day_short
+        day_number: 1
+        human: human
+        unix: 0
+        iso_local: iso_local
+      title: Resolved timezone response
+    TimezoneMatch:
+      allOf:
+      - $ref: '#/components/schemas/TimePayload'
+      - properties:
+          offset:
+            type: integer
+          dst:
+            type: boolean
+          timezone:
+            type: string
+        required:
+        - dst
+        - offset
+        - timezone
+        type: object
+    TimezoneOffsetResponse:
+      allOf:
+      - $ref: '#/components/schemas/TimezoneResolvedResponse'
+      - properties:
+          timezone:
+            nullable: true
+            type: string
+          matching_zones:
+            items:
+              $ref: '#/components/schemas/TimezoneMatch'
+            type: array
+        required:
+        - matching_zones
+        type: object
+      description: Offset-based timezone lookup result with `matching_zones` for the
+        current request-time offset match.
+      title: Offset match response
+    JwkKey:
+      example:
+        kty: OKP
+        crv: Ed25519
+        use: sig
+        kid: ed25519-2026-07-19
+        x: x
+        alg: EdDSA
+      properties:
+        kty:
+          enum:
+          - OKP
+          type: string
+        crv:
+          enum:
+          - Ed25519
+          type: string
+        alg:
+          enum:
+          - EdDSA
+          type: string
+        use:
+          enum:
+          - sig
+          type: string
+        kid:
+          example: ed25519-2026-07-19
+          type: string
+        x:
+          type: string
+      required:
+      - alg
+      - crv
+      - kid
+      - kty
+      - use
+      - x
+      type: object
+    JwksResponse:
+      example:
+        keys:
+        - kty: OKP
+          crv: Ed25519
+          use: sig
+          kid: ed25519-2026-07-19
+          x: x
+          alg: EdDSA
+        - kty: OKP
+          crv: Ed25519
+          use: sig
+          kid: ed25519-2026-07-19
+          x: x
+          alg: EdDSA
+      properties:
+        keys:
+          items:
+            $ref: '#/components/schemas/JwkKey'
+          type: array
+      required:
+      - keys
+      type: object
+    getCurrentTime_200_response:
+      oneOf:
+      - $ref: '#/components/schemas/TimePayload'
+      - $ref: '#/components/schemas/TimePayloadBulkResponse'
+    getTimezone_200_response:
+      oneOf:
+      - $ref: '#/components/schemas/TimezoneResolvedResponse'
+      - $ref: '#/components/schemas/TimezoneOffsetResponse'
+  securitySchemes:
+    directBearerAuth:
+      bearerFormat: TimeLogic API key
+      description: "Direct API key supplied as Authorization: Bearer."
+      scheme: bearer
+      type: http
+    directApiKeyHeader:
+      description: Direct API key supplied as X-API-Key.
+      in: header
+      name: X-API-Key
+      type: apiKey
+    directApiKeyQuery:
+      description: Direct API key supplied as a query parameter; headers are preferred.
+      in: query
+      name: api_key
+      type: apiKey
+    rapidApiKey:
+      description: RapidAPI subscription key. The SDK rapidApi option accepts this
+        key.
+      in: header
+      name: X-RapidAPI-Key
+      type: apiKey
+    rapidApiHost:
+      description: RapidAPI gateway host header. SDKs supply the configured host automatically.
+      in: header
+      name: X-RapidAPI-Host
+      type: apiKey
+

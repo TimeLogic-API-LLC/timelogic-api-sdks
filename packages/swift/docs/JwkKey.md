@@ -1,0 +1,15 @@
+# JwkKey
+
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**kty** | **String** |  | 
+**crv** | **String** |  | 
+**alg** | **String** |  | 
+**use** | **String** |  | 
+**kid** | **String** |  | 
+**x** | **String** |  | 
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+
