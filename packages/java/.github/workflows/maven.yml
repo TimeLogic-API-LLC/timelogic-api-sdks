@@ -13,7 +13,7 @@ on:
 
 jobs:
   build:
-    name: Build TimeLogic API — Direct Customer Access
+    name: Build TimeLogic API | A World Time API
     runs-on: ubuntu-latest
     strategy:
       matrix:

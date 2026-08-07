@@ -19,7 +19,7 @@ const transportArtifacts = {
   rust: 'packages/rust/src/apis/configuration.rs',
   go: 'packages/go/transport.go',
   java: 'packages/java/src/main/java/com/timelogic/direct/TransportConfiguration.java',
-  csharp: 'packages/csharp/src/TimeLogic.DirectApi/Client/TransportConfiguration.cs',
+  csharp: 'packages/csharp/src/TimeLogic.Api/Client/TransportConfiguration.cs',
   php: 'packages/php/lib/TransportConfiguration.php',
   ruby: 'packages/ruby/lib/timelogic-direct-api/transport_configuration.rb',
   kotlin: 'packages/kotlin/src/main/kotlin/com/timelogic/direct/api/infrastructure/TransportConfiguration.kt',

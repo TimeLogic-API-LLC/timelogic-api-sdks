@@ -1,4 +1,4 @@
-# TimeLogic.DirectApi.Model.TimePayloadBulkResponse
+# TimeLogic.Api.Model.TimePayloadBulkResponse
 Bulk response array returned when `/v1/time/current` or `/v1/time/convert` receives one comma-separated `tz`, `ip`, or `offset` selector.
 
 ## Properties

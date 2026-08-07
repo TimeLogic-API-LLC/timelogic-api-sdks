@@ -6,4 +6,4 @@ build_script:
 - dotnet build -c Release
 - dotnet test -c Release
 after_build:
-- dotnet pack .\src\TimeLogic.DirectApi\TimeLogic.DirectApi.csproj -o ../../output -c Release --no-build
+- dotnet pack .\src\TimeLogic.Api\TimeLogic.Api.csproj -o ../../output -c Release --no-build

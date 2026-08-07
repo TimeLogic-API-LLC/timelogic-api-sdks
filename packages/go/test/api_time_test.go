@@ -1,5 +1,5 @@
 /*
-TimeLogic API — Direct Customer Access
+TimeLogic API | A World Time API
 
 Testing TimeAPIService
 

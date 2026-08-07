@@ -1,4 +1,4 @@
-# TimeLogic.DirectApi.Api.UtilityApi
+# TimeLogic.Api.Api.UtilityApi
 
 All URIs are relative to *https://api.timelogicapi.com*
 
@@ -18,9 +18,9 @@ Unauthenticated JWKS endpoint for verifying signed JSON responses.  The public g
 ```csharp
 using System.Collections.Generic;
 using System.Diagnostics;
-using TimeLogic.DirectApi.Api;
-using TimeLogic.DirectApi.Client;
-using TimeLogic.DirectApi.Model;
+using TimeLogic.Api.Api;
+using TimeLogic.Api.Client;
+using TimeLogic.Api.Model;
 
 namespace Example
 {

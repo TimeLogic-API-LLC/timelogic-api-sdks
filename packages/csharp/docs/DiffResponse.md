@@ -1,4 +1,4 @@
-# TimeLogic.DirectApi.Model.DiffResponse
+# TimeLogic.Api.Model.DiffResponse
 
 ## Properties
 

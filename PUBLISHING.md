@@ -1,6 +1,6 @@
 # Publishing TimeLogic SDKs
 
-This repository has ten generated SDKs. A release tag currently publishes **only** the TypeScript/npm and Python/PyPI packages, and it can additionally publish the Rust/crates.io package when explicitly enabled. The remaining packages must not be represented as released until their registry metadata and automation have been added.
+This repository has ten generated SDKs. A release tag publishes the TypeScript/npm, Python/PyPI, Rust/crates.io (when `PUBLISH_CRATES=true`), and C#/NuGet.org packages independently after shared verification. The remaining packages must not be represented as released until their registry metadata and automation have been added.
 
 ## Current release status
 
@@ -11,13 +11,13 @@ This repository has ten generated SDKs. A release tag currently publishes **only
 | Rust | crates.io | `timelogic-api` | Optional | Gated: requires crates.io publisher setup and `PUBLISH_CRATES=true` |
 | Go | Go module proxy | `github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go` | No | Publish with a matching module tag |
 | Java | Maven Central | `com.timelogic:timelogic-direct-api` | No | Requires Central publishing/signing configuration |
-| C# | NuGet.org | `TimeLogic.DirectApi` | No | Requires NuGet.org publisher setup and automation |
+| C# | NuGet.org | `TimeLogic.Api` | Yes | Requires NuGet trusted publishing and the `NUGET_USER` repository variable |
 | PHP | Packagist | Not yet declared | No | Blocked: `composer.json` has no required `name` |
 | Ruby | RubyGems.org | `timelogic-direct-api` | No | Requires RubyGems publisher setup and automation |
 | Kotlin | Maven Central | Intended: `com.timelogic:timelogic-direct-api` | No | Blocked: no Maven publication is defined |
 | Swift | Swift Package Manager | Git source package (currently `OpenAPIClient`) | No | Release by Git tag after package identity cleanup |
 
-The existing release workflow is [`.github/workflows/release.yml`](.github/workflows/release.yml). After shared verification, the `npm` and `pypi` jobs run independently and in parallel: a failure in one does not prevent the other registry from publishing. It creates a GitHub release only after both jobs succeed. A Rust failure is currently not part of that final dependency list, so enable and test it before describing the tag as a complete multi-SDK release.
+The existing release workflow is [`.github/workflows/release.yml`](.github/workflows/release.yml). After shared verification, npm, PyPI, crates.io, NuGet.org, and the GitHub release run independently and in parallel. A failure in one registry does not block publishing to the others.
 
 ## One release, end to end
 
@@ -181,27 +181,21 @@ After the portal and signing configuration exist, publish through CI, not a deve
 
 ### C# / NuGet.org
 
-Package: `TimeLogic.DirectApi`, defined in [`packages/csharp/src/TimeLogic.DirectApi/TimeLogic.DirectApi.csproj`](packages/csharp/src/TimeLogic.DirectApi/TimeLogic.DirectApi.csproj).
+Package: `TimeLogic.Api`, defined in [`packages/csharp/src/TimeLogic.Api/TimeLogic.Api.csproj`](packages/csharp/src/TimeLogic.Api/TimeLogic.Api.csproj).
 
-Before first release, create/reserve the NuGet package ID, create a scoped NuGet API key, and store it in a protected GitHub environment (for example `nuget`). Replace generator placeholder author/company/description/copyright metadata and add license, package project URL, repository, readme, and package tags.
+Configure a NuGet trusted-publishing policy for this GitHub repository, `release.yml`, and the protected `nuget` environment. Add the repository variable `NUGET_USER` with the NuGet.org profile username that owns the policy. This is not a secret. The workflow exchanges GitHub OIDC for a short-lived publishing key; do not add a NuGet API key to the repository.
 
 Local preflight:
 
 ```powershell
 Push-Location packages/csharp
-dotnet restore TimeLogic.DirectApi.sln
-dotnet test TimeLogic.DirectApi.sln -c Release
-dotnet pack src/TimeLogic.DirectApi/TimeLogic.DirectApi.csproj -c Release -o ./artifacts
+dotnet restore TimeLogic.Api.sln
+dotnet test TimeLogic.Api.sln -c Release
+dotnet pack src/TimeLogic.Api/TimeLogic.Api.csproj -c Release -o ./artifacts
 Pop-Location
 ```
 
-Publish an inspected `.nupkg` using CI:
-
-```powershell
-dotnet nuget push packages/csharp/artifacts/TimeLogic.DirectApi.0.1.1.nupkg --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate
-```
-
-Add that command to the tag workflow only after a successful Test/production trial. The version in the `.csproj` is regenerated from `scripts/generate-all.mjs`, so update the generator script rather than only editing the project file.
+For the first independent NuGet release, manually dispatch `Release SDKs` with target `nuget`. This skips the other registries and publishes `TimeLogic.Api` through the trusted-publishing policy. The version in the `.csproj` is regenerated from `scripts/generate-all.mjs`, so update the generator script rather than only editing the project file.
 
 ### PHP / Packagist
 

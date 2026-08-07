@@ -1,4 +1,4 @@
-# TimeLogic.DirectApi.Model.TimezoneResolvedResponse
+# TimeLogic.Api.Model.TimezoneResolvedResponse
 Standard single-target timezone resolution payload.
 
 ## Properties

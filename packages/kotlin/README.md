@@ -1,4 +1,4 @@
-# com.timelogic.direct.api - Kotlin client library for TimeLogic API — Direct Customer Access
+# com.timelogic.direct.api - Kotlin client library for TimeLogic API | A World Time API
 
 Public direct-access contract for the TimeLogic gateway.
 

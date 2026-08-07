@@ -1,6 +1,6 @@
 # timelogic-direct-api
 
-TimeLogic API — Direct Customer Access
+TimeLogic API | A World Time API
 - API version: 1.0.0
   - Build date: 1970-01-01T00:00:00Z[Etc/UTC]
   - Generator version: 7.10.0

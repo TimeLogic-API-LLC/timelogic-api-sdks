@@ -1,4 +1,4 @@
-# TimeLogic.DirectApi.Model.DstResponse
+# TimeLogic.Api.Model.DstResponse
 
 ## Properties
 

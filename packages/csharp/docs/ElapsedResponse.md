@@ -1,4 +1,4 @@
-# TimeLogic.DirectApi.Model.ElapsedResponse
+# TimeLogic.Api.Model.ElapsedResponse
 
 ## Properties
 

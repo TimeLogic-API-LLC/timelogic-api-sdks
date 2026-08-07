@@ -1,6 +1,6 @@
 # timelogic-direct-api
 
-TimeLogic::DirectApi - the Ruby gem for the TimeLogic API — Direct Customer Access
+TimeLogic::DirectApi - the Ruby gem for the TimeLogic API | A World Time API
 
 Public direct-access contract for the TimeLogic gateway.
 

@@ -2,11 +2,11 @@
 name = "timelogic-api"
 version = "1.0.0"
 description = "TimeLogic API | A World Time API"
-authors = ["OpenAPI Generator Community <team@openapitools.org>"]
+authors = ["OpenAPI Generator Community <>"]
 license = "NoLicense"
 readme = "README.md"
 repository = "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks"
-keywords = ["OpenAPI", "OpenAPI-Generator", "TimeLogic API — Direct Customer Access"]
+keywords = ["OpenAPI", "OpenAPI-Generator", "TimeLogic API | A World Time API"]
 include = ["timelogic_direct_api/py.typed"]
 
 [tool.poetry.dependencies]

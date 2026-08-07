@@ -1,4 +1,4 @@
-# TimeLogic.DirectApi.Model.JwkKey
+# TimeLogic.Api.Model.JwkKey
 
 ## Properties
 

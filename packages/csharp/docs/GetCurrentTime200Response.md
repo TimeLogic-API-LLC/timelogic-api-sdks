@@ -1,4 +1,4 @@
-# TimeLogic.DirectApi.Model.GetCurrentTime200Response
+# TimeLogic.Api.Model.GetCurrentTime200Response
 
 ## Properties
 

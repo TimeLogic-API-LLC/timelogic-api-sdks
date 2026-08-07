@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>TimeLogic.Api</AssemblyName>
+    <PackageId>TimeLogic.Api</PackageId>
+    <OutputType>Library</OutputType>
+    <Authors>TimeLogic API LLC</Authors>
+    <Company>TimeLogic API LLC</Company>
+    <AssemblyTitle>TimeLogic API .NET SDK</AssemblyTitle>
+    <Description>Official .NET SDK for TimeLogic API, a world time API.</Description>
+    <Copyright>Copyright (c) TimeLogic API LLC</Copyright>
+    <RootNamespace>TimeLogic.Api</RootNamespace>
+    <Version>1.0.0</Version>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\TimeLogic.Api.xml</DocumentationFile>
+    <RepositoryUrl>https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://api.timelogicapi.com</PackageProjectUrl>
+    <PackageLicenseExpression>Unlicense</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>time;timezone;world-time;api;timelogic</PackageTags>
+    <PackageReleaseNotes>Initial public release.</PackageReleaseNotes>
+    <Nullable>annotations</Nullable>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JsonSubTypes" Version="2.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="RestSharp" Version="112.0.0" />
+    <PackageReference Include="Polly" Version="8.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+</Project>

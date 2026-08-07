@@ -4,7 +4,7 @@
   { "id": "rust", "generator": "rust", "output": "packages/rust", "required": ["Cargo.toml"] },
   { "id": "go", "generator": "go", "output": "packages/go", "required": ["go.mod"] },
   { "id": "java", "generator": "java", "output": "packages/java", "required": ["pom.xml"] },
-  { "id": "csharp", "generator": "csharp", "output": "packages/csharp", "required": ["src/TimeLogic.DirectApi/TimeLogic.DirectApi.csproj"] },
+  { "id": "csharp", "generator": "csharp", "output": "packages/csharp", "required": ["src/TimeLogic.Api/TimeLogic.Api.csproj"] },
   { "id": "php", "generator": "php", "output": "packages/php", "required": ["composer.json"] },
   { "id": "ruby", "generator": "ruby", "output": "packages/ruby", "required": ["Gemfile"] },
   { "id": "kotlin", "generator": "kotlin", "output": "packages/kotlin", "required": ["build.gradle"] },

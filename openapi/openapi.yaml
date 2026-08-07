@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: TimeLogic API — Direct Customer Access
+  title: TimeLogic API | A World Time API
   version: 1.0.0
   description: 'Public direct-access contract for the TimeLogic gateway.
 

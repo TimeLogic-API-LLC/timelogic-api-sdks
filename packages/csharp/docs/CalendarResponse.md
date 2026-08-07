@@ -1,4 +1,4 @@
-# TimeLogic.DirectApi.Model.CalendarResponse
+# TimeLogic.Api.Model.CalendarResponse
 
 ## Properties
 

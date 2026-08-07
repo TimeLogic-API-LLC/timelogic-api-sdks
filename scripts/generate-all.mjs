@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -18,7 +18,7 @@ const properties = {
   rust: 'packageName=timelogic-api,packageVersion=1.0.0,generateAliasAsModel=true,gitUserId=TimeLogic-API-LLC,gitRepoId=timelogic-api-sdks',
   go: 'packageName=timelogicdirectapi,packageVersion=0.1.0,generateAliasAsModel=true,gitUserId=TimeLogic-API-LLC,gitRepoId=timelogic-api-sdks',
   java: 'groupId=com.timelogic,artifactId=timelogic-direct-api,artifactVersion=0.1.0,apiPackage=com.timelogic.direct.api,modelPackage=com.timelogic.direct.model,generateAliasAsModel=true,gitUserId=TimeLogic-API-LLC,gitRepoId=timelogic-api-sdks',
-  csharp: 'packageName=TimeLogic.DirectApi,packageVersion=0.1.0,generateAliasAsModel=true,gitUserId=TimeLogic-API-LLC,gitRepoId=timelogic-api-sdks',
+  csharp: 'packageName=TimeLogic.Api,packageVersion=1.0.0,generateAliasAsModel=true,gitUserId=TimeLogic-API-LLC,gitRepoId=timelogic-api-sdks',
   php: 'invokerPackage=TimeLogic\\DirectApi,variableNamingConvention=camelCase,generateAliasAsModel=true,gitUserId=TimeLogic-API-LLC,gitRepoId=timelogic-api-sdks',
   ruby: 'gemName=timelogic-direct-api,moduleName=TimeLogic::DirectApi,generateAliasAsModel=true,gitUserId=TimeLogic-API-LLC,gitRepoId=timelogic-api-sdks',
   kotlin: 'packageName=com.timelogic.direct.api,artifactId=timelogic-direct-api,groupId=com.timelogic,artifactVersion=0.1.0,generateAliasAsModel=true,gitUserId=TimeLogic-API-LLC,gitRepoId=timelogic-api-sdks',
@@ -31,9 +31,23 @@ const run = (args) => new Promise((resolve, reject) => {
   child.on('exit', (code) => code === 0 ? resolve() : reject(new Error(`docker exited with ${code}`)));
 });
 
+function resetOutput(output) {
+  try {
+    rmSync(output, { recursive: true, force: true });
+  } catch (error) {
+    // Windows does not allow deletion of a directory that another process is
+    // using as its current working directory. Generated contents can still be
+    // safely cleared before OpenAPI Generator writes the replacement output.
+    if (error?.code !== 'EPERM' || !existsSync(output)) throw error;
+    for (const entry of readdirSync(output)) {
+      rmSync(path.join(output, entry), { recursive: true, force: true });
+    }
+  }
+}
+
 for (const target of targets) {
   const output = path.join(root, target.output);
-  rmSync(output, { recursive: true, force: true });
+  resetOutput(output);
   console.log(`Generating ${target.id} SDK...`);
   await run([
     'run', '--rm',

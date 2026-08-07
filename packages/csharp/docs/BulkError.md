@@ -1,4 +1,4 @@
-# TimeLogic.DirectApi.Model.BulkError
+# TimeLogic.Api.Model.BulkError
 Per-item error wrapper used inside bulk arrays returned by bulk-capable routes.
 
 ## Properties

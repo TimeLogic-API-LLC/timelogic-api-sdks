@@ -1,4 +1,4 @@
-# TimeLogic.DirectApi.Model.TimePayload
+# TimeLogic.Api.Model.TimePayload
 Canonical single-target time payload.
 
 ## Properties

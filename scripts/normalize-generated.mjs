@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const repoUrl = 'https://github.com/TimeLogic-API-LLC/timelogic-api.git';
+const repoUrl = 'https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git';
 const moduleName = 'github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go';
 
 function filesUnder(directory) {
@@ -28,14 +28,80 @@ for (const file of filesUnder('packages')) {
   if (normalized !== original) writeFileSync(file, normalized);
 }
 
-const csharpSolutionPath = 'packages/csharp/TimeLogic.DirectApi.sln';
+const csharpPackageName = 'TimeLogic.Api';
+const csharpSolutionPath = `packages/csharp/${csharpPackageName}.sln`;
 const csharpFixedProjectGuid = '{0F073C98-0C47-4A15-B71F-D69526FB4A50}';
 let csharpSolution = readFileSync(csharpSolutionPath, 'utf8');
-const csharpGeneratedProjectGuid = csharpSolution.match(/Project\("\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC\}"\) = "TimeLogic\.DirectApi", "[^"]+", "(\{[A-F0-9-]+\})"/)?.[1];
+const csharpGeneratedProjectGuid = csharpSolution.match(/Project\("\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC\}"\) = "TimeLogic\.Api", "[^"]+", "(\{[A-F0-9-]+\})"/)?.[1];
 if (csharpGeneratedProjectGuid && csharpGeneratedProjectGuid !== csharpFixedProjectGuid) {
   csharpSolution = csharpSolution.replaceAll(csharpGeneratedProjectGuid, csharpFixedProjectGuid);
 }
 writeFileSync(csharpSolutionPath, csharpSolution);
+
+writeFileSync(`packages/csharp/src/${csharpPackageName}/${csharpPackageName}.csproj`, `<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>${csharpPackageName}</AssemblyName>
+    <PackageId>${csharpPackageName}</PackageId>
+    <OutputType>Library</OutputType>
+    <Authors>TimeLogic API LLC</Authors>
+    <Company>TimeLogic API LLC</Company>
+    <AssemblyTitle>TimeLogic API .NET SDK</AssemblyTitle>
+    <Description>Official .NET SDK for TimeLogic API, a world time API.</Description>
+    <Copyright>Copyright (c) TimeLogic API LLC</Copyright>
+    <RootNamespace>${csharpPackageName}</RootNamespace>
+    <Version>1.0.0</Version>
+    <DocumentationFile>bin\\$(Configuration)\\$(TargetFramework)\\${csharpPackageName}.xml</DocumentationFile>
+    <RepositoryUrl>${repoUrl}</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://api.timelogicapi.com</PackageProjectUrl>
+    <PackageLicenseExpression>Unlicense</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>time;timezone;world-time;api;timelogic</PackageTags>
+    <PackageReleaseNotes>Initial public release.</PackageReleaseNotes>
+    <Nullable>annotations</Nullable>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JsonSubTypes" Version="2.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="RestSharp" Version="112.0.0" />
+    <PackageReference Include="Polly" Version="8.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+</Project>
+`);
+
+writeFileSync('packages/csharp/README.md', `# TimeLogic API | A World Time API
+
+Official .NET SDK for TimeLogic API.
+
+## Install
+
+\`\`\`bash
+dotnet add package TimeLogic.Api --version 1.0.0
+\`\`\`
+
+## Quick start
+
+\`\`\`csharp
+using TimeLogic.Api.Api;
+using TimeLogic.Api.Client;
+
+var configuration = TransportConfiguration.Create("YOUR_API_KEY");
+var api = new TimeApi(configuration);
+var result = api.GetCurrentTime(tz: "America/New_York");
+\`\`\`
+
+For API reference and usage guides, visit [TimeLogic API](https://api.timelogicapi.com).
+`);
 
 const goMod = 'packages/go/go.mod';
 writeFileSync(goMod, `module ${moduleName}
@@ -84,6 +150,8 @@ const pythonPyprojectPath = 'packages/python/pyproject.toml';
 let pythonPyproject = readFileSync(pythonPyprojectPath, 'utf8')
   .replace('name = "timelogic_direct_api"', 'name = "timelogic-api"')
   .replace(/^description = ".*"$/m, 'description = "TimeLogic API | A World Time API"')
+  .replaceAll('OpenAPI Generator community', 'TimeLogic API LLC')
+  .replaceAll('team@openapitools.org', '')
   .replace(
     'repository = "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go"',
     'repository = "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks"'
@@ -94,6 +162,8 @@ const pythonSetupPath = 'packages/python/setup.py';
 let pythonSetup = readFileSync(pythonSetupPath, 'utf8')
   .replace('url="",', 'url="https://github.com/TimeLogic-API-LLC/timelogic-api-sdks",')
   .replace(/description="[^"]*"/, 'description="TimeLogic API | A World Time API"')
+  .replaceAll('OpenAPI Generator community', 'TimeLogic API LLC')
+  .replaceAll('team@openapitools.org', '')
   .replace(
     /long_description="""\\[\s\S]*?""",  # noqa: E501/,
     `long_description="""\\
@@ -204,7 +274,7 @@ class TimePayloadBulkResponse(RootModel[List[TimePayloadBulkItem]]):
 
 const goBulk = 'packages/go/model_time_payload_bulk_response.go';
 writeFileSync(goBulk, `/*
-TimeLogic API — Direct Customer Access
+TimeLogic API | A World Time API
 
 Code generated by OpenAPI Generator and normalized for Go's array-model handling.
 */
@@ -596,9 +666,9 @@ public final class TransportConfiguration {
 }
 `);
 
-writeFileSync('packages/csharp/src/TimeLogic.DirectApi/Client/TransportConfiguration.cs', `using System;
+writeFileSync(`packages/csharp/src/${csharpPackageName}/Client/TransportConfiguration.cs`, `using System;
 
-namespace TimeLogic.DirectApi.Client
+namespace ${csharpPackageName}.Client
 {
     public static class TransportConfiguration
     {

@@ -1,4 +1,4 @@
-# TimeLogic.DirectApi.Model.TimezoneOffsetResponse
+# TimeLogic.Api.Model.TimezoneOffsetResponse
 Offset-based timezone lookup result with `matching_zones` for the current request-time offset match.
 
 ## Properties

@@ -1,4 +1,4 @@
-# TimeLogic.DirectApi.Model.GetTimezone200Response
+# TimeLogic.Api.Model.GetTimezone200Response
 
 ## Properties
 

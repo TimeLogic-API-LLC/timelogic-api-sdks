@@ -1,4 +1,4 @@
-# TimeLogic.DirectApi.Model.ErrorResponse
+# TimeLogic.Api.Model.ErrorResponse
 
 ## Properties
 

@@ -17,7 +17,7 @@ info:
     - credentials are extracted in Authorization, X-API-Key, then api_key query order; conflicting values are rejected
     - the first server is the default direct API host. The second server is the RapidAPI gateway and can be selected or overridden by SDK configuration
     - `sign` is available on supported JSON routes and is not supported on `/v1/time/clock`
-  title: TimeLogic API — Direct Customer Access
+  title: TimeLogic API | A World Time API
   version: 1.0.0
 servers:
 - description: Default direct customer API host; override `host` for a customer-specific

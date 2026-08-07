@@ -1,4 +1,4 @@
-# TimeLogic.DirectApi.Model.JwksResponse
+# TimeLogic.Api.Model.JwksResponse
 
 ## Properties
 

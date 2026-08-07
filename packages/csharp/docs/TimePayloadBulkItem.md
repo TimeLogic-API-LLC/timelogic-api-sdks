@@ -1,4 +1,4 @@
-# TimeLogic.DirectApi.Model.TimePayloadBulkItem
+# TimeLogic.Api.Model.TimePayloadBulkItem
 One bulk array item, either a successful time payload or a per-item bulk error.
 
 ## Properties

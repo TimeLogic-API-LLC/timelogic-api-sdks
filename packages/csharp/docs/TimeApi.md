@@ -1,4 +1,4 @@
-# TimeLogic.DirectApi.Api.TimeApi
+# TimeLogic.Api.Api.TimeApi
 
 All URIs are relative to *https://api.timelogicapi.com*
 
@@ -26,9 +26,9 @@ Adds `seconds`, `minutes`, `hours`, and `days` to an optional base timestamp.  I
 ```csharp
 using System.Collections.Generic;
 using System.Diagnostics;
-using TimeLogic.DirectApi.Api;
-using TimeLogic.DirectApi.Client;
-using TimeLogic.DirectApi.Model;
+using TimeLogic.Api.Api;
+using TimeLogic.Api.Client;
+using TimeLogic.Api.Model;
 
 namespace Example
 {
@@ -184,9 +184,9 @@ Converts one required input timestamp into a single target or a bulk array.  Inp
 ```csharp
 using System.Collections.Generic;
 using System.Diagnostics;
-using TimeLogic.DirectApi.Api;
-using TimeLogic.DirectApi.Client;
-using TimeLogic.DirectApi.Model;
+using TimeLogic.Api.Api;
+using TimeLogic.Api.Client;
+using TimeLogic.Api.Model;
 
 namespace Example
 {
@@ -334,9 +334,9 @@ Computes the duration between `from` and `to`.  Required query fields: `from` an
 ```csharp
 using System.Collections.Generic;
 using System.Diagnostics;
-using TimeLogic.DirectApi.Api;
-using TimeLogic.DirectApi.Client;
-using TimeLogic.DirectApi.Model;
+using TimeLogic.Api.Api;
+using TimeLogic.Api.Client;
+using TimeLogic.Api.Model;
 
 namespace Example
 {
@@ -484,9 +484,9 @@ Returns calendar fields for an optional timestamp and target.  Input timestamp f
 ```csharp
 using System.Collections.Generic;
 using System.Diagnostics;
-using TimeLogic.DirectApi.Api;
-using TimeLogic.DirectApi.Client;
-using TimeLogic.DirectApi.Model;
+using TimeLogic.Api.Api;
+using TimeLogic.Api.Client;
+using TimeLogic.Api.Model;
 
 namespace Example
 {
@@ -634,9 +634,9 @@ Returns an embeddable HTML clock fragment.  Input timestamp forms: - `unix=17113
 ```csharp
 using System.Collections.Generic;
 using System.Diagnostics;
-using TimeLogic.DirectApi.Api;
-using TimeLogic.DirectApi.Client;
-using TimeLogic.DirectApi.Model;
+using TimeLogic.Api.Api;
+using TimeLogic.Api.Client;
+using TimeLogic.Api.Model;
 
 namespace Example
 {
@@ -780,9 +780,9 @@ Returns current time data for a single target, or a bulk array when exactly one 
 ```csharp
 using System.Collections.Generic;
 using System.Diagnostics;
-using TimeLogic.DirectApi.Api;
-using TimeLogic.DirectApi.Client;
-using TimeLogic.DirectApi.Model;
+using TimeLogic.Api.Api;
+using TimeLogic.Api.Client;
+using TimeLogic.Api.Model;
 
 namespace Example
 {
@@ -912,9 +912,9 @@ Returns daylight-saving status for the selected target.  Target selector rules: 
 ```csharp
 using System.Collections.Generic;
 using System.Diagnostics;
-using TimeLogic.DirectApi.Api;
-using TimeLogic.DirectApi.Client;
-using TimeLogic.DirectApi.Model;
+using TimeLogic.Api.Api;
+using TimeLogic.Api.Client;
+using TimeLogic.Api.Model;
 
 namespace Example
 {
@@ -1046,9 +1046,9 @@ Computes elapsed or remaining duration relative to one required reference timest
 ```csharp
 using System.Collections.Generic;
 using System.Diagnostics;
-using TimeLogic.DirectApi.Api;
-using TimeLogic.DirectApi.Client;
-using TimeLogic.DirectApi.Model;
+using TimeLogic.Api.Api;
+using TimeLogic.Api.Client;
+using TimeLogic.Api.Model;
 
 namespace Example
 {
@@ -1216,9 +1216,9 @@ Resolves timezone metadata for a single target.  Target selector rules: - Use ex
 ```csharp
 using System.Collections.Generic;
 using System.Diagnostics;
-using TimeLogic.DirectApi.Api;
-using TimeLogic.DirectApi.Client;
-using TimeLogic.DirectApi.Model;
+using TimeLogic.Api.Api;
+using TimeLogic.Api.Client;
+using TimeLogic.Api.Model;
 
 namespace Example
 {

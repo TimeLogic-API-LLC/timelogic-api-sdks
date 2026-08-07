@@ -1,4 +1,4 @@
-# TimeLogic.DirectApi.Model.TimezoneMatch
+# TimeLogic.Api.Model.TimezoneMatch
 
 ## Properties
 
