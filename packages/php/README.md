@@ -34,7 +34,7 @@ To install the bindings via [Composer](https://getcomposer.org/), add the follow
   "repositories": [
     {
       "type": "vcs",
-      "url": "https://github.com/TimeLogic-API-LLC/timelogic-api.git"
+      "url": "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git"
     }
   ],
   "require": {

@@ -54,7 +54,7 @@ Finally add this to the Gemfile:
 
 If the Ruby gem is hosted at a git repository: https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go, then add the following in the Gemfile:
 
-    gem 'timelogic-direct-api', :git => 'https://github.com/TimeLogic-API-LLC/timelogic-api.git'
+    gem 'timelogic-direct-api', :git => 'https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git'
 
 ### Include the Ruby code directly
 
