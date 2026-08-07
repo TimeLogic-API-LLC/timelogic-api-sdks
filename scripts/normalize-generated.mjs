@@ -69,6 +69,40 @@ gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 `);
 
+const typescriptPackagePath = 'packages/typescript/package.json';
+const typescriptPackage = JSON.parse(readFileSync(typescriptPackagePath, 'utf8'));
+typescriptPackage.repository = {
+  type: 'git',
+  url: 'git+https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git'
+};
+typescriptPackage.files = ['dist', 'README.md'];
+delete typescriptPackage.scripts.prepare;
+typescriptPackage.scripts.prepack = 'npm run build';
+writeFileSync(typescriptPackagePath, `${JSON.stringify(typescriptPackage, null, 2)}\n`);
+
+const pythonPyprojectPath = 'packages/python/pyproject.toml';
+let pythonPyproject = readFileSync(pythonPyprojectPath, 'utf8')
+  .replace('name = "timelogic_direct_api"', 'name = "timelogic-api"')
+  .replace(
+    'repository = "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go"',
+    'repository = "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks"'
+  );
+writeFileSync(pythonPyprojectPath, pythonPyproject);
+
+const pythonSetupPath = 'packages/python/setup.py';
+let pythonSetup = readFileSync(pythonSetupPath, 'utf8')
+  .replace('url="",', 'url="https://github.com/TimeLogic-API-LLC/timelogic-api-sdks",');
+writeFileSync(pythonSetupPath, pythonSetup);
+
+const pythonReadmePath = 'packages/python/README.md';
+let pythonReadme = readFileSync(pythonReadmePath, 'utf8')
+  .replaceAll(
+    'git+https://github.com/TimeLogic-API-LLC/timelogic-api.git',
+    'git+https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git#subdirectory=packages/python'
+  )
+  .trimEnd() + '\n';
+writeFileSync(pythonReadmePath, pythonReadme);
+
 const pythonBulk = 'packages/python/timelogic_direct_api/models/time_payload_bulk_response.py';
 writeFileSync(pythonBulk, `# coding: utf-8
 """Typed root-array model for the direct API bulk response."""

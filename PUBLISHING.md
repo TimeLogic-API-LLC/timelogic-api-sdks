@@ -64,7 +64,7 @@ Prerequisites:
 - Create the `@timelogic` npm organization and ensure the publishing GitHub identity has permission to publish the package.
 - Configure npm trusted publishing for this repository and the `Release SDKs` workflow/environment named `npm`. The workflow uses GitHub OIDC, so no `NPM_TOKEN` is configured in this repo.
 - The first scoped package publish must be public. The workflow already uses `--access public`.
-- The release job installs from `packages/typescript/package-lock.json`, builds `dist/`, and performs an `npm pack --dry-run` check before publishing.
+- The release job installs the package build dependency, builds `dist/`, and performs an `npm pack --dry-run` check before publishing.
 
 Local preflight:
 
