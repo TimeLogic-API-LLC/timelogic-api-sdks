@@ -195,7 +195,7 @@ dotnet pack src/TimeLogic.Api/TimeLogic.Api.csproj -c Release -o ./artifacts
 Pop-Location
 ```
 
-For the first independent NuGet release, manually dispatch `Release SDKs` with target `nuget`. This skips the other registries and publishes `TimeLogic.Api` through the trusted-publishing policy. The version in the `.csproj` is regenerated from `scripts/generate-all.mjs`, so update the generator script rather than only editing the project file.
+For the first independent NuGet release, manually dispatch `Release SDKs` with target `nuget`. This skips the other registries and publishes `TimeLogic.Api` through the trusted-publishing policy. The workflow waits for the public NuGet catalog to expose the version before reporting success; NuGet may need several minutes to index a newly accepted upload. The version in the `.csproj` is regenerated from `scripts/generate-all.mjs`, so update the generator script rather than only editing the project file.
 
 ### PHP / Packagist
 

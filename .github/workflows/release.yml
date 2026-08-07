@@ -127,6 +127,24 @@ jobs:
           user: ${{ vars.NUGET_USER }}
       - run: dotnet nuget push artifacts/*.nupkg --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
         working-directory: packages/csharp
+      - name: Wait for public NuGet indexing
+        shell: bash
+        working-directory: packages/csharp
+        run: |
+          package_id=$(sed -n 's:.*<PackageId>\([^<]*\)</PackageId>.*:\1:p' src/TimeLogic.Api/TimeLogic.Api.csproj)
+          package_version=$(sed -n 's:.*<Version>\([^<]*\)</Version>.*:\1:p' src/TimeLogic.Api/TimeLogic.Api.csproj)
+          package_id_lower=$(printf '%s' "$package_id" | tr '[:upper:]' '[:lower:]')
+          index_url="https://api.nuget.org/v3-flatcontainer/${package_id_lower}/index.json"
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent "$index_url" | grep -Fq "\"$package_version\""; then
+              echo "NuGet catalog contains ${package_id} ${package_version}."
+              exit 0
+            fi
+            echo "NuGet catalog is still indexing ${package_id} ${package_version} (attempt ${attempt}/20)."
+            sleep 15
+          done
+          echo "NuGet accepted the upload but did not expose ${package_id} ${package_version} in the public catalog within five minutes."
+          exit 1
 
   github-release:
     needs: verify
