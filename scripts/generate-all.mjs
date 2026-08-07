@@ -15,7 +15,7 @@ if (!existsSync(path.join(root, 'openapi/openapi.yaml'))) throw new Error('opena
 const properties = {
   typescript: 'npmName=@timelogic/direct-api,npmVersion=1.0.0,supportsES6=true,useSingleRequestParameter=true,generateAliasAsModel=true,gitUserId=TimeLogic-API-LLC,gitRepoId=timelogic-api-sdks',
   python: 'packageName=timelogic_direct_api,projectName=timelogic-api,packageVersion=1.0.0,generateAliasAsModel=true,gitUserId=TimeLogic-API-LLC,gitRepoId=timelogic-api-sdks',
-  rust: 'packageName=timelogic-api,packageVersion=0.1.0,generateAliasAsModel=true,gitUserId=TimeLogic-API-LLC,gitRepoId=timelogic-api-sdks',
+  rust: 'packageName=timelogic-api,packageVersion=1.0.0,generateAliasAsModel=true,gitUserId=TimeLogic-API-LLC,gitRepoId=timelogic-api-sdks',
   go: 'packageName=timelogicdirectapi,packageVersion=0.1.0,generateAliasAsModel=true,gitUserId=TimeLogic-API-LLC,gitRepoId=timelogic-api-sdks',
   java: 'groupId=com.timelogic,artifactId=timelogic-direct-api,artifactVersion=0.1.0,apiPackage=com.timelogic.direct.api,modelPackage=com.timelogic.direct.model,generateAliasAsModel=true,gitUserId=TimeLogic-API-LLC,gitRepoId=timelogic-api-sdks',
   csharp: 'packageName=TimeLogic.DirectApi,packageVersion=0.1.0,generateAliasAsModel=true,gitUserId=TimeLogic-API-LLC,gitRepoId=timelogic-api-sdks',

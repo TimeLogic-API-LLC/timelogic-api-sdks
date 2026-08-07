@@ -127,7 +127,7 @@ cargo publish --dry-run
 Pop-Location
 ```
 
-Once configured and corrected, the `v0.1.1` tag runs `cargo publish`. Do not invoke a second publish after the job succeeds. The crate metadata includes its repository, homepage, readme, keywords, and categories for a complete crates.io listing.
+For an independently published Rust version, create a dedicated immutable tag such as `rust-v1.0.0`, then manually dispatch `Release SDKs` with target `crates`. This skips npm, PyPI, and GitHub-release creation while using the same verified workflow. Do not invoke a second publish after the job succeeds. The crate metadata includes its repository, homepage, readme, keywords, and categories for a complete crates.io listing.
 
 ## Manual targets and required one-time setup
 

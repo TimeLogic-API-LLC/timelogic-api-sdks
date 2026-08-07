@@ -4,6 +4,15 @@ on:
   push:
     tags: ['v*.*.*']
   workflow_dispatch:
+    inputs:
+      target:
+        description: Registry target to publish
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - crates
 
 permissions:
   contents: write
@@ -27,6 +36,7 @@ jobs:
 
   npm:
     needs: verify
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.target == 'all' }}
     runs-on: ubuntu-latest
     environment: npm
     steps:
@@ -60,6 +70,7 @@ jobs:
 
   pypi:
     needs: verify
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.target == 'all' }}
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
@@ -81,7 +92,7 @@ jobs:
     needs: verify
     runs-on: ubuntu-latest
     environment: crates-io
-    if: ${{ vars.PUBLISH_CRATES == 'true' }}
+    if: ${{ vars.PUBLISH_CRATES == 'true' && (github.event_name != 'workflow_dispatch' || inputs.target == 'all' || inputs.target == 'crates') }}
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -94,6 +105,7 @@ jobs:
 
   github-release:
     needs: [verify, npm, pypi]
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.target == 'all' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
