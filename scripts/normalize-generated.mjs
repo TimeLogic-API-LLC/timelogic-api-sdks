@@ -144,6 +144,7 @@ categories = ["api-bindings", "date-and-time"]`
 writeFileSync(rustCargoTomlPath, rustCargoToml);
 
 const rustReadmePath = 'packages/rust/README.md';
+const rustVersion = rustCargoToml.match(/^version = "([^"]+)"$/m)?.[1] ?? '0.1.0';
 let rustReadme = readFileSync(rustReadmePath, 'utf8')
   .replace(
     /^# Rust API client for [^\r\n]+[\s\S]*?## Documentation for API Endpoints/,
@@ -157,13 +158,14 @@ Add the crate to your \`Cargo.toml\`:
 
 \`\`\`toml
 [dependencies]
-timelogic-api = "${rustCargoToml.match(/^version = "([^"]+)"$/m)?.[1] ?? '0.1.0'}"
+timelogic-api = "${rustVersion}"
 \`\`\`
 
 The crate is imported as \`timelogic_api\`.
 
 ## Documentation for API Endpoints`
   )
+  .replace(/^timelogic-api = ".*"$/m, `timelogic-api = "${rustVersion}"`)
   .replaceAll('timelogic-direct-api', 'timelogic-api');
 writeFileSync(rustReadmePath, rustReadme);
 

@@ -8,7 +8,7 @@ Add the crate to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-timelogic-api = "0.1.0"
+timelogic-api = "1.0.0"
 ```
 
 The crate is imported as `timelogic_api`.
