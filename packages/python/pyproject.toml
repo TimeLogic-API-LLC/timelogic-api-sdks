@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "timelogic_direct_api"
-version = "0.1.0"
+name = "timelogic-api"
+version = "1.0.0"
 description = "TimeLogic API — Direct Customer Access"
 authors = ["OpenAPI Generator Community <team@openapitools.org>"]
 license = "NoLicense"
 readme = "README.md"
-repository = "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go"
+repository = "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks"
 keywords = ["OpenAPI", "OpenAPI-Generator", "TimeLogic API — Direct Customer Access"]
 include = ["timelogic_direct_api/py.typed"]
 

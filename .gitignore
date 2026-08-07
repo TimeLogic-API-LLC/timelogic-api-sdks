@@ -1,5 +1,6 @@
 node_modules/
 packages/**/package-lock.json
+!packages/typescript/package-lock.json
 packages/**/__rapid_transport_test__/
 packages/**/composer.lock
 packages/**/vendor/
