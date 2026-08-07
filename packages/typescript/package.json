@@ -7,10 +7,6 @@
     "type": "git",
     "url": "git+https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git"
   },
-  "files": [
-    "dist",
-    "README.md"
-  ],
   "main": "./dist/index.js",
   "typings": "./dist/index.d.ts",
   "module": "./dist/esm/index.js",
@@ -21,5 +17,9 @@
   },
   "devDependencies": {
     "typescript": "^4.0 || ^5.0"
-  }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ]
 }

@@ -1,4 +1,4 @@
-# timelogic-direct-api
+# timelogic-api
 Public direct-access contract for the TimeLogic gateway.
 
 This public spec excludes `/healthz` and the shared clock asset routes. It keeps `/.well-known/time-api-public-key`, `/v1/time/clock`, and signed JSON response controls because public consumers may need them.

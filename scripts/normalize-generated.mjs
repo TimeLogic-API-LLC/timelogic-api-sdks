@@ -96,6 +96,7 @@ writeFileSync(pythonSetupPath, pythonSetup);
 
 const pythonReadmePath = 'packages/python/README.md';
 let pythonReadme = readFileSync(pythonReadmePath, 'utf8')
+  .replace('# timelogic-direct-api', '# timelogic-api')
   .replaceAll(
     'git+https://github.com/TimeLogic-API-LLC/timelogic-api.git',
     'git+https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git#subdirectory=packages/python'
