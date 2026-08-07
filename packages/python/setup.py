@@ -33,7 +33,7 @@ REQUIRES = [
 setup(
     name=NAME,
     version=VERSION,
-    description="TimeLogic API — Direct Customer Access",
+    description="TimeLogic API | A World Time API",
     author="OpenAPI Generator community",
     author_email="team@openapitools.org",
     url="https://github.com/TimeLogic-API-LLC/timelogic-api-sdks",
@@ -43,9 +43,9 @@ setup(
     include_package_data=True,
     long_description_content_type='text/markdown',
     long_description="""\
-# TimeLogic API Python SDK
+# TimeLogic API | A World Time API
 
-Official Python client for the TimeLogic direct-access API.
+Official Python SDK for world time, timezone conversion, and calendar information.
 
 ## Install
 

@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "timelogic-api"
 version = "1.0.0"
-description = "TimeLogic API — Direct Customer Access"
+description = "TimeLogic API | A World Time API"
 authors = ["OpenAPI Generator Community <team@openapitools.org>"]
 license = "NoLicense"
 readme = "README.md"

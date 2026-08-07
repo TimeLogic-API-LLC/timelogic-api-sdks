@@ -83,6 +83,7 @@ writeFileSync(typescriptPackagePath, `${JSON.stringify(typescriptPackage, null, 
 const pythonPyprojectPath = 'packages/python/pyproject.toml';
 let pythonPyproject = readFileSync(pythonPyprojectPath, 'utf8')
   .replace('name = "timelogic_direct_api"', 'name = "timelogic-api"')
+  .replace(/^description = ".*"$/m, 'description = "TimeLogic API | A World Time API"')
   .replace(
     'repository = "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go"',
     'repository = "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks"'
@@ -92,12 +93,13 @@ writeFileSync(pythonPyprojectPath, pythonPyproject);
 const pythonSetupPath = 'packages/python/setup.py';
 let pythonSetup = readFileSync(pythonSetupPath, 'utf8')
   .replace('url="",', 'url="https://github.com/TimeLogic-API-LLC/timelogic-api-sdks",')
+  .replace(/description="[^"]*"/, 'description="TimeLogic API | A World Time API"')
   .replace(
     /long_description="""\\[\s\S]*?""",  # noqa: E501/,
     `long_description="""\\
-# TimeLogic API Python SDK
+# TimeLogic API | A World Time API
 
-Official Python client for the TimeLogic direct-access API.
+Official Python SDK for world time, timezone conversion, and calendar information.
 
 ## Install
 
