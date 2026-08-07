@@ -17,7 +17,7 @@ This repository has ten generated SDKs. A release tag currently publishes **only
 | Kotlin | Maven Central | Intended: `com.timelogic:timelogic-direct-api` | No | Blocked: no Maven publication is defined |
 | Swift | Swift Package Manager | Git source package (currently `OpenAPIClient`) | No | Release by Git tag after package identity cleanup |
 
-The existing release workflow is [`.github/workflows/release.yml`](.github/workflows/release.yml). It creates a GitHub release only after the `npm` and `pypi` jobs succeed. A Rust failure is currently not part of that final dependency list, so enable and test it before describing the tag as a complete multi-SDK release.
+The existing release workflow is [`.github/workflows/release.yml`](.github/workflows/release.yml). After shared verification, the `npm` and `pypi` jobs run independently and in parallel: a failure in one does not prevent the other registry from publishing. It creates a GitHub release only after both jobs succeed. A Rust failure is currently not part of that final dependency list, so enable and test it before describing the tag as a complete multi-SDK release.
 
 ## One release, end to end
 

@@ -43,7 +43,21 @@ setup(
     include_package_data=True,
     long_description_content_type='text/markdown',
     long_description="""\
-    Public direct-access contract for the TimeLogic gateway.  This public spec excludes &#x60;/healthz&#x60; and the shared clock asset routes. It keeps &#x60;/.well-known/time-api-public-key&#x60;, &#x60;/v1/time/clock&#x60;, and signed JSON response controls because public consumers may need them.  Authentication: - direct access supports &#x60;Authorization: Bearer &lt;token&gt;&#x60;, &#x60;X-API-Key&#x60;, and &#x60;api_key&#x60; query credentials - RapidAPI access uses &#x60;X-RapidAPI-Key&#x60; and &#x60;X-RapidAPI-Host&#x60;; the SDKs expose this as a &#x60;rapidApi&#x60; transport option that accepts only the RapidAPI key  Behavioral notes: - all documented operations are &#x60;GET&#x60; - only one selector family may be used at a time - current and convert support bulk only through one comma-separated &#x60;tz&#x60;, &#x60;ip&#x60;, or &#x60;offset&#x60; selector - add, diff, calendar, dst, elapsed, timezone, and clock are single-target routes - credentials are extracted in Authorization, X-API-Key, then api_key query order; conflicting values are rejected - the first server is the default direct API host. The second server is the RapidAPI gateway and can be selected or overridden by SDK configuration - &#x60;sign&#x60; is available on supported JSON routes and is not supported on &#x60;/v1/time/clock&#x60;
-    """,  # noqa: E501
+# TimeLogic API Python SDK
+
+Official Python client for the TimeLogic direct-access API.
+
+## Install
+
+```bash
+pip install timelogic-api
+```
+
+```python
+import timelogic_direct_api
+```
+
+See the API reference and source code at https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.
+""",  # noqa: E501
     package_data={"timelogic_direct_api": ["py.typed"]},
 )

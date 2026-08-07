@@ -91,7 +91,27 @@ writeFileSync(pythonPyprojectPath, pythonPyproject);
 
 const pythonSetupPath = 'packages/python/setup.py';
 let pythonSetup = readFileSync(pythonSetupPath, 'utf8')
-  .replace('url="",', 'url="https://github.com/TimeLogic-API-LLC/timelogic-api-sdks",');
+  .replace('url="",', 'url="https://github.com/TimeLogic-API-LLC/timelogic-api-sdks",')
+  .replace(
+    /long_description="""\\[\s\S]*?""",  # noqa: E501/,
+    `long_description="""\\
+# TimeLogic API Python SDK
+
+Official Python client for the TimeLogic direct-access API.
+
+## Install
+
+\`\`\`bash
+pip install timelogic-api
+\`\`\`
+
+\`\`\`python
+import timelogic_direct_api
+\`\`\`
+
+See the API reference and source code at https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.
+""",  # noqa: E501`
+  );
 writeFileSync(pythonSetupPath, pythonSetup);
 
 const pythonReadmePath = 'packages/python/README.md';
