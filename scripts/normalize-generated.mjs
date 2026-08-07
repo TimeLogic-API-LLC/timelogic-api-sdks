@@ -813,7 +813,7 @@ const rubyReadmePath = 'packages/ruby/README.md';
 let rubyReadme = readFileSync(rubyReadmePath, 'utf8')
   .replace(/^# timelogic-api[\s\S]*?\n## Installation/m,
     '# TimeLogic API | A World Time API\n\nOfficial Ruby SDK for TimeLogic API, providing world time, timezone, calendar, and signed response operations.\n\n## Installation')
-  .replaceAll('https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go', repoUrl.replace(/\.git$/, ''))
+  .replace(/https:\/\/github\.com\/TimeLogic-API-LLC\/timelogic-api-sdks(?:\.git)?\/packages\/go/g, repoUrl)
   .replaceAll('Public direct-access contract for the TimeLogic gateway.', 'Official Ruby SDK for TimeLogic API.')
   .trimEnd() + '\n';
 writeFileSync(rubyReadmePath, rubyReadme);
