@@ -126,6 +126,28 @@ let pythonReadme = readFileSync(pythonReadmePath, 'utf8')
   .trimEnd() + '\n';
 writeFileSync(pythonReadmePath, pythonReadme);
 
+const rustCargoTomlPath = 'packages/rust/Cargo.toml';
+let rustCargoToml = readFileSync(rustCargoTomlPath, 'utf8')
+  .replace(/^name = .*$/m, 'name = "timelogic-api"')
+  .replace(/^authors = .*$/m, 'authors = ["TimeLogic API LLC"]')
+  .replace(/^description = .*$/m, 'description = "Official Rust SDK for TimeLogic API, a world time API."')
+  .replace(/^(repository|homepage|readme|keywords|categories) = .*\r?\n/gm, '')
+  .replace(
+    'edition = "2021"',
+    `edition = "2021"
+repository = "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks"
+homepage = "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks"
+readme = "README.md"
+keywords = ["time", "timezone", "world-time", "api"]
+categories = ["api-bindings", "date-and-time"]`
+  );
+writeFileSync(rustCargoTomlPath, rustCargoToml);
+
+const rustReadmePath = 'packages/rust/README.md';
+let rustReadme = readFileSync(rustReadmePath, 'utf8')
+  .replaceAll('timelogic-direct-api', 'timelogic-api');
+writeFileSync(rustReadmePath, rustReadme);
+
 const pythonBulk = 'packages/python/timelogic_direct_api/models/time_payload_bulk_response.py';
 writeFileSync(pythonBulk, `# coding: utf-8
 """Typed root-array model for the direct API bulk response."""

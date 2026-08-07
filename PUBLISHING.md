@@ -8,7 +8,7 @@ This repository has ten generated SDKs. A release tag currently publishes **only
 | --- | --- | --- | --- | --- |
 | TypeScript | npm | `@timelogic/direct-api` | Yes | Ready after trusted-publisher/2FA publishing access is configured |
 | Python | PyPI | `timelogic-api` | Yes | Ready after trusted-publisher setup |
-| Rust | crates.io | `timelogic-direct-api` | Optional | Blocked: `--locked` is used but `Cargo.lock` is intentionally absent |
+| Rust | crates.io | `timelogic-api` | Optional | Gated: requires crates.io publisher setup and `PUBLISH_CRATES=true` |
 | Go | Go module proxy | `github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go` | No | Publish with a matching module tag |
 | Java | Maven Central | `com.timelogic:timelogic-direct-api` | No | Requires Central publishing/signing configuration |
 | C# | NuGet.org | `TimeLogic.DirectApi` | No | Requires NuGet.org publisher setup and automation |
@@ -108,14 +108,14 @@ The tag workflow builds and publishes `packages/python/dist/` with PyPI OIDC. Fo
 
 ### Rust / crates.io
 
-Crate: `timelogic-direct-api`, from [`packages/rust/Cargo.toml`](packages/rust/Cargo.toml).
+Crate: `timelogic-api`, from [`packages/rust/Cargo.toml`](packages/rust/Cargo.toml). Its Rust import name is `timelogic_api`.
 
 Prerequisites:
 
 - Claim the crate name and add the organization/maintainers on crates.io.
 - Configure a protected GitHub environment named `crates-io`, containing the `CARGO_REGISTRY_TOKEN` secret.
 - Set the repository variable `PUBLISH_CRATES` to exactly `true`. This deliberately gates the existing workflow job.
-- Fix the Rust workflow command before enabling it: [`packages/rust/.gitignore`](packages/rust/.gitignore) excludes `Cargo.lock`, but the workflow runs `cargo publish --locked`. Either commit a generated lockfile and stop ignoring it, or remove `--locked` from the publish command. For a library crate, the latter is generally the normal choice.
+- The release workflow first runs `cargo publish --dry-run`, then publishes. It intentionally remains gated until the crate name and public metadata have been reviewed.
 
 Local preflight:
 
@@ -127,7 +127,7 @@ cargo publish --dry-run
 Pop-Location
 ```
 
-Once configured and corrected, the `v0.1.1` tag runs `cargo publish`. Do not invoke a second publish after the job succeeds. Consider adding `repository`, `homepage`, `documentation`, and `readme` fields to `Cargo.toml` before the first public release, so the crates.io listing is complete.
+Once configured and corrected, the `v0.1.1` tag runs `cargo publish`. Do not invoke a second publish after the job succeeds. The crate metadata includes its repository, homepage, readme, keywords, and categories for a complete crates.io listing.
 
 ## Manual targets and required one-time setup
 
