@@ -145,6 +145,25 @@ writeFileSync(rustCargoTomlPath, rustCargoToml);
 
 const rustReadmePath = 'packages/rust/README.md';
 let rustReadme = readFileSync(rustReadmePath, 'utf8')
+  .replace(
+    /^# Rust API client for [^\r\n]+[\s\S]*?## Documentation for API Endpoints/,
+    `# TimeLogic API | A World Time API
+
+Official Rust SDK for world time, timezone conversion, and calendar information.
+
+## Install
+
+Add the crate to your \`Cargo.toml\`:
+
+\`\`\`toml
+[dependencies]
+timelogic-api = "${rustCargoToml.match(/^version = "([^"]+)"$/m)?.[1] ?? '0.1.0'}"
+\`\`\`
+
+The crate is imported as \`timelogic_api\`.
+
+## Documentation for API Endpoints`
+  )
   .replaceAll('timelogic-direct-api', 'timelogic-api');
 writeFileSync(rustReadmePath, rustReadme);
 
