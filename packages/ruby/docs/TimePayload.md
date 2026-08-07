@@ -1,4 +1,4 @@
-# TimeLogic::DirectApi::TimePayload
+# TimeLogic::Api::TimePayload
 
 ## Properties
 
@@ -19,9 +19,9 @@
 ## Example
 
 ```ruby
-require 'timelogic-direct-api'
+require 'timelogic-api'
 
-instance = TimeLogic::DirectApi::TimePayload.new(
+instance = TimeLogic::Api::TimePayload.new(
   unix: null,
   unix_ms: null,
   utc: null,

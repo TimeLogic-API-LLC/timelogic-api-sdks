@@ -1,7 +1,7 @@
 =begin
 #TimeLogic API | A World Time API
 
-#Public direct-access contract for the TimeLogic gateway.  This public spec excludes `/healthz` and the shared clock asset routes. It keeps `/.well-known/time-api-public-key`, `/v1/time/clock`, and signed JSON response controls because public consumers may need them.  Authentication: - direct access supports `Authorization: Bearer <token>`, `X-API-Key`, and `api_key` query credentials - RapidAPI access uses `X-RapidAPI-Key` and `X-RapidAPI-Host`; the SDKs expose this as a `rapidApi` transport option that accepts only the RapidAPI key  Behavioral notes: - all documented operations are `GET` - only one selector family may be used at a time - current and convert support bulk only through one comma-separated `tz`, `ip`, or `offset` selector - add, diff, calendar, dst, elapsed, timezone, and clock are single-target routes - credentials are extracted in Authorization, X-API-Key, then api_key query order; conflicting values are rejected - the first server is the default direct API host. The second server is the RapidAPI gateway and can be selected or overridden by SDK configuration - `sign` is available on supported JSON routes and is not supported on `/v1/time/clock`
+# Official public API contract for TimeLogic API.
 
 The version of the OpenAPI document: 1.0.0
 
@@ -18,7 +18,7 @@ require 'time'
 require 'typhoeus'
 
 
-module TimeLogic::DirectApi
+module TimeLogic::Api
   class ApiClient
     # The Configuration object holding settings to be used in the API client.
     attr_accessor :config
@@ -280,7 +280,7 @@ module TimeLogic::DirectApi
         end
       else
         # models (e.g. Pet) or oneOf
-        klass = TimeLogic::DirectApi.const_get(return_type)
+        klass = TimeLogic::Api.const_get(return_type)
         klass.respond_to?(:openapi_one_of) ? klass.build(data) : klass.build_from_hash(data)
       end
     end

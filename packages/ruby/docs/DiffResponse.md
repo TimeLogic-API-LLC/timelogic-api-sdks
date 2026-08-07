@@ -1,4 +1,4 @@
-# TimeLogic::DirectApi::DiffResponse
+# TimeLogic::Api::DiffResponse
 
 ## Properties
 
@@ -18,9 +18,9 @@
 ## Example
 
 ```ruby
-require 'timelogic-direct-api'
+require 'timelogic-api'
 
-instance = TimeLogic::DirectApi::DiffResponse.new(
+instance = TimeLogic::Api::DiffResponse.new(
   seconds: null,
   minutes: null,
   hours: null,

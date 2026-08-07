@@ -1,4 +1,4 @@
-# TimeLogic::DirectApi::JwksResponse
+# TimeLogic::Api::JwksResponse
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'timelogic-direct-api'
+require 'timelogic-api'
 
-instance = TimeLogic::DirectApi::JwksResponse.new(
+instance = TimeLogic::Api::JwksResponse.new(
   keys: null
 )
 ```

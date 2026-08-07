@@ -1,4 +1,4 @@
-# TimeLogic::DirectApi::GetCurrentTime200Response
+# TimeLogic::Api::GetCurrentTime200Response
 
 ## Class instance methods
 
@@ -9,9 +9,9 @@ Returns the list of classes defined in oneOf.
 #### Example
 
 ```ruby
-require 'timelogic-direct-api'
+require 'timelogic-api'
 
-TimeLogic::DirectApi::GetCurrentTime200Response.openapi_one_of
+TimeLogic::Api::GetCurrentTime200Response.openapi_one_of
 # =>
 # [
 #   :'TimePayload',
@@ -26,12 +26,12 @@ Find the appropriate object from the `openapi_one_of` list and casts the data in
 #### Example
 
 ```ruby
-require 'timelogic-direct-api'
+require 'timelogic-api'
 
-TimeLogic::DirectApi::GetCurrentTime200Response.build(data)
+TimeLogic::Api::GetCurrentTime200Response.build(data)
 # => #<TimePayload:0x00007fdd4aab02a0>
 
-TimeLogic::DirectApi::GetCurrentTime200Response.build(data_that_doesnt_match)
+TimeLogic::Api::GetCurrentTime200Response.build(data_that_doesnt_match)
 # => nil
 ```
 

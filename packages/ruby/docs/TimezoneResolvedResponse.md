@@ -1,4 +1,4 @@
-# TimeLogic::DirectApi::TimezoneResolvedResponse
+# TimeLogic::Api::TimezoneResolvedResponse
 
 ## Properties
 
@@ -21,9 +21,9 @@
 ## Example
 
 ```ruby
-require 'timelogic-direct-api'
+require 'timelogic-api'
 
-instance = TimeLogic::DirectApi::TimezoneResolvedResponse.new(
+instance = TimeLogic::Api::TimezoneResolvedResponse.new(
   unix: null,
   unix_ms: null,
   utc: null,

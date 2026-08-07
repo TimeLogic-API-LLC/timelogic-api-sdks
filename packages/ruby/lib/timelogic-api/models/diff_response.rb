@@ -1,7 +1,7 @@
 =begin
 #TimeLogic API | A World Time API
 
-#Public direct-access contract for the TimeLogic gateway.  This public spec excludes `/healthz` and the shared clock asset routes. It keeps `/.well-known/time-api-public-key`, `/v1/time/clock`, and signed JSON response controls because public consumers may need them.  Authentication: - direct access supports `Authorization: Bearer <token>`, `X-API-Key`, and `api_key` query credentials - RapidAPI access uses `X-RapidAPI-Key` and `X-RapidAPI-Host`; the SDKs expose this as a `rapidApi` transport option that accepts only the RapidAPI key  Behavioral notes: - all documented operations are `GET` - only one selector family may be used at a time - current and convert support bulk only through one comma-separated `tz`, `ip`, or `offset` selector - add, diff, calendar, dst, elapsed, timezone, and clock are single-target routes - credentials are extracted in Authorization, X-API-Key, then api_key query order; conflicting values are rejected - the first server is the default direct API host. The second server is the RapidAPI gateway and can be selected or overridden by SDK configuration - `sign` is available on supported JSON routes and is not supported on `/v1/time/clock`
+# Official public API contract for TimeLogic API.
 
 The version of the OpenAPI document: 1.0.0
 
@@ -13,7 +13,7 @@ Generator version: 7.10.0
 require 'date'
 require 'time'
 
-module TimeLogic::DirectApi
+module TimeLogic::Api
   class DiffResponse
     attr_accessor :seconds
 
@@ -105,13 +105,13 @@ module TimeLogic::DirectApi
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `TimeLogic::DirectApi::DiffResponse` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `TimeLogic::Api::DiffResponse` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `TimeLogic::DirectApi::DiffResponse`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `TimeLogic::Api::DiffResponse`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
@@ -330,7 +330,7 @@ module TimeLogic::DirectApi
         end
       else # model
         # models (e.g. Pet) or oneOf
-        klass = TimeLogic::DirectApi.const_get(type)
+        klass = TimeLogic::Api.const_get(type)
         klass.respond_to?(:openapi_any_of) || klass.respond_to?(:openapi_one_of) ? klass.build(value) : klass.build_from_hash(value)
       end
     end

@@ -1,4 +1,4 @@
-# TimeLogic::DirectApi::DiffEndpointRef
+# TimeLogic::Api::DiffEndpointRef
 
 ## Properties
 
@@ -9,9 +9,9 @@
 ## Example
 
 ```ruby
-require 'timelogic-direct-api'
+require 'timelogic-api'
 
-instance = TimeLogic::DirectApi::DiffEndpointRef.new(
+instance = TimeLogic::Api::DiffEndpointRef.new(
   unix_ms: null
 )
 ```

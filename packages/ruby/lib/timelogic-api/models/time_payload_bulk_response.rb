@@ -1,7 +1,7 @@
 =begin
 #TimeLogic API | A World Time API
 
-#Public direct-access contract for the TimeLogic gateway.  This public spec excludes `/healthz` and the shared clock asset routes. It keeps `/.well-known/time-api-public-key`, `/v1/time/clock`, and signed JSON response controls because public consumers may need them.  Authentication: - direct access supports `Authorization: Bearer <token>`, `X-API-Key`, and `api_key` query credentials - RapidAPI access uses `X-RapidAPI-Key` and `X-RapidAPI-Host`; the SDKs expose this as a `rapidApi` transport option that accepts only the RapidAPI key  Behavioral notes: - all documented operations are `GET` - only one selector family may be used at a time - current and convert support bulk only through one comma-separated `tz`, `ip`, or `offset` selector - add, diff, calendar, dst, elapsed, timezone, and clock are single-target routes - credentials are extracted in Authorization, X-API-Key, then api_key query order; conflicting values are rejected - the first server is the default direct API host. The second server is the RapidAPI gateway and can be selected or overridden by SDK configuration - `sign` is available on supported JSON routes and is not supported on `/v1/time/clock`
+# Official public API contract for TimeLogic API.
 
 The version of the OpenAPI document: 1.0.0
 
@@ -13,26 +13,23 @@ Generator version: 7.10.0
 require 'date'
 require 'time'
 
-module TimeLogic::DirectApi
-  class JwksResponse
-    attr_accessor :keys
-
+module TimeLogic::Api
+  # Bulk response array returned when `/v1/time/current` or `/v1/time/convert` receives one comma-separated `tz`, `ip`, or `offset` selector.
+  class TimePayloadBulkResponse < Array
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'keys' => :'keys'
       }
     end
 
-    # Returns all the JSON keys this model knows about
+    # Returns all the JSON keys this model knows about, including the ones defined in its parent(s)
     def self.acceptable_attributes
-      attribute_map.values
+      attribute_map.values.concat(superclass.acceptable_attributes)
     end
 
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'keys' => :'Array<JwkKey>'
       }
     end
 
@@ -46,35 +43,26 @@ module TimeLogic::DirectApi
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `TimeLogic::DirectApi::JwksResponse` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `TimeLogic::Api::TimePayloadBulkResponse` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `TimeLogic::DirectApi::JwksResponse`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `TimeLogic::Api::TimePayloadBulkResponse`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'keys')
-        if (value = attributes[:'keys']).is_a?(Array)
-          self.keys = value
-        end
-      else
-        self.keys = nil
-      end
+      # call parent's initialize
+      super(attributes)
     end
 
     # Show invalid properties with the reasons. Usually used together with valid?
     # @return Array for valid properties with the reasons
     def list_invalid_properties
       warn '[DEPRECATED] the `list_invalid_properties` method is obsolete'
-      invalid_properties = Array.new
-      if @keys.nil?
-        invalid_properties.push('invalid value for "keys", keys cannot be nil.')
-      end
-
+      invalid_properties = super
       invalid_properties
     end
 
@@ -82,16 +70,14 @@ module TimeLogic::DirectApi
     # @return true if the model is valid
     def valid?
       warn '[DEPRECATED] the `valid?` method is obsolete'
-      return false if @keys.nil?
-      true
+      true && super
     end
 
     # Checks equality by comparing each attribute.
     # @param [Object] Object to be compared
     def ==(o)
       return true if self.equal?(o)
-      self.class == o.class &&
-          keys == o.keys
+      self.class == o.class && super(o)
     end
 
     # @see the `==` method
@@ -103,7 +89,7 @@ module TimeLogic::DirectApi
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [keys].hash
+      [].hash
     end
 
     # Builds the object from hash
@@ -111,6 +97,7 @@ module TimeLogic::DirectApi
     # @return [Object] Returns the model itself
     def self.build_from_hash(attributes)
       return nil unless attributes.is_a?(Hash)
+      super(attributes)
       attributes = attributes.transform_keys(&:to_sym)
       transformed_hash = {}
       openapi_types.each_pair do |key, type|
@@ -167,7 +154,7 @@ module TimeLogic::DirectApi
         end
       else # model
         # models (e.g. Pet) or oneOf
-        klass = TimeLogic::DirectApi.const_get(type)
+        klass = TimeLogic::Api.const_get(type)
         klass.respond_to?(:openapi_any_of) || klass.respond_to?(:openapi_one_of) ? klass.build(value) : klass.build_from_hash(value)
       end
     end
@@ -187,7 +174,7 @@ module TimeLogic::DirectApi
     # Returns the object in the form of hash
     # @return [Hash] Returns the object in the form of hash
     def to_hash
-      hash = {}
+      hash = super
       self.class.attribute_map.each_pair do |attr, param|
         value = self.send(attr)
         if value.nil?

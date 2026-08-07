@@ -1,7 +1,7 @@
 =begin
 #TimeLogic API | A World Time API
 
-#Public direct-access contract for the TimeLogic gateway.  This public spec excludes `/healthz` and the shared clock asset routes. It keeps `/.well-known/time-api-public-key`, `/v1/time/clock`, and signed JSON response controls because public consumers may need them.  Authentication: - direct access supports `Authorization: Bearer <token>`, `X-API-Key`, and `api_key` query credentials - RapidAPI access uses `X-RapidAPI-Key` and `X-RapidAPI-Host`; the SDKs expose this as a `rapidApi` transport option that accepts only the RapidAPI key  Behavioral notes: - all documented operations are `GET` - only one selector family may be used at a time - current and convert support bulk only through one comma-separated `tz`, `ip`, or `offset` selector - add, diff, calendar, dst, elapsed, timezone, and clock are single-target routes - credentials are extracted in Authorization, X-API-Key, then api_key query order; conflicting values are rejected - the first server is the default direct API host. The second server is the RapidAPI gateway and can be selected or overridden by SDK configuration - `sign` is available on supported JSON routes and is not supported on `/v1/time/clock`
+# Official public API contract for TimeLogic API.
 
 The version of the OpenAPI document: 1.0.0
 
@@ -13,58 +13,50 @@ Generator version: 7.10.0
 require 'date'
 require 'time'
 
-module TimeLogic::DirectApi
-  class ElapsedResponse
-    attr_accessor :seconds
+module TimeLogic::Api
+  class TimezoneMatch
+    attr_accessor :unix
 
-    attr_accessor :minutes
+    attr_accessor :unix_ms
 
-    attr_accessor :hours
+    attr_accessor :utc
 
-    attr_accessor :days
+    attr_accessor :iso_local
+
+    attr_accessor :rfc2822
 
     attr_accessor :human
 
-    # `left` means the target instant is still in the future. `passed` means the target instant is already in the past.
-    attr_accessor :direction
+    attr_accessor :day_number
+
+    attr_accessor :day_short
+
+    attr_accessor :day_full
+
+    attr_accessor :timezone
 
     attr_accessor :formatted
 
-    attr_accessor :business_days
+    attr_accessor :offset
 
-    class EnumAttributeValidator
-      attr_reader :datatype
-      attr_reader :allowable_values
-
-      def initialize(datatype, allowable_values)
-        @allowable_values = allowable_values.map do |value|
-          case datatype.to_s
-          when /Integer/i
-            value.to_i
-          when /Float/i
-            value.to_f
-          else
-            value
-          end
-        end
-      end
-
-      def valid?(value)
-        !value || allowable_values.include?(value)
-      end
-    end
+    attr_accessor :dst
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'seconds' => :'seconds',
-        :'minutes' => :'minutes',
-        :'hours' => :'hours',
-        :'days' => :'days',
+        :'unix' => :'unix',
+        :'unix_ms' => :'unix_ms',
+        :'utc' => :'utc',
+        :'iso_local' => :'iso_local',
+        :'rfc2822' => :'rfc2822',
         :'human' => :'human',
-        :'direction' => :'direction',
+        :'day_number' => :'day_number',
+        :'day_short' => :'day_short',
+        :'day_full' => :'day_full',
+        :'timezone' => :'timezone',
         :'formatted' => :'formatted',
-        :'business_days' => :'business_days'
+        :'offset' => :'offset',
+        :'dst' => :'dst'
       }
     end
 
@@ -76,60 +68,79 @@ module TimeLogic::DirectApi
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'seconds' => :'Integer',
-        :'minutes' => :'Integer',
-        :'hours' => :'Integer',
-        :'days' => :'Integer',
+        :'unix' => :'Integer',
+        :'unix_ms' => :'Integer',
+        :'utc' => :'Time',
+        :'iso_local' => :'String',
+        :'rfc2822' => :'String',
         :'human' => :'String',
-        :'direction' => :'String',
+        :'day_number' => :'Integer',
+        :'day_short' => :'String',
+        :'day_full' => :'String',
+        :'timezone' => :'String',
         :'formatted' => :'String',
-        :'business_days' => :'Integer'
+        :'offset' => :'Integer',
+        :'dst' => :'Boolean'
       }
     end
 
     # List of attributes with nullable: true
     def self.openapi_nullable
       Set.new([
+        :'iso_local',
       ])
+    end
+
+    # List of class defined in allOf (OpenAPI v3)
+    def self.openapi_all_of
+      [
+      :'TimePayload'
+      ]
     end
 
     # Initializes the object
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `TimeLogic::DirectApi::ElapsedResponse` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `TimeLogic::Api::TimezoneMatch` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `TimeLogic::DirectApi::ElapsedResponse`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `TimeLogic::Api::TimezoneMatch`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'seconds')
-        self.seconds = attributes[:'seconds']
+      if attributes.key?(:'unix')
+        self.unix = attributes[:'unix']
       else
-        self.seconds = nil
+        self.unix = nil
       end
 
-      if attributes.key?(:'minutes')
-        self.minutes = attributes[:'minutes']
+      if attributes.key?(:'unix_ms')
+        self.unix_ms = attributes[:'unix_ms']
       else
-        self.minutes = nil
+        self.unix_ms = nil
       end
 
-      if attributes.key?(:'hours')
-        self.hours = attributes[:'hours']
+      if attributes.key?(:'utc')
+        self.utc = attributes[:'utc']
       else
-        self.hours = nil
+        self.utc = nil
       end
 
-      if attributes.key?(:'days')
-        self.days = attributes[:'days']
+      if attributes.key?(:'iso_local')
+        self.iso_local = attributes[:'iso_local']
       else
-        self.days = nil
+        self.iso_local = nil
+      end
+
+      if attributes.key?(:'rfc2822')
+        self.rfc2822 = attributes[:'rfc2822']
+      else
+        self.rfc2822 = nil
       end
 
       if attributes.key?(:'human')
@@ -138,18 +149,44 @@ module TimeLogic::DirectApi
         self.human = nil
       end
 
-      if attributes.key?(:'direction')
-        self.direction = attributes[:'direction']
+      if attributes.key?(:'day_number')
+        self.day_number = attributes[:'day_number']
       else
-        self.direction = nil
+        self.day_number = nil
+      end
+
+      if attributes.key?(:'day_short')
+        self.day_short = attributes[:'day_short']
+      else
+        self.day_short = nil
+      end
+
+      if attributes.key?(:'day_full')
+        self.day_full = attributes[:'day_full']
+      else
+        self.day_full = nil
+      end
+
+      if attributes.key?(:'timezone')
+        self.timezone = attributes[:'timezone']
+      else
+        self.timezone = nil
       end
 
       if attributes.key?(:'formatted')
         self.formatted = attributes[:'formatted']
       end
 
-      if attributes.key?(:'business_days')
-        self.business_days = attributes[:'business_days']
+      if attributes.key?(:'offset')
+        self.offset = attributes[:'offset']
+      else
+        self.offset = nil
+      end
+
+      if attributes.key?(:'dst')
+        self.dst = attributes[:'dst']
+      else
+        self.dst = nil
       end
     end
 
@@ -158,28 +195,56 @@ module TimeLogic::DirectApi
     def list_invalid_properties
       warn '[DEPRECATED] the `list_invalid_properties` method is obsolete'
       invalid_properties = Array.new
-      if @seconds.nil?
-        invalid_properties.push('invalid value for "seconds", seconds cannot be nil.')
+      if @unix.nil?
+        invalid_properties.push('invalid value for "unix", unix cannot be nil.')
       end
 
-      if @minutes.nil?
-        invalid_properties.push('invalid value for "minutes", minutes cannot be nil.')
+      if @unix_ms.nil?
+        invalid_properties.push('invalid value for "unix_ms", unix_ms cannot be nil.')
       end
 
-      if @hours.nil?
-        invalid_properties.push('invalid value for "hours", hours cannot be nil.')
+      if @utc.nil?
+        invalid_properties.push('invalid value for "utc", utc cannot be nil.')
       end
 
-      if @days.nil?
-        invalid_properties.push('invalid value for "days", days cannot be nil.')
+      if @rfc2822.nil?
+        invalid_properties.push('invalid value for "rfc2822", rfc2822 cannot be nil.')
       end
 
       if @human.nil?
         invalid_properties.push('invalid value for "human", human cannot be nil.')
       end
 
-      if @direction.nil?
-        invalid_properties.push('invalid value for "direction", direction cannot be nil.')
+      if @day_number.nil?
+        invalid_properties.push('invalid value for "day_number", day_number cannot be nil.')
+      end
+
+      if @day_number > 7
+        invalid_properties.push('invalid value for "day_number", must be smaller than or equal to 7.')
+      end
+
+      if @day_number < 1
+        invalid_properties.push('invalid value for "day_number", must be greater than or equal to 1.')
+      end
+
+      if @day_short.nil?
+        invalid_properties.push('invalid value for "day_short", day_short cannot be nil.')
+      end
+
+      if @day_full.nil?
+        invalid_properties.push('invalid value for "day_full", day_full cannot be nil.')
+      end
+
+      if @timezone.nil?
+        invalid_properties.push('invalid value for "timezone", timezone cannot be nil.')
+      end
+
+      if @offset.nil?
+        invalid_properties.push('invalid value for "offset", offset cannot be nil.')
+      end
+
+      if @dst.nil?
+        invalid_properties.push('invalid value for "dst", dst cannot be nil.')
       end
 
       invalid_properties
@@ -189,25 +254,38 @@ module TimeLogic::DirectApi
     # @return true if the model is valid
     def valid?
       warn '[DEPRECATED] the `valid?` method is obsolete'
-      return false if @seconds.nil?
-      return false if @minutes.nil?
-      return false if @hours.nil?
-      return false if @days.nil?
+      return false if @unix.nil?
+      return false if @unix_ms.nil?
+      return false if @utc.nil?
+      return false if @rfc2822.nil?
       return false if @human.nil?
-      return false if @direction.nil?
-      direction_validator = EnumAttributeValidator.new('String', ["left", "passed"])
-      return false unless direction_validator.valid?(@direction)
+      return false if @day_number.nil?
+      return false if @day_number > 7
+      return false if @day_number < 1
+      return false if @day_short.nil?
+      return false if @day_full.nil?
+      return false if @timezone.nil?
+      return false if @offset.nil?
+      return false if @dst.nil?
       true
     end
 
-    # Custom attribute writer method checking allowed values (enum).
-    # @param [Object] direction Object to be assigned
-    def direction=(direction)
-      validator = EnumAttributeValidator.new('String', ["left", "passed"])
-      unless validator.valid?(direction)
-        fail ArgumentError, "invalid value for \"direction\", must be one of #{validator.allowable_values}."
+    # Custom attribute writer method with validation
+    # @param [Object] day_number Value to be assigned
+    def day_number=(day_number)
+      if day_number.nil?
+        fail ArgumentError, 'day_number cannot be nil'
       end
-      @direction = direction
+
+      if day_number > 7
+        fail ArgumentError, 'invalid value for "day_number", must be smaller than or equal to 7.'
+      end
+
+      if day_number < 1
+        fail ArgumentError, 'invalid value for "day_number", must be greater than or equal to 1.'
+      end
+
+      @day_number = day_number
     end
 
     # Checks equality by comparing each attribute.
@@ -215,14 +293,19 @@ module TimeLogic::DirectApi
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          seconds == o.seconds &&
-          minutes == o.minutes &&
-          hours == o.hours &&
-          days == o.days &&
+          unix == o.unix &&
+          unix_ms == o.unix_ms &&
+          utc == o.utc &&
+          iso_local == o.iso_local &&
+          rfc2822 == o.rfc2822 &&
           human == o.human &&
-          direction == o.direction &&
+          day_number == o.day_number &&
+          day_short == o.day_short &&
+          day_full == o.day_full &&
+          timezone == o.timezone &&
           formatted == o.formatted &&
-          business_days == o.business_days
+          offset == o.offset &&
+          dst == o.dst
     end
 
     # @see the `==` method
@@ -234,7 +317,7 @@ module TimeLogic::DirectApi
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [seconds, minutes, hours, days, human, direction, formatted, business_days].hash
+      [unix, unix_ms, utc, iso_local, rfc2822, human, day_number, day_short, day_full, timezone, formatted, offset, dst].hash
     end
 
     # Builds the object from hash
@@ -298,7 +381,7 @@ module TimeLogic::DirectApi
         end
       else # model
         # models (e.g. Pet) or oneOf
-        klass = TimeLogic::DirectApi.const_get(type)
+        klass = TimeLogic::Api.const_get(type)
         klass.respond_to?(:openapi_any_of) || klass.respond_to?(:openapi_one_of) ? klass.build(value) : klass.build_from_hash(value)
       end
     end

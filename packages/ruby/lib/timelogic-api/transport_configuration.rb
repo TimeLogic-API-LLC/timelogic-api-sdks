@@ -3,7 +3,7 @@
 require 'uri'
 
 module TimeLogic
-  module DirectApi
+  module Api
     module TransportConfiguration
       DEFAULT_API_BASE_URL = 'https://api.timelogicapi.com'
       DEFAULT_RAPID_API_HOST = 'timelogic-api-world-time-timezones-time-calculations.p.rapidapi.com'

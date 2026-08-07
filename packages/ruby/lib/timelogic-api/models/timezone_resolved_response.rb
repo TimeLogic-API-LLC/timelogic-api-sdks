@@ -1,7 +1,7 @@
 =begin
 #TimeLogic API | A World Time API
 
-#Public direct-access contract for the TimeLogic gateway.  This public spec excludes `/healthz` and the shared clock asset routes. It keeps `/.well-known/time-api-public-key`, `/v1/time/clock`, and signed JSON response controls because public consumers may need them.  Authentication: - direct access supports `Authorization: Bearer <token>`, `X-API-Key`, and `api_key` query credentials - RapidAPI access uses `X-RapidAPI-Key` and `X-RapidAPI-Host`; the SDKs expose this as a `rapidApi` transport option that accepts only the RapidAPI key  Behavioral notes: - all documented operations are `GET` - only one selector family may be used at a time - current and convert support bulk only through one comma-separated `tz`, `ip`, or `offset` selector - add, diff, calendar, dst, elapsed, timezone, and clock are single-target routes - credentials are extracted in Authorization, X-API-Key, then api_key query order; conflicting values are rejected - the first server is the default direct API host. The second server is the RapidAPI gateway and can be selected or overridden by SDK configuration - `sign` is available on supported JSON routes and is not supported on `/v1/time/clock`
+# Official public API contract for TimeLogic API.
 
 The version of the OpenAPI document: 1.0.0
 
@@ -13,8 +13,9 @@ Generator version: 7.10.0
 require 'date'
 require 'time'
 
-module TimeLogic::DirectApi
-  class CalendarResponse
+module TimeLogic::Api
+  # Standard single-target timezone resolution payload.
+  class TimezoneResolvedResponse
     attr_accessor :unix
 
     attr_accessor :unix_ms
@@ -37,15 +38,9 @@ module TimeLogic::DirectApi
 
     attr_accessor :formatted
 
-    attr_accessor :year
+    attr_accessor :offset
 
-    attr_accessor :month
-
-    attr_accessor :month_name
-
-    attr_accessor :day
-
-    attr_accessor :week_number
+    attr_accessor :dst
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
@@ -61,11 +56,8 @@ module TimeLogic::DirectApi
         :'day_full' => :'day_full',
         :'timezone' => :'timezone',
         :'formatted' => :'formatted',
-        :'year' => :'year',
-        :'month' => :'month',
-        :'month_name' => :'month_name',
-        :'day' => :'day',
-        :'week_number' => :'week_number'
+        :'offset' => :'offset',
+        :'dst' => :'dst'
       }
     end
 
@@ -88,11 +80,8 @@ module TimeLogic::DirectApi
         :'day_full' => :'String',
         :'timezone' => :'String',
         :'formatted' => :'String',
-        :'year' => :'Integer',
-        :'month' => :'Integer',
-        :'month_name' => :'String',
-        :'day' => :'Integer',
-        :'week_number' => :'Integer'
+        :'offset' => :'Integer',
+        :'dst' => :'Boolean'
       }
     end
 
@@ -115,13 +104,13 @@ module TimeLogic::DirectApi
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `TimeLogic::DirectApi::CalendarResponse` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `TimeLogic::Api::TimezoneResolvedResponse` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `TimeLogic::DirectApi::CalendarResponse`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `TimeLogic::Api::TimezoneResolvedResponse`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
@@ -190,32 +179,16 @@ module TimeLogic::DirectApi
         self.formatted = attributes[:'formatted']
       end
 
-      if attributes.key?(:'year')
-        self.year = attributes[:'year']
+      if attributes.key?(:'offset')
+        self.offset = attributes[:'offset']
       else
-        self.year = nil
+        self.offset = nil
       end
 
-      if attributes.key?(:'month')
-        self.month = attributes[:'month']
+      if attributes.key?(:'dst')
+        self.dst = attributes[:'dst']
       else
-        self.month = nil
-      end
-
-      if attributes.key?(:'month_name')
-        self.month_name = attributes[:'month_name']
-      else
-        self.month_name = nil
-      end
-
-      if attributes.key?(:'day')
-        self.day = attributes[:'day']
-      else
-        self.day = nil
-      end
-
-      if attributes.key?(:'week_number')
-        self.week_number = attributes[:'week_number']
+        self.dst = nil
       end
     end
 
@@ -264,20 +237,12 @@ module TimeLogic::DirectApi
         invalid_properties.push('invalid value for "day_full", day_full cannot be nil.')
       end
 
-      if @year.nil?
-        invalid_properties.push('invalid value for "year", year cannot be nil.')
+      if @offset.nil?
+        invalid_properties.push('invalid value for "offset", offset cannot be nil.')
       end
 
-      if @month.nil?
-        invalid_properties.push('invalid value for "month", month cannot be nil.')
-      end
-
-      if @month_name.nil?
-        invalid_properties.push('invalid value for "month_name", month_name cannot be nil.')
-      end
-
-      if @day.nil?
-        invalid_properties.push('invalid value for "day", day cannot be nil.')
+      if @dst.nil?
+        invalid_properties.push('invalid value for "dst", dst cannot be nil.')
       end
 
       invalid_properties
@@ -297,10 +262,8 @@ module TimeLogic::DirectApi
       return false if @day_number < 1
       return false if @day_short.nil?
       return false if @day_full.nil?
-      return false if @year.nil?
-      return false if @month.nil?
-      return false if @month_name.nil?
-      return false if @day.nil?
+      return false if @offset.nil?
+      return false if @dst.nil?
       true
     end
 
@@ -338,11 +301,8 @@ module TimeLogic::DirectApi
           day_full == o.day_full &&
           timezone == o.timezone &&
           formatted == o.formatted &&
-          year == o.year &&
-          month == o.month &&
-          month_name == o.month_name &&
-          day == o.day &&
-          week_number == o.week_number
+          offset == o.offset &&
+          dst == o.dst
     end
 
     # @see the `==` method
@@ -354,7 +314,7 @@ module TimeLogic::DirectApi
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [unix, unix_ms, utc, iso_local, rfc2822, human, day_number, day_short, day_full, timezone, formatted, year, month, month_name, day, week_number].hash
+      [unix, unix_ms, utc, iso_local, rfc2822, human, day_number, day_short, day_full, timezone, formatted, offset, dst].hash
     end
 
     # Builds the object from hash
@@ -418,7 +378,7 @@ module TimeLogic::DirectApi
         end
       else # model
         # models (e.g. Pet) or oneOf
-        klass = TimeLogic::DirectApi.const_get(type)
+        klass = TimeLogic::Api.const_get(type)
         klass.respond_to?(:openapi_any_of) || klass.respond_to?(:openapi_one_of) ? klass.build(value) : klass.build_from_hash(value)
       end
     end

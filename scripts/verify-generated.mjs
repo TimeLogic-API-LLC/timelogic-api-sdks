@@ -21,7 +21,7 @@ const transportArtifacts = {
   java: 'packages/java/src/main/java/com/timelogic/direct/TransportConfiguration.java',
   csharp: 'packages/csharp/src/TimeLogic.Api/Client/TransportConfiguration.cs',
   php: 'packages/php/lib/TransportConfiguration.php',
-  ruby: 'packages/ruby/lib/timelogic-direct-api/transport_configuration.rb',
+  ruby: 'packages/ruby/lib/timelogic-api/transport_configuration.rb',
   kotlin: 'packages/kotlin/src/main/kotlin/com/timelogic/direct/api/infrastructure/TransportConfiguration.kt',
   swift: 'packages/swift/OpenAPIClient/Classes/OpenAPIs/TransportConfiguration.swift'
 };

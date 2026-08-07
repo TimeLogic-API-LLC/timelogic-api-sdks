@@ -1,7 +1,7 @@
 =begin
 #TimeLogic API | A World Time API
 
-#Public direct-access contract for the TimeLogic gateway.  This public spec excludes `/healthz` and the shared clock asset routes. It keeps `/.well-known/time-api-public-key`, `/v1/time/clock`, and signed JSON response controls because public consumers may need them.  Authentication: - direct access supports `Authorization: Bearer <token>`, `X-API-Key`, and `api_key` query credentials - RapidAPI access uses `X-RapidAPI-Key` and `X-RapidAPI-Host`; the SDKs expose this as a `rapidApi` transport option that accepts only the RapidAPI key  Behavioral notes: - all documented operations are `GET` - only one selector family may be used at a time - current and convert support bulk only through one comma-separated `tz`, `ip`, or `offset` selector - add, diff, calendar, dst, elapsed, timezone, and clock are single-target routes - credentials are extracted in Authorization, X-API-Key, then api_key query order; conflicting values are rejected - the first server is the default direct API host. The second server is the RapidAPI gateway and can be selected or overridden by SDK configuration - `sign` is available on supported JSON routes and is not supported on `/v1/time/clock`
+# Official public API contract for TimeLogic API.
 
 The version of the OpenAPI document: 1.0.0
 
@@ -13,14 +13,15 @@ Generator version: 7.10.0
 require 'date'
 require 'time'
 
-module TimeLogic::DirectApi
-  module GetCurrentTime200Response
+module TimeLogic::Api
+  # One bulk array item, either a successful time payload or a per-item bulk error.
+  module TimePayloadBulkItem
     class << self
       # List of class defined in oneOf (OpenAPI v3)
       def openapi_one_of
         [
-          :'TimePayload',
-          :'TimePayloadBulkResponse'
+          :'BulkError',
+          :'TimePayload'
         ]
       end
 
@@ -81,7 +82,7 @@ module TimeLogic::DirectApi
             return data.each_with_object({}) { |(k, v), hsh| hsh[k] = find_and_cast_into_type(sub_type, v) }
           end
         else # model
-          const = TimeLogic::DirectApi.const_get(klass)
+          const = TimeLogic::Api.const_get(klass)
           if const
             if const.respond_to?(:openapi_one_of) # nested oneOf model
               model = const.build(data)

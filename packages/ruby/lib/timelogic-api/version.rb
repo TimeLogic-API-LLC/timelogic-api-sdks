@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module TimeLogic
-  module DirectApi
-    VERSION = '0.1.0'
+  module Api
+    VERSION = '1.0.0'
   end
 end

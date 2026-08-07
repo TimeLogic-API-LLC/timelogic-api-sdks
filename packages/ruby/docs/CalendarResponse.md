@@ -1,4 +1,4 @@
-# TimeLogic::DirectApi::CalendarResponse
+# TimeLogic::Api::CalendarResponse
 
 ## Properties
 
@@ -24,9 +24,9 @@
 ## Example
 
 ```ruby
-require 'timelogic-direct-api'
+require 'timelogic-api'
 
-instance = TimeLogic::DirectApi::CalendarResponse.new(
+instance = TimeLogic::Api::CalendarResponse.new(
   unix: null,
   unix_ms: null,
   utc: null,

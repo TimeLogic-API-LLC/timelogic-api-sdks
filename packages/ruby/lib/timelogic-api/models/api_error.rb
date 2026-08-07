@@ -1,7 +1,7 @@
 =begin
 #TimeLogic API | A World Time API
 
-#Public direct-access contract for the TimeLogic gateway.  This public spec excludes `/healthz` and the shared clock asset routes. It keeps `/.well-known/time-api-public-key`, `/v1/time/clock`, and signed JSON response controls because public consumers may need them.  Authentication: - direct access supports `Authorization: Bearer <token>`, `X-API-Key`, and `api_key` query credentials - RapidAPI access uses `X-RapidAPI-Key` and `X-RapidAPI-Host`; the SDKs expose this as a `rapidApi` transport option that accepts only the RapidAPI key  Behavioral notes: - all documented operations are `GET` - only one selector family may be used at a time - current and convert support bulk only through one comma-separated `tz`, `ip`, or `offset` selector - add, diff, calendar, dst, elapsed, timezone, and clock are single-target routes - credentials are extracted in Authorization, X-API-Key, then api_key query order; conflicting values are rejected - the first server is the default direct API host. The second server is the RapidAPI gateway and can be selected or overridden by SDK configuration - `sign` is available on supported JSON routes and is not supported on `/v1/time/clock`
+# Official public API contract for TimeLogic API.
 
 The version of the OpenAPI document: 1.0.0
 
@@ -13,25 +13,43 @@ Generator version: 7.10.0
 require 'date'
 require 'time'
 
-module TimeLogic::DirectApi
-  # Per-item error wrapper used inside bulk arrays returned by bulk-capable routes.
-  class BulkError
-    attr_accessor :error
+module TimeLogic::Api
+  class ApiError
+    attr_accessor :code
 
-    attr_accessor :request_id
+    attr_accessor :message
 
-    # Intentionally omitted from public API error responses to avoid exposing request timing; use request_id for support correlation.
-    attr_accessor :timestamp
+    # Optional implementation-specific detail payload.
+    attr_accessor :details
 
-    attr_accessor :item
+    class EnumAttributeValidator
+      attr_reader :datatype
+      attr_reader :allowable_values
+
+      def initialize(datatype, allowable_values)
+        @allowable_values = allowable_values.map do |value|
+          case datatype.to_s
+          when /Integer/i
+            value.to_i
+          when /Float/i
+            value.to_f
+          else
+            value
+          end
+        end
+      end
+
+      def valid?(value)
+        !value || allowable_values.include?(value)
+      end
+    end
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'error' => :'error',
-        :'request_id' => :'request_id',
-        :'timestamp' => :'timestamp',
-        :'item' => :'item'
+        :'code' => :'code',
+        :'message' => :'message',
+        :'details' => :'details'
       }
     end
 
@@ -43,61 +61,48 @@ module TimeLogic::DirectApi
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'error' => :'ApiError',
-        :'request_id' => :'String',
-        :'timestamp' => :'Time',
-        :'item' => :'String'
+        :'code' => :'String',
+        :'message' => :'String',
+        :'details' => :'Object'
       }
     end
 
     # List of attributes with nullable: true
     def self.openapi_nullable
       Set.new([
+        :'details'
       ])
-    end
-
-    # List of class defined in allOf (OpenAPI v3)
-    def self.openapi_all_of
-      [
-      :'ErrorResponse'
-      ]
     end
 
     # Initializes the object
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `TimeLogic::DirectApi::BulkError` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `TimeLogic::Api::ApiError` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `TimeLogic::DirectApi::BulkError`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `TimeLogic::Api::ApiError`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'error')
-        self.error = attributes[:'error']
+      if attributes.key?(:'code')
+        self.code = attributes[:'code']
       else
-        self.error = nil
+        self.code = nil
       end
 
-      if attributes.key?(:'request_id')
-        self.request_id = attributes[:'request_id']
+      if attributes.key?(:'message')
+        self.message = attributes[:'message']
       else
-        self.request_id = nil
+        self.message = nil
       end
 
-      if attributes.key?(:'timestamp')
-        self.timestamp = attributes[:'timestamp']
-      end
-
-      if attributes.key?(:'item')
-        self.item = attributes[:'item']
-      else
-        self.item = nil
+      if attributes.key?(:'details')
+        self.details = attributes[:'details']
       end
     end
 
@@ -106,16 +111,12 @@ module TimeLogic::DirectApi
     def list_invalid_properties
       warn '[DEPRECATED] the `list_invalid_properties` method is obsolete'
       invalid_properties = Array.new
-      if @error.nil?
-        invalid_properties.push('invalid value for "error", error cannot be nil.')
+      if @code.nil?
+        invalid_properties.push('invalid value for "code", code cannot be nil.')
       end
 
-      if @request_id.nil?
-        invalid_properties.push('invalid value for "request_id", request_id cannot be nil.')
-      end
-
-      if @item.nil?
-        invalid_properties.push('invalid value for "item", item cannot be nil.')
+      if @message.nil?
+        invalid_properties.push('invalid value for "message", message cannot be nil.')
       end
 
       invalid_properties
@@ -125,10 +126,21 @@ module TimeLogic::DirectApi
     # @return true if the model is valid
     def valid?
       warn '[DEPRECATED] the `valid?` method is obsolete'
-      return false if @error.nil?
-      return false if @request_id.nil?
-      return false if @item.nil?
+      return false if @code.nil?
+      code_validator = EnumAttributeValidator.new('String', ["AMBIGUOUS_TARGET", "MISSING_TARGET", "INVALID_PARAMETER", "INVALID_TIMESTAMP", "DEPENDENCY_NOT_READY", "SIGNING_NOT_READY", "UNAUTHORIZED", "INVALID_AUTH", "METHOD_NOT_ALLOWED", "NOT_FOUND", "INTERNAL_ERROR", "SUBSCRIPTION_INACTIVE", "QUOTA_EXCEEDED"])
+      return false unless code_validator.valid?(@code)
+      return false if @message.nil?
       true
+    end
+
+    # Custom attribute writer method checking allowed values (enum).
+    # @param [Object] code Object to be assigned
+    def code=(code)
+      validator = EnumAttributeValidator.new('String', ["AMBIGUOUS_TARGET", "MISSING_TARGET", "INVALID_PARAMETER", "INVALID_TIMESTAMP", "DEPENDENCY_NOT_READY", "SIGNING_NOT_READY", "UNAUTHORIZED", "INVALID_AUTH", "METHOD_NOT_ALLOWED", "NOT_FOUND", "INTERNAL_ERROR", "SUBSCRIPTION_INACTIVE", "QUOTA_EXCEEDED"])
+      unless validator.valid?(code)
+        fail ArgumentError, "invalid value for \"code\", must be one of #{validator.allowable_values}."
+      end
+      @code = code
     end
 
     # Checks equality by comparing each attribute.
@@ -136,10 +148,9 @@ module TimeLogic::DirectApi
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          error == o.error &&
-          request_id == o.request_id &&
-          timestamp == o.timestamp &&
-          item == o.item
+          code == o.code &&
+          message == o.message &&
+          details == o.details
     end
 
     # @see the `==` method
@@ -151,7 +162,7 @@ module TimeLogic::DirectApi
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [error, request_id, timestamp, item].hash
+      [code, message, details].hash
     end
 
     # Builds the object from hash
@@ -215,7 +226,7 @@ module TimeLogic::DirectApi
         end
       else # model
         # models (e.g. Pet) or oneOf
-        klass = TimeLogic::DirectApi.const_get(type)
+        klass = TimeLogic::Api.const_get(type)
         klass.respond_to?(:openapi_any_of) || klass.respond_to?(:openapi_one_of) ? klass.build(value) : klass.build_from_hash(value)
       end
     end

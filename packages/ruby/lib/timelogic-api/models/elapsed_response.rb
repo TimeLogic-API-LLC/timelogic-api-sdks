@@ -1,7 +1,7 @@
 =begin
 #TimeLogic API | A World Time API
 
-#Public direct-access contract for the TimeLogic gateway.  This public spec excludes `/healthz` and the shared clock asset routes. It keeps `/.well-known/time-api-public-key`, `/v1/time/clock`, and signed JSON response controls because public consumers may need them.  Authentication: - direct access supports `Authorization: Bearer <token>`, `X-API-Key`, and `api_key` query credentials - RapidAPI access uses `X-RapidAPI-Key` and `X-RapidAPI-Host`; the SDKs expose this as a `rapidApi` transport option that accepts only the RapidAPI key  Behavioral notes: - all documented operations are `GET` - only one selector family may be used at a time - current and convert support bulk only through one comma-separated `tz`, `ip`, or `offset` selector - add, diff, calendar, dst, elapsed, timezone, and clock are single-target routes - credentials are extracted in Authorization, X-API-Key, then api_key query order; conflicting values are rejected - the first server is the default direct API host. The second server is the RapidAPI gateway and can be selected or overridden by SDK configuration - `sign` is available on supported JSON routes and is not supported on `/v1/time/clock`
+# Official public API contract for TimeLogic API.
 
 The version of the OpenAPI document: 1.0.0
 
@@ -13,15 +13,58 @@ Generator version: 7.10.0
 require 'date'
 require 'time'
 
-module TimeLogic::DirectApi
-  # Resolved endpoint reference for diff calculations. This object intentionally includes only the resolved epoch-millisecond instant.
-  class DiffEndpointRef
-    attr_accessor :unix_ms
+module TimeLogic::Api
+  class ElapsedResponse
+    attr_accessor :seconds
+
+    attr_accessor :minutes
+
+    attr_accessor :hours
+
+    attr_accessor :days
+
+    attr_accessor :human
+
+    # `left` means the target instant is still in the future. `passed` means the target instant is already in the past.
+    attr_accessor :direction
+
+    attr_accessor :formatted
+
+    attr_accessor :business_days
+
+    class EnumAttributeValidator
+      attr_reader :datatype
+      attr_reader :allowable_values
+
+      def initialize(datatype, allowable_values)
+        @allowable_values = allowable_values.map do |value|
+          case datatype.to_s
+          when /Integer/i
+            value.to_i
+          when /Float/i
+            value.to_f
+          else
+            value
+          end
+        end
+      end
+
+      def valid?(value)
+        !value || allowable_values.include?(value)
+      end
+    end
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'unix_ms' => :'unix_ms'
+        :'seconds' => :'seconds',
+        :'minutes' => :'minutes',
+        :'hours' => :'hours',
+        :'days' => :'days',
+        :'human' => :'human',
+        :'direction' => :'direction',
+        :'formatted' => :'formatted',
+        :'business_days' => :'business_days'
       }
     end
 
@@ -33,7 +76,14 @@ module TimeLogic::DirectApi
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'unix_ms' => :'Integer'
+        :'seconds' => :'Integer',
+        :'minutes' => :'Integer',
+        :'hours' => :'Integer',
+        :'days' => :'Integer',
+        :'human' => :'String',
+        :'direction' => :'String',
+        :'formatted' => :'String',
+        :'business_days' => :'Integer'
       }
     end
 
@@ -47,21 +97,59 @@ module TimeLogic::DirectApi
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `TimeLogic::DirectApi::DiffEndpointRef` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `TimeLogic::Api::ElapsedResponse` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `TimeLogic::DirectApi::DiffEndpointRef`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `TimeLogic::Api::ElapsedResponse`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'unix_ms')
-        self.unix_ms = attributes[:'unix_ms']
+      if attributes.key?(:'seconds')
+        self.seconds = attributes[:'seconds']
       else
-        self.unix_ms = nil
+        self.seconds = nil
+      end
+
+      if attributes.key?(:'minutes')
+        self.minutes = attributes[:'minutes']
+      else
+        self.minutes = nil
+      end
+
+      if attributes.key?(:'hours')
+        self.hours = attributes[:'hours']
+      else
+        self.hours = nil
+      end
+
+      if attributes.key?(:'days')
+        self.days = attributes[:'days']
+      else
+        self.days = nil
+      end
+
+      if attributes.key?(:'human')
+        self.human = attributes[:'human']
+      else
+        self.human = nil
+      end
+
+      if attributes.key?(:'direction')
+        self.direction = attributes[:'direction']
+      else
+        self.direction = nil
+      end
+
+      if attributes.key?(:'formatted')
+        self.formatted = attributes[:'formatted']
+      end
+
+      if attributes.key?(:'business_days')
+        self.business_days = attributes[:'business_days']
       end
     end
 
@@ -70,8 +158,28 @@ module TimeLogic::DirectApi
     def list_invalid_properties
       warn '[DEPRECATED] the `list_invalid_properties` method is obsolete'
       invalid_properties = Array.new
-      if @unix_ms.nil?
-        invalid_properties.push('invalid value for "unix_ms", unix_ms cannot be nil.')
+      if @seconds.nil?
+        invalid_properties.push('invalid value for "seconds", seconds cannot be nil.')
+      end
+
+      if @minutes.nil?
+        invalid_properties.push('invalid value for "minutes", minutes cannot be nil.')
+      end
+
+      if @hours.nil?
+        invalid_properties.push('invalid value for "hours", hours cannot be nil.')
+      end
+
+      if @days.nil?
+        invalid_properties.push('invalid value for "days", days cannot be nil.')
+      end
+
+      if @human.nil?
+        invalid_properties.push('invalid value for "human", human cannot be nil.')
+      end
+
+      if @direction.nil?
+        invalid_properties.push('invalid value for "direction", direction cannot be nil.')
       end
 
       invalid_properties
@@ -81,8 +189,25 @@ module TimeLogic::DirectApi
     # @return true if the model is valid
     def valid?
       warn '[DEPRECATED] the `valid?` method is obsolete'
-      return false if @unix_ms.nil?
+      return false if @seconds.nil?
+      return false if @minutes.nil?
+      return false if @hours.nil?
+      return false if @days.nil?
+      return false if @human.nil?
+      return false if @direction.nil?
+      direction_validator = EnumAttributeValidator.new('String', ["left", "passed"])
+      return false unless direction_validator.valid?(@direction)
       true
+    end
+
+    # Custom attribute writer method checking allowed values (enum).
+    # @param [Object] direction Object to be assigned
+    def direction=(direction)
+      validator = EnumAttributeValidator.new('String', ["left", "passed"])
+      unless validator.valid?(direction)
+        fail ArgumentError, "invalid value for \"direction\", must be one of #{validator.allowable_values}."
+      end
+      @direction = direction
     end
 
     # Checks equality by comparing each attribute.
@@ -90,7 +215,14 @@ module TimeLogic::DirectApi
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          unix_ms == o.unix_ms
+          seconds == o.seconds &&
+          minutes == o.minutes &&
+          hours == o.hours &&
+          days == o.days &&
+          human == o.human &&
+          direction == o.direction &&
+          formatted == o.formatted &&
+          business_days == o.business_days
     end
 
     # @see the `==` method
@@ -102,7 +234,7 @@ module TimeLogic::DirectApi
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [unix_ms].hash
+      [seconds, minutes, hours, days, human, direction, formatted, business_days].hash
     end
 
     # Builds the object from hash
@@ -166,7 +298,7 @@ module TimeLogic::DirectApi
         end
       else # model
         # models (e.g. Pet) or oneOf
-        klass = TimeLogic::DirectApi.const_get(type)
+        klass = TimeLogic::Api.const_get(type)
         klass.respond_to?(:openapi_any_of) || klass.respond_to?(:openapi_one_of) ? klass.build(value) : klass.build_from_hash(value)
       end
     end

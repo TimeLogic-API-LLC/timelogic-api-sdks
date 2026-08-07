@@ -1,4 +1,4 @@
-# TimeLogic::DirectApi::UtilityApi
+# TimeLogic::Api::UtilityApi
 
 All URIs are relative to *https://api.timelogicapi.com*
 
@@ -19,9 +19,9 @@ Unauthenticated JWKS endpoint for verifying signed JSON responses.  The public g
 
 ```ruby
 require 'time'
-require 'timelogic-direct-api'
+require 'timelogic-api'
 
-api_instance = TimeLogic::DirectApi::UtilityApi.new
+api_instance = TimeLogic::Api::UtilityApi.new
 opts = {
   kid: 'kid_example' # String | Optional signing key identifier filter, for example `ed25519-2026-07-19`. When present, the response returns only the matching retained public key.
 }
@@ -30,7 +30,7 @@ begin
   # Public signing key set
   result = api_instance.get_public_signing_key(opts)
   p result
-rescue TimeLogic::DirectApi::ApiError => e
+rescue TimeLogic::Api::ApiError => e
   puts "Error when calling UtilityApi->get_public_signing_key: #{e}"
 end
 ```
@@ -48,7 +48,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <JwksResponse>
-rescue TimeLogic::DirectApi::ApiError => e
+rescue TimeLogic::Api::ApiError => e
   puts "Error when calling UtilityApi->get_public_signing_key_with_http_info: #{e}"
 end
 ```

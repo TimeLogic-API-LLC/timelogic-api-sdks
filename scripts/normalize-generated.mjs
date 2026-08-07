@@ -24,7 +24,8 @@ for (const file of filesUnder('packages')) {
     .replaceAll('GIT_USER_ID', 'TimeLogic-API-LLC')
     .replaceAll('GIT_REPO_ID', 'timelogic-api-sdks')
     .replace(/date = "\d{4}-\d{2}-\d{2}T[^\"]+\[Etc\/UTC\]"/g, 'date = "1970-01-01T00:00:00Z[Etc/UTC]"')
-    .replace(/- Build date: .*/g, '- Build date: 1970-01-01T00:00:00Z[Etc/UTC]');
+    .replace(/- Build date: .*/g, '- Build date: 1970-01-01T00:00:00Z[Etc/UTC]')
+    .replace(/#Public direct-access contract for the TimeLogic gateway\.[^\r\n]*/g, '# Official public API contract for TimeLogic API.');
   if (normalized !== original) writeFileSync(file, normalized);
 }
 
@@ -342,28 +343,28 @@ func (v *NullableTimePayloadBulkResponse) UnmarshalJSON(data []byte) error {
 }
 `);
 
-const rubyVersion = 'packages/ruby/lib/timelogic-direct-api/version.rb';
+const rubyVersion = 'packages/ruby/lib/timelogic-api/version.rb';
 writeFileSync(rubyVersion, `# frozen_string_literal: true
 
 module TimeLogic
-  module DirectApi
-    VERSION = '0.1.0'
+  module Api
+    VERSION = '1.0.0'
   end
 end
 `);
 
-const rubyRoot = 'packages/ruby/lib/timelogic-direct-api.rb';
+const rubyRoot = 'packages/ruby/lib/timelogic-api.rb';
 const rubyRootSource = readFileSync(rubyRoot, 'utf8');
 if (!rubyRootSource.startsWith('module TimeLogic\n')) {
   writeFileSync(rubyRoot, `module TimeLogic\nend\n\n${rubyRootSource}`);
 }
 
-const rubyException = 'packages/ruby/lib/timelogic-direct-api/api_error.rb';
+const rubyException = 'packages/ruby/lib/timelogic-api/api_error.rb';
 writeFileSync(
   rubyException,
   readFileSync(rubyException, 'utf8').replace('class ApiError < StandardError', 'class ApiException < StandardError')
 );
-const rubyClient = 'packages/ruby/lib/timelogic-direct-api/api_client.rb';
+const rubyClient = 'packages/ruby/lib/timelogic-api/api_client.rb';
 writeFileSync(rubyClient, readFileSync(rubyClient, 'utf8').replaceAll('ApiError.new', 'ApiException.new'));
 
 const swiftTransport = 'packages/swift/OpenAPIClient/Classes/OpenAPIs/URLSessionImplementations.swift';
@@ -728,12 +729,12 @@ final class TransportConfiguration
 }
 `);
 
-writeFileSync('packages/ruby/lib/timelogic-direct-api/transport_configuration.rb', `# frozen_string_literal: true
+writeFileSync('packages/ruby/lib/timelogic-api/transport_configuration.rb', `# frozen_string_literal: true
 
 require 'uri'
 
 module TimeLogic
-  module DirectApi
+  module Api
     module TransportConfiguration
       DEFAULT_API_BASE_URL = 'https://api.timelogicapi.com'
       DEFAULT_RAPID_API_HOST = '${rapidApiHost}'
@@ -763,10 +764,59 @@ module TimeLogic
   end
 end
 `);
-const rubyRootPath = 'packages/ruby/lib/timelogic-direct-api.rb';
+const rubyRootPath = 'packages/ruby/lib/timelogic-api.rb';
 let rubyRootForTransport = readFileSync(rubyRootPath, 'utf8');
-if (!rubyRootForTransport.includes("require 'timelogic-direct-api/transport_configuration'")) rubyRootForTransport = rubyRootForTransport.replace("require 'timelogic-direct-api/configuration'", "require 'timelogic-direct-api/configuration'\nrequire 'timelogic-direct-api/transport_configuration'");
+if (!rubyRootForTransport.includes("require 'timelogic-api/transport_configuration'")) rubyRootForTransport = rubyRootForTransport.replace("require 'timelogic-api/configuration'", "require 'timelogic-api/configuration'\nrequire 'timelogic-api/transport_configuration'");
 writeFileSync(rubyRootPath, rubyRootForTransport);
+
+const rubyGemspecPath = 'packages/ruby/timelogic-api.gemspec';
+writeFileSync(rubyGemspecPath, `# frozen_string_literal: true
+
+$LOAD_PATH.unshift File.expand_path('lib', __dir__)
+require 'timelogic-api/version'
+
+Gem::Specification.new do |s|
+  s.name        = 'timelogic-api'
+  s.version     = TimeLogic::Api::VERSION
+  s.platform    = Gem::Platform::RUBY
+  s.authors     = ['TimeLogic API LLC']
+  s.email       = ['support@timelogicapi.com']
+  s.homepage    = 'https://github.com/TimeLogic-API-LLC/timelogic-api-sdks'
+  s.summary     = 'TimeLogic API | A World Time API'
+  s.description = 'Official Ruby SDK for TimeLogic API, providing world time, timezone, calendar, and signed response operations.'
+  s.license     = 'Unlicense'
+  s.required_ruby_version = '>= 2.7'
+  s.metadata    = {
+    'source_code_uri' => 'https://github.com/TimeLogic-API-LLC/timelogic-api-sdks',
+    'bug_tracker_uri' => 'https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/issues',
+    'changelog_uri' => 'https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/releases'
+  }
+
+  s.files = Dir.chdir(__dir__) do
+    Dir['lib/**/*', 'docs/**/*', 'README.md'].select { |file| File.file?(file) }.sort
+  end
+  s.require_paths = ['lib']
+
+  s.add_runtime_dependency 'typhoeus', '~> 1.0', '>= 1.0.1'
+  s.add_development_dependency 'rspec', '~> 3.6', '>= 3.6.0'
+end
+`);
+
+writeFileSync('packages/ruby/Gemfile', `source 'https://rubygems.org'
+
+gemspec
+
+gem 'rake', '~> 13.0'
+`);
+
+const rubyReadmePath = 'packages/ruby/README.md';
+let rubyReadme = readFileSync(rubyReadmePath, 'utf8')
+  .replace(/^# timelogic-api[\s\S]*?\n## Installation/m,
+    '# TimeLogic API | A World Time API\n\nOfficial Ruby SDK for TimeLogic API, providing world time, timezone, calendar, and signed response operations.\n\n## Installation')
+  .replaceAll('https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go', repoUrl.replace(/\.git$/, ''))
+  .replaceAll('Public direct-access contract for the TimeLogic gateway.', 'Official Ruby SDK for TimeLogic API.')
+  .trimEnd() + '\n';
+writeFileSync(rubyReadmePath, rubyReadme);
 
 writeFileSync('packages/kotlin/src/main/kotlin/com/timelogic/direct/api/infrastructure/TransportConfiguration.kt', `package com.timelogic.direct.api.infrastructure
 

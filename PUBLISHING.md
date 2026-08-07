@@ -222,22 +222,21 @@ Packagist does not receive an uploaded archive. Its “publish” action is a co
 
 ### Ruby / RubyGems.org
 
-Gem: `timelogic-direct-api`, versioned by [`packages/ruby/lib/timelogic-direct-api/version.rb`](packages/ruby/lib/timelogic-direct-api/version.rb).
+Gem: `timelogic-api`, versioned by [`packages/ruby/lib/timelogic-api/version.rb`](packages/ruby/lib/timelogic-api/version.rb).
 
-Before first release, claim the gem name and add organization owners on RubyGems. Replace the generator placeholder homepage and add source-code, changelog, and bug-tracker metadata in the `.gemspec`. Confirm the gem does not unintentionally package CI artifacts; its current file list is derived from `find *`.
+The gem uses RubyGems Trusted Publishing. The pending publisher is registered for the `TimeLogic-API-LLC/timelogic-api-sdks` repository, the `release.yml` workflow, and the `release` GitHub environment. No RubyGems API token is stored in the repository or GitHub secrets.
 
-Preflight and publish:
+Preflight:
 
 ```powershell
 Push-Location packages/ruby
 bundle install
 bundle exec rspec
-gem build timelogic-direct-api.gemspec
-gem push timelogic-direct-api-0.1.1.gem
+gem build timelogic-api.gemspec
 Pop-Location
 ```
 
-Use an API key supplied by a protected CI environment (`GEM_HOST_API_KEY`), rather than a developer login. The normalizer hard-codes the Ruby version, so update `scripts/normalize-generated.mjs` before regeneration. Add a RubyGems job to the tag workflow before treating root tags as Ruby releases.
+Release a tag such as `v1.0.0`, or manually run the root `Release SDKs` workflow with target `ruby`. The Ruby job runs independently after the shared verification job and uses `rubygems/release-gem@v1` with OIDC. Its gemspec includes only the public README, API documentation, and `lib/` code.
 
 ### Kotlin / Maven Central
 

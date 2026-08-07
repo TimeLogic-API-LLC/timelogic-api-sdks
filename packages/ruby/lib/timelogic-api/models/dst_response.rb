@@ -1,7 +1,7 @@
 =begin
 #TimeLogic API | A World Time API
 
-#Public direct-access contract for the TimeLogic gateway.  This public spec excludes `/healthz` and the shared clock asset routes. It keeps `/.well-known/time-api-public-key`, `/v1/time/clock`, and signed JSON response controls because public consumers may need them.  Authentication: - direct access supports `Authorization: Bearer <token>`, `X-API-Key`, and `api_key` query credentials - RapidAPI access uses `X-RapidAPI-Key` and `X-RapidAPI-Host`; the SDKs expose this as a `rapidApi` transport option that accepts only the RapidAPI key  Behavioral notes: - all documented operations are `GET` - only one selector family may be used at a time - current and convert support bulk only through one comma-separated `tz`, `ip`, or `offset` selector - add, diff, calendar, dst, elapsed, timezone, and clock are single-target routes - credentials are extracted in Authorization, X-API-Key, then api_key query order; conflicting values are rejected - the first server is the default direct API host. The second server is the RapidAPI gateway and can be selected or overridden by SDK configuration - `sign` is available on supported JSON routes and is not supported on `/v1/time/clock`
+# Official public API contract for TimeLogic API.
 
 The version of the OpenAPI document: 1.0.0
 
@@ -13,9 +13,8 @@ Generator version: 7.10.0
 require 'date'
 require 'time'
 
-module TimeLogic::DirectApi
-  # Canonical single-target time payload.
-  class TimePayload
+module TimeLogic::Api
+  class DstResponse
     attr_accessor :unix
 
     attr_accessor :unix_ms
@@ -38,6 +37,10 @@ module TimeLogic::DirectApi
 
     attr_accessor :formatted
 
+    attr_accessor :dst_active
+
+    attr_accessor :next_transition
+
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
@@ -51,7 +54,9 @@ module TimeLogic::DirectApi
         :'day_short' => :'day_short',
         :'day_full' => :'day_full',
         :'timezone' => :'timezone',
-        :'formatted' => :'formatted'
+        :'formatted' => :'formatted',
+        :'dst_active' => :'dst_active',
+        :'next_transition' => :'next_transition'
       }
     end
 
@@ -73,7 +78,9 @@ module TimeLogic::DirectApi
         :'day_short' => :'String',
         :'day_full' => :'String',
         :'timezone' => :'String',
-        :'formatted' => :'String'
+        :'formatted' => :'String',
+        :'dst_active' => :'Boolean',
+        :'next_transition' => :'Time'
       }
     end
 
@@ -82,20 +89,28 @@ module TimeLogic::DirectApi
       Set.new([
         :'iso_local',
         :'timezone',
+        :'next_transition'
       ])
+    end
+
+    # List of class defined in allOf (OpenAPI v3)
+    def self.openapi_all_of
+      [
+      :'TimePayload'
+      ]
     end
 
     # Initializes the object
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `TimeLogic::DirectApi::TimePayload` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `TimeLogic::Api::DstResponse` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `TimeLogic::DirectApi::TimePayload`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `TimeLogic::Api::DstResponse`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
@@ -163,6 +178,16 @@ module TimeLogic::DirectApi
       if attributes.key?(:'formatted')
         self.formatted = attributes[:'formatted']
       end
+
+      if attributes.key?(:'dst_active')
+        self.dst_active = attributes[:'dst_active']
+      else
+        self.dst_active = nil
+      end
+
+      if attributes.key?(:'next_transition')
+        self.next_transition = attributes[:'next_transition']
+      end
     end
 
     # Show invalid properties with the reasons. Usually used together with valid?
@@ -210,6 +235,10 @@ module TimeLogic::DirectApi
         invalid_properties.push('invalid value for "day_full", day_full cannot be nil.')
       end
 
+      if @dst_active.nil?
+        invalid_properties.push('invalid value for "dst_active", dst_active cannot be nil.')
+      end
+
       invalid_properties
     end
 
@@ -227,6 +256,7 @@ module TimeLogic::DirectApi
       return false if @day_number < 1
       return false if @day_short.nil?
       return false if @day_full.nil?
+      return false if @dst_active.nil?
       true
     end
 
@@ -263,7 +293,9 @@ module TimeLogic::DirectApi
           day_short == o.day_short &&
           day_full == o.day_full &&
           timezone == o.timezone &&
-          formatted == o.formatted
+          formatted == o.formatted &&
+          dst_active == o.dst_active &&
+          next_transition == o.next_transition
     end
 
     # @see the `==` method
@@ -275,7 +307,7 @@ module TimeLogic::DirectApi
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [unix, unix_ms, utc, iso_local, rfc2822, human, day_number, day_short, day_full, timezone, formatted].hash
+      [unix, unix_ms, utc, iso_local, rfc2822, human, day_number, day_short, day_full, timezone, formatted, dst_active, next_transition].hash
     end
 
     # Builds the object from hash
@@ -339,7 +371,7 @@ module TimeLogic::DirectApi
         end
       else # model
         # models (e.g. Pet) or oneOf
-        klass = TimeLogic::DirectApi.const_get(type)
+        klass = TimeLogic::Api.const_get(type)
         klass.respond_to?(:openapi_any_of) || klass.respond_to?(:openapi_one_of) ? klass.build(value) : klass.build_from_hash(value)
       end
     end

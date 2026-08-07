@@ -1,4 +1,4 @@
-# TimeLogic::DirectApi::TimeApi
+# TimeLogic::Api::TimeApi
 
 All URIs are relative to *https://api.timelogicapi.com*
 
@@ -27,9 +27,9 @@ Adds `seconds`, `minutes`, `hours`, and `days` to an optional base timestamp.  I
 
 ```ruby
 require 'time'
-require 'timelogic-direct-api'
+require 'timelogic-api'
 # setup authorization
-TimeLogic::DirectApi.configure do |config|
+TimeLogic::Api.configure do |config|
   # Configure API key authorization: directApiKeyHeader
   config.api_key['X-API-Key'] = 'YOUR API KEY'
   # Uncomment the following line to set a prefix for the API key, e.g. 'Bearer' (defaults to nil)
@@ -54,7 +54,7 @@ TimeLogic::DirectApi.configure do |config|
   # config.api_key_prefix['X-RapidAPI-Host'] = 'Bearer'
 end
 
-api_instance = TimeLogic::DirectApi::TimeApi.new
+api_instance = TimeLogic::Api::TimeApi.new
 opts = {
   unix: 1711300000, # Integer | 
   unix_ms: 1711300000000, # Integer | 
@@ -83,7 +83,7 @@ begin
   # Add modifiers to a timestamp
   result = api_instance.add_time(opts)
   p result
-rescue TimeLogic::DirectApi::ApiError => e
+rescue TimeLogic::Api::ApiError => e
   puts "Error when calling TimeApi->add_time: #{e}"
 end
 ```
@@ -101,7 +101,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <TimePayload>
-rescue TimeLogic::DirectApi::ApiError => e
+rescue TimeLogic::Api::ApiError => e
   puts "Error when calling TimeApi->add_time_with_http_info: #{e}"
 end
 ```
@@ -158,9 +158,9 @@ Converts one required input timestamp into a single target or a bulk array.  Inp
 
 ```ruby
 require 'time'
-require 'timelogic-direct-api'
+require 'timelogic-api'
 # setup authorization
-TimeLogic::DirectApi.configure do |config|
+TimeLogic::Api.configure do |config|
   # Configure API key authorization: directApiKeyHeader
   config.api_key['X-API-Key'] = 'YOUR API KEY'
   # Uncomment the following line to set a prefix for the API key, e.g. 'Bearer' (defaults to nil)
@@ -185,7 +185,7 @@ TimeLogic::DirectApi.configure do |config|
   # config.api_key_prefix['X-RapidAPI-Host'] = 'Bearer'
 end
 
-api_instance = TimeLogic::DirectApi::TimeApi.new
+api_instance = TimeLogic::Api::TimeApi.new
 opts = {
   unix: 1711300000, # Integer | 
   unix_ms: 1711300000000, # Integer | 
@@ -210,7 +210,7 @@ begin
   # Convert a timestamp into a target timezone or offset
   result = api_instance.convert_time(opts)
   p result
-rescue TimeLogic::DirectApi::ApiError => e
+rescue TimeLogic::Api::ApiError => e
   puts "Error when calling TimeApi->convert_time: #{e}"
 end
 ```
@@ -228,7 +228,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <GetCurrentTime200Response>
-rescue TimeLogic::DirectApi::ApiError => e
+rescue TimeLogic::Api::ApiError => e
   puts "Error when calling TimeApi->convert_time_with_http_info: #{e}"
 end
 ```
@@ -281,9 +281,9 @@ Computes the duration between `from` and `to`.  Required query fields: `from` an
 
 ```ruby
 require 'time'
-require 'timelogic-direct-api'
+require 'timelogic-api'
 # setup authorization
-TimeLogic::DirectApi.configure do |config|
+TimeLogic::Api.configure do |config|
   # Configure API key authorization: directApiKeyHeader
   config.api_key['X-API-Key'] = 'YOUR API KEY'
   # Uncomment the following line to set a prefix for the API key, e.g. 'Bearer' (defaults to nil)
@@ -308,7 +308,7 @@ TimeLogic::DirectApi.configure do |config|
   # config.api_key_prefix['X-RapidAPI-Host'] = 'Bearer'
 end
 
-api_instance = TimeLogic::DirectApi::TimeApi.new
+api_instance = TimeLogic::Api::TimeApi.new
 from = 'from_example' # String | Time specifier. Supported forms are `now`, `unix=<seconds>`, `unix_ms=<milliseconds>`, `iso=<ISO-8601>`, `offset=±HH:MM`, `tz=<IANA timezone>`, and `ip=<IP address>`. For `tz=...`, `ip=...`, and `offset=...`, the specifier means the current request-time instant resolved through that selector. To express a local wall-clock time, use `from=iso=...` together with one of `from_tz`, `from_ip`, `from_lat`+`from_lon`, or `from_offset`.
 to = 'to_example' # String | Time specifier. Supported forms are `now`, `unix=<seconds>`, `unix_ms=<milliseconds>`, `iso=<ISO-8601>`, `offset=±HH:MM`, `tz=<IANA timezone>`, and `ip=<IP address>`. For `tz=...`, `ip=...`, and `offset=...`, the specifier means the current request-time instant resolved through that selector. To express a local wall-clock time, use `to=iso=...` together with one of `to_tz`, `to_ip`, `to_lat`+`to_lon`, or `to_offset`.
 opts = {
@@ -333,7 +333,7 @@ begin
   # Difference between two instants
   result = api_instance.diff_time(from, to, opts)
   p result
-rescue TimeLogic::DirectApi::ApiError => e
+rescue TimeLogic::Api::ApiError => e
   puts "Error when calling TimeApi->diff_time: #{e}"
 end
 ```
@@ -351,7 +351,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <DiffResponse>
-rescue TimeLogic::DirectApi::ApiError => e
+rescue TimeLogic::Api::ApiError => e
   puts "Error when calling TimeApi->diff_time_with_http_info: #{e}"
 end
 ```
@@ -404,9 +404,9 @@ Returns calendar fields for an optional timestamp and target.  Input timestamp f
 
 ```ruby
 require 'time'
-require 'timelogic-direct-api'
+require 'timelogic-api'
 # setup authorization
-TimeLogic::DirectApi.configure do |config|
+TimeLogic::Api.configure do |config|
   # Configure API key authorization: directApiKeyHeader
   config.api_key['X-API-Key'] = 'YOUR API KEY'
   # Uncomment the following line to set a prefix for the API key, e.g. 'Bearer' (defaults to nil)
@@ -431,7 +431,7 @@ TimeLogic::DirectApi.configure do |config|
   # config.api_key_prefix['X-RapidAPI-Host'] = 'Bearer'
 end
 
-api_instance = TimeLogic::DirectApi::TimeApi.new
+api_instance = TimeLogic::Api::TimeApi.new
 opts = {
   unix: 1711300000, # Integer | 
   unix_ms: 1711300000000, # Integer | 
@@ -456,7 +456,7 @@ begin
   # Calendar projection for a target instant
   result = api_instance.get_calendar(opts)
   p result
-rescue TimeLogic::DirectApi::ApiError => e
+rescue TimeLogic::Api::ApiError => e
   puts "Error when calling TimeApi->get_calendar: #{e}"
 end
 ```
@@ -474,7 +474,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <CalendarResponse>
-rescue TimeLogic::DirectApi::ApiError => e
+rescue TimeLogic::Api::ApiError => e
   puts "Error when calling TimeApi->get_calendar_with_http_info: #{e}"
 end
 ```
@@ -527,9 +527,9 @@ Returns an embeddable HTML clock fragment.  Input timestamp forms: - `unix=17113
 
 ```ruby
 require 'time'
-require 'timelogic-direct-api'
+require 'timelogic-api'
 # setup authorization
-TimeLogic::DirectApi.configure do |config|
+TimeLogic::Api.configure do |config|
   # Configure API key authorization: directApiKeyHeader
   config.api_key['X-API-Key'] = 'YOUR API KEY'
   # Uncomment the following line to set a prefix for the API key, e.g. 'Bearer' (defaults to nil)
@@ -554,7 +554,7 @@ TimeLogic::DirectApi.configure do |config|
   # config.api_key_prefix['X-RapidAPI-Host'] = 'Bearer'
 end
 
-api_instance = TimeLogic::DirectApi::TimeApi.new
+api_instance = TimeLogic::Api::TimeApi.new
 style = 'analog-station' # String | Clock style name. Valid values are enumerated here; there is no separate style discovery endpoint.
 opts = {
   unix: 1711300000, # Integer | 
@@ -577,7 +577,7 @@ begin
   # Render a live HTML clock
   result = api_instance.get_clock(style, opts)
   p result
-rescue TimeLogic::DirectApi::ApiError => e
+rescue TimeLogic::Api::ApiError => e
   puts "Error when calling TimeApi->get_clock: #{e}"
 end
 ```
@@ -595,7 +595,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => String
-rescue TimeLogic::DirectApi::ApiError => e
+rescue TimeLogic::Api::ApiError => e
   puts "Error when calling TimeApi->get_clock_with_http_info: #{e}"
 end
 ```
@@ -646,9 +646,9 @@ Returns current time data for a single target, or a bulk array when exactly one 
 
 ```ruby
 require 'time'
-require 'timelogic-direct-api'
+require 'timelogic-api'
 # setup authorization
-TimeLogic::DirectApi.configure do |config|
+TimeLogic::Api.configure do |config|
   # Configure API key authorization: directApiKeyHeader
   config.api_key['X-API-Key'] = 'YOUR API KEY'
   # Uncomment the following line to set a prefix for the API key, e.g. 'Bearer' (defaults to nil)
@@ -673,7 +673,7 @@ TimeLogic::DirectApi.configure do |config|
   # config.api_key_prefix['X-RapidAPI-Host'] = 'Bearer'
 end
 
-api_instance = TimeLogic::DirectApi::TimeApi.new
+api_instance = TimeLogic::Api::TimeApi.new
 opts = {
   tz: 'America/New_York', # String | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode.
   ip: '8.8.8.8', # String | IP address. On bulk-capable routes, a comma-separated list enables bulk mode.
@@ -689,7 +689,7 @@ begin
   # Get the current time for a target
   result = api_instance.get_current_time(opts)
   p result
-rescue TimeLogic::DirectApi::ApiError => e
+rescue TimeLogic::Api::ApiError => e
   puts "Error when calling TimeApi->get_current_time: #{e}"
 end
 ```
@@ -707,7 +707,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <GetCurrentTime200Response>
-rescue TimeLogic::DirectApi::ApiError => e
+rescue TimeLogic::Api::ApiError => e
   puts "Error when calling TimeApi->get_current_time_with_http_info: #{e}"
 end
 ```
@@ -751,9 +751,9 @@ Returns daylight-saving status for the selected target.  Target selector rules: 
 
 ```ruby
 require 'time'
-require 'timelogic-direct-api'
+require 'timelogic-api'
 # setup authorization
-TimeLogic::DirectApi.configure do |config|
+TimeLogic::Api.configure do |config|
   # Configure API key authorization: directApiKeyHeader
   config.api_key['X-API-Key'] = 'YOUR API KEY'
   # Uncomment the following line to set a prefix for the API key, e.g. 'Bearer' (defaults to nil)
@@ -778,7 +778,7 @@ TimeLogic::DirectApi.configure do |config|
   # config.api_key_prefix['X-RapidAPI-Host'] = 'Bearer'
 end
 
-api_instance = TimeLogic::DirectApi::TimeApi.new
+api_instance = TimeLogic::Api::TimeApi.new
 opts = {
   tz: 'America/New_York', # String | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode.
   ip: '8.8.8.8', # String | IP address. On bulk-capable routes, a comma-separated list enables bulk mode.
@@ -795,7 +795,7 @@ begin
   # Daylight-saving status for a target
   result = api_instance.get_dst(opts)
   p result
-rescue TimeLogic::DirectApi::ApiError => e
+rescue TimeLogic::Api::ApiError => e
   puts "Error when calling TimeApi->get_dst: #{e}"
 end
 ```
@@ -813,7 +813,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <DstResponse>
-rescue TimeLogic::DirectApi::ApiError => e
+rescue TimeLogic::Api::ApiError => e
   puts "Error when calling TimeApi->get_dst_with_http_info: #{e}"
 end
 ```
@@ -858,9 +858,9 @@ Computes elapsed or remaining duration relative to one required reference timest
 
 ```ruby
 require 'time'
-require 'timelogic-direct-api'
+require 'timelogic-api'
 # setup authorization
-TimeLogic::DirectApi.configure do |config|
+TimeLogic::Api.configure do |config|
   # Configure API key authorization: directApiKeyHeader
   config.api_key['X-API-Key'] = 'YOUR API KEY'
   # Uncomment the following line to set a prefix for the API key, e.g. 'Bearer' (defaults to nil)
@@ -885,7 +885,7 @@ TimeLogic::DirectApi.configure do |config|
   # config.api_key_prefix['X-RapidAPI-Host'] = 'Bearer'
 end
 
-api_instance = TimeLogic::DirectApi::TimeApi.new
+api_instance = TimeLogic::Api::TimeApi.new
 opts = {
   unix: 1711300000, # Integer | 
   unix_ms: 1711300000000, # Integer | 
@@ -920,7 +920,7 @@ begin
   # Time elapsed since or remaining until a reference instant
   result = api_instance.get_elapsed(opts)
   p result
-rescue TimeLogic::DirectApi::ApiError => e
+rescue TimeLogic::Api::ApiError => e
   puts "Error when calling TimeApi->get_elapsed: #{e}"
 end
 ```
@@ -938,7 +938,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <ElapsedResponse>
-rescue TimeLogic::DirectApi::ApiError => e
+rescue TimeLogic::Api::ApiError => e
   puts "Error when calling TimeApi->get_elapsed_with_http_info: #{e}"
 end
 ```
@@ -1001,9 +1001,9 @@ Resolves timezone metadata for a single target.  Target selector rules: - Use ex
 
 ```ruby
 require 'time'
-require 'timelogic-direct-api'
+require 'timelogic-api'
 # setup authorization
-TimeLogic::DirectApi.configure do |config|
+TimeLogic::Api.configure do |config|
   # Configure API key authorization: directApiKeyHeader
   config.api_key['X-API-Key'] = 'YOUR API KEY'
   # Uncomment the following line to set a prefix for the API key, e.g. 'Bearer' (defaults to nil)
@@ -1028,7 +1028,7 @@ TimeLogic::DirectApi.configure do |config|
   # config.api_key_prefix['X-RapidAPI-Host'] = 'Bearer'
 end
 
-api_instance = TimeLogic::DirectApi::TimeApi.new
+api_instance = TimeLogic::Api::TimeApi.new
 opts = {
   tz: 'America/New_York', # String | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode.
   ip: '8.8.8.8', # String | IP address. On bulk-capable routes, a comma-separated list enables bulk mode.
@@ -1043,7 +1043,7 @@ begin
   # Resolve timezone information for a target
   result = api_instance.get_timezone(opts)
   p result
-rescue TimeLogic::DirectApi::ApiError => e
+rescue TimeLogic::Api::ApiError => e
   puts "Error when calling TimeApi->get_timezone: #{e}"
 end
 ```
@@ -1061,7 +1061,7 @@ begin
   p status_code # => 2xx
   p headers # => { ... }
   p data # => <GetTimezone200Response>
-rescue TimeLogic::DirectApi::ApiError => e
+rescue TimeLogic::Api::ApiError => e
   puts "Error when calling TimeApi->get_timezone_with_http_info: #{e}"
 end
 ```

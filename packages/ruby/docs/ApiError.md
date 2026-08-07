@@ -1,4 +1,4 @@
-# TimeLogic::DirectApi::ApiError
+# TimeLogic::Api::ApiError
 
 ## Properties
 
@@ -11,9 +11,9 @@
 ## Example
 
 ```ruby
-require 'timelogic-direct-api'
+require 'timelogic-api'
 
-instance = TimeLogic::DirectApi::ApiError.new(
+instance = TimeLogic::Api::ApiError.new(
   code: null,
   message: null,
   details: null

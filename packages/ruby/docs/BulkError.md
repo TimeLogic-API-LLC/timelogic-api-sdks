@@ -1,4 +1,4 @@
-# TimeLogic::DirectApi::BulkError
+# TimeLogic::Api::BulkError
 
 ## Properties
 
@@ -12,9 +12,9 @@
 ## Example
 
 ```ruby
-require 'timelogic-direct-api'
+require 'timelogic-api'
 
-instance = TimeLogic::DirectApi::BulkError.new(
+instance = TimeLogic::Api::BulkError.new(
   error: null,
   request_id: null,
   timestamp: null,

@@ -1,4 +1,4 @@
-# TimeLogic::DirectApi::ElapsedResponse
+# TimeLogic::Api::ElapsedResponse
 
 ## Properties
 
@@ -16,9 +16,9 @@
 ## Example
 
 ```ruby
-require 'timelogic-direct-api'
+require 'timelogic-api'
 
-instance = TimeLogic::DirectApi::ElapsedResponse.new(
+instance = TimeLogic::Api::ElapsedResponse.new(
   seconds: null,
   minutes: null,
   hours: null,
