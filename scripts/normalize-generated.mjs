@@ -302,6 +302,7 @@ for (const file of filesUnder('packages/go')) {
   if (!/\.(go|md|yaml|yml)$/.test(file)) continue;
   const original = readFileSync(file, 'utf8');
   const normalized = original
+    .replace(/^Public direct-access contract for the TimeLogic gateway\..*$/gm, 'TimeLogic API | A World Time API. World time, timezone, calendar, duration, and signed response operations.')
     .replace(/^Official public API contract for TimeLogic API\..*$/gm, 'TimeLogic API | A World Time API. World time, timezone, calendar, duration, and signed response operations.')
     .replaceAll('OpenAPI-Generator/0.1.0/go', 'OpenAPI-Generator/1.0.0/go')
     .replace(/^# Go API client for timelogicdirectapi$/m, '# TimeLogic API Go SDK | A World Time API')
