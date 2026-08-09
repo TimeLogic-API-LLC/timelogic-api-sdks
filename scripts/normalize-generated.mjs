@@ -298,6 +298,21 @@ gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 `);
 
+for (const file of filesUnder('packages/go')) {
+  if (!/\.(go|md|yaml|yml)$/.test(file)) continue;
+  const original = readFileSync(file, 'utf8');
+  const normalized = original
+    .replace(/^Official public API contract for TimeLogic API\..*$/gm, 'TimeLogic API | A World Time API. World time, timezone, calendar, duration, and signed response operations.')
+    .replaceAll('OpenAPI-Generator/0.1.0/go', 'OpenAPI-Generator/1.0.0/go')
+    .replace(/^# Go API client for timelogicdirectapi$/m, '# TimeLogic API Go SDK | A World Time API')
+    .replace(/^- Package version: 0\.1\.0$/m, '- Package version: 1.0.0')
+    .replaceAll('direct access supports', 'the API supports')
+    .replaceAll('default direct API host', 'default API host')
+    .replaceAll('Default direct customer API host', 'Default TimeLogic API host')
+    .replaceAll('Direct API key supplied', 'API key supplied');
+  if (normalized !== original) writeFileSync(file, normalized);
+}
+
 const typescriptPackagePath = 'packages/typescript/package.json';
 const typescriptPackage = JSON.parse(readFileSync(typescriptPackagePath, 'utf8'));
 typescriptPackage.repository = {

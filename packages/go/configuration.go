@@ -1,7 +1,7 @@
 /*
 TimeLogic API | A World Time API
 
-Public direct-access contract for the TimeLogic gateway.  This public spec excludes `/healthz` and the shared clock asset routes. It keeps `/.well-known/time-api-public-key`, `/v1/time/clock`, and signed JSON response controls because public consumers may need them.  Authentication: - direct access supports `Authorization: Bearer <token>`, `X-API-Key`, and `api_key` query credentials - RapidAPI access uses `X-RapidAPI-Key` and `X-RapidAPI-Host`; the SDKs expose this as a `rapidApi` transport option that accepts only the RapidAPI key  Behavioral notes: - all documented operations are `GET` - only one selector family may be used at a time - current and convert support bulk only through one comma-separated `tz`, `ip`, or `offset` selector - add, diff, calendar, dst, elapsed, timezone, and clock are single-target routes - credentials are extracted in Authorization, X-API-Key, then api_key query order; conflicting values are rejected - the first server is the default direct API host. The second server is the RapidAPI gateway and can be selected or overridden by SDK configuration - `sign` is available on supported JSON routes and is not supported on `/v1/time/clock`
+TimeLogic API | A World Time API. World time, timezone, calendar, duration, and signed response operations.
 
 API version: 1.0.0
 */
@@ -92,12 +92,12 @@ type Configuration struct {
 func NewConfiguration() *Configuration {
 	cfg := &Configuration{
 		DefaultHeader:    make(map[string]string),
-		UserAgent:        "OpenAPI-Generator/0.1.0/go",
+		UserAgent:        "OpenAPI-Generator/1.0.0/go",
 		Debug:            false,
 		Servers:          ServerConfigurations{
 			{
 				URL: "https://{host}",
-				Description: "Default direct customer API host; override `host` for a customer-specific domain or subdomain.",
+				Description: "Default TimeLogic API host; override `host` for a customer-specific domain or subdomain.",
 				Variables: map[string]ServerVariable{
 					"host": ServerVariable{
 						Description: "HTTPS hostname serving this API.",
