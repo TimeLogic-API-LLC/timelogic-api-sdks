@@ -1,7 +1,3 @@
-plugins {
-    id 'com.vanniktech.maven.publish' version '0.37.0'
-}
-
 group 'com.timelogicapi'
 version '1.0.0'
 
@@ -20,10 +16,12 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotless_version"
+        classpath "com.vanniktech.maven.publish:com.vanniktech.maven.publish.gradle.plugin:0.37.0"
     }
 }
 
 apply plugin: 'kotlin'
+apply plugin: 'com.vanniktech.maven.publish'
 apply plugin: 'maven-publish'
 apply plugin: 'com.diffplug.spotless'
 

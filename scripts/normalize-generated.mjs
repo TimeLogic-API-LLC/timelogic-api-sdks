@@ -126,12 +126,17 @@ const kotlinBuildPath = 'packages/kotlin/build.gradle';
 let kotlinBuild = readFileSync(kotlinBuildPath, 'utf8')
   .replace("group 'com.timelogic'", "group 'com.timelogicapi'")
   .replace("version '0.1.0'", "version '1.0.0'");
-if (!kotlinBuild.includes("com.vanniktech.maven.publish")) {
-  kotlinBuild = `plugins {
-    id 'com.vanniktech.maven.publish' version '0.37.0'
+if (!kotlinBuild.includes('com.vanniktech.maven.publish.gradle.plugin')) {
+  kotlinBuild = kotlinBuild.replace(
+    '        classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotless_version"',
+    '        classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotless_version"\n        classpath "com.vanniktech.maven.publish:com.vanniktech.maven.publish.gradle.plugin:0.37.0"'
+  );
 }
-
-${kotlinBuild}`;
+if (!kotlinBuild.includes("apply plugin: 'com.vanniktech.maven.publish'")) {
+  kotlinBuild = kotlinBuild.replace(
+    "apply plugin: 'kotlin'",
+    "apply plugin: 'kotlin'\napply plugin: 'com.vanniktech.maven.publish'"
+  );
 }
 if (!kotlinBuild.includes('mavenPublishing {')) {
   kotlinBuild = `${kotlinBuild.trimEnd()}
