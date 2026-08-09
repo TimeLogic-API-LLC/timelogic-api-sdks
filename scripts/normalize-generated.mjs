@@ -227,12 +227,13 @@ let javaClient = readFileSync(javaClientPath, 'utf8');
 if (!javaClient.includes('loggingInterceptor.redactHeader("Authorization")')) {
   javaClient = javaClient.replace(
     '                loggingInterceptor = new HttpLoggingInterceptor();',
-`                loggingInterceptor = new HttpLoggingInterceptor();
+`                loggingInterceptor = new HttpLoggingInterceptor(message ->
+                    java.util.logging.Logger.getLogger(ApiClient.class.getName()).info(
+                        message.replaceAll("(?i)([?&]api_key=)[^& ]*", "$1[REDACTED]")));
                 loggingInterceptor.redactHeader("Authorization");
                 loggingInterceptor.redactHeader("X-API-Key");
                 loggingInterceptor.redactHeader("X-RapidAPI-Key");
-                loggingInterceptor.redactHeader("X-RapidAPI-Host");
-                loggingInterceptor.redactQueryParams("api_key");`);
+                loggingInterceptor.redactHeader("X-RapidAPI-Host");`);
 }
 writeFileSync(javaClientPath, javaClient);
 
@@ -1075,6 +1076,12 @@ swiftSource = swiftSource.replace(
   '#if !os(macOS)\nimport MobileCoreServices\n#endif',
   '#if canImport(MobileCoreServices)\nimport MobileCoreServices\n#endif'
 );
+if (!swiftSource.includes('#endif\n            return "application/octet-stream"\n        } else {')) {
+  swiftSource = swiftSource.replace(
+    '            #endif\n        } else {\n            #if canImport(MobileCoreServices)',
+    '            #endif\n            return "application/octet-stream"\n        } else {\n            #if canImport(MobileCoreServices)'
+  );
+}
 swiftSource = swiftSource.replace(
   '        } else {\n            if let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension as NSString, nil)?.takeRetainedValue(),\n                    let mimetype = UTTypeCopyPreferredTagWithClass(uti, kUTTagClassMIMEType)?.takeRetainedValue() {\n                return mimetype as String\n            }\n            return "application/octet-stream"\n',
   '        } else {\n            #if canImport(MobileCoreServices)\n            if let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension as NSString, nil)?.takeRetainedValue(),\n                    let mimetype = UTTypeCopyPreferredTagWithClass(uti, kUTTagClassMIMEType)?.takeRetainedValue() {\n                return mimetype as String\n            }\n            #endif\n            return "application/octet-stream"\n'

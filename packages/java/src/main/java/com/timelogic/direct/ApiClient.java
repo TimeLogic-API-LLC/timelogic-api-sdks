@@ -582,12 +582,13 @@ public class ApiClient {
     public ApiClient setDebugging(boolean debugging) {
         if (debugging != this.debugging) {
             if (debugging) {
-                loggingInterceptor = new HttpLoggingInterceptor();
+                loggingInterceptor = new HttpLoggingInterceptor(message ->
+                    java.util.logging.Logger.getLogger(ApiClient.class.getName()).info(
+                        message.replaceAll("(?i)([?&]api_key=)[^& ]*", "$1[REDACTED]")));
                 loggingInterceptor.redactHeader("Authorization");
                 loggingInterceptor.redactHeader("X-API-Key");
                 loggingInterceptor.redactHeader("X-RapidAPI-Key");
                 loggingInterceptor.redactHeader("X-RapidAPI-Host");
-                loggingInterceptor.redactQueryParams("api_key");
                 loggingInterceptor.setLevel(Level.BODY);
                 httpClient = httpClient.newBuilder().addInterceptor(loggingInterceptor).build();
             } else {
