@@ -12,6 +12,7 @@ on:
         type: choice
         options:
           - all
+          - npm
           - crates
           - go
           - nuget
@@ -42,7 +43,7 @@ jobs:
 
   npm:
     needs: verify
-    if: ${{ github.event_name != 'workflow_dispatch' || inputs.target == 'all' }}
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.target == 'all' || inputs.target == 'npm' }}
     runs-on: ubuntu-latest
     environment: npm
     steps:
