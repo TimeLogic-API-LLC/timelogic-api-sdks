@@ -1663,11 +1663,9 @@ const normalizedPythonSetup = readFileSync(pythonSetupPath, 'utf8')
 writeFileSync(pythonSetupPath, normalizedPythonSetup);
 
 const typescriptReadmePath = 'packages/typescript/README.md';
-let typescriptReadme = readFileSync(typescriptReadmePath, 'utf8')
-  .replace(/^## .*$/m, `# TimeLogic API TypeScript SDK | A World Time API`)
-  .replace(/@timelogic\/direct-api@1\.0\.0/g, `@timelogic/direct-api@${releaseVersion}`)
-  .replace(/npm install @timelogic\/direct-api@1\.0\.0 --save/g, `npm install @timelogic/direct-api@${releaseVersion} --save`)
-  .replace(/Package version:\s*1\.0\.0/g, `Package version: ${releaseVersion}`);
+const typescriptReadmeTemplatePath = 'config/readmes/typescript.md';
+const typescriptReadme = readFileSync(typescriptReadmeTemplatePath, 'utf8')
+  .replaceAll('__VERSION__', releaseVersion);
 writeFileSync(typescriptReadmePath, typescriptReadme);
 
 const packageReadmes = [

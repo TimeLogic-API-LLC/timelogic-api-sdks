@@ -16,7 +16,7 @@ npm install @timelogic/direct-api
 Pin the current release when you need reproducible builds:
 
 ```bash
-npm install @timelogic/direct-api@1.0.1
+npm install @timelogic/direct-api@__VERSION__
 ```
 
 The package supports Node.js and browser environments with a standard `fetch` implementation. It ships CommonJS, ES modules, and TypeScript declarations.
