@@ -1087,8 +1087,8 @@ swiftSource = swiftSource.replace(
   '        } else {\n            #if canImport(MobileCoreServices)\n            if let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension as NSString, nil)?.takeRetainedValue(),\n                    let mimetype = UTTypeCopyPreferredTagWithClass(uti, kUTTagClassMIMEType)?.takeRetainedValue() {\n                return mimetype as String\n            }\n            #endif\n            return "application/octet-stream"\n'
 );
 swiftSource = swiftSource.replace(
-  '            return "application/octet-stream"\n        }\n        return "application/octet-stream"\n    }',
-  '            return "application/octet-stream"\n        }\n    }'
+  '            #endif\n            return "application/octet-stream"\n        }\n        return "application/octet-stream"\n    }',
+  '            #endif\n            return "application/octet-stream"\n        }\n    }'
 );
 writeFileSync(swiftTransport, swiftSource);
 
