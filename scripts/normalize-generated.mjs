@@ -301,9 +301,9 @@ gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 for (const file of filesUnder('packages/go')) {
   if (!/\.(go|md|yaml|yml)$/.test(file)) continue;
   const original = readFileSync(file, 'utf8');
+  const goDescription = 'TimeLogic API | A World Time API. World time, timezone, calendar, duration, and signed response operations.';
   const normalized = original
-    .replace(/^Public direct-access contract for the TimeLogic gateway\..*$/gm, 'TimeLogic API | A World Time API. World time, timezone, calendar, duration, and signed response operations.')
-    .replace(/^Official public API contract for TimeLogic API\..*$/gm, 'TimeLogic API | A World Time API. World time, timezone, calendar, duration, and signed response operations.')
+    .replace(/^([ \t]*)(?:Public direct-access contract for the TimeLogic gateway\.|Official public API contract for TimeLogic API\.|TimeLogic API \| A World Time API\. World time, timezone, calendar, duration, and signed response operations\.).*$/gm, `$1${goDescription}`)
     .replaceAll('OpenAPI-Generator/0.1.0/go', 'OpenAPI-Generator/1.0.0/go')
     .replace(/^# Go API client for timelogicdirectapi$/m, '# TimeLogic API Go SDK | A World Time API')
     .replace(/^- Package version: 0\.1\.0$/m, '- Package version: 1.0.0')
