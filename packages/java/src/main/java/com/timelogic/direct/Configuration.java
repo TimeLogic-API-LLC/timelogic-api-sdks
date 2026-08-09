@@ -15,7 +15,7 @@ package com.timelogic.direct;
 
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "1970-01-01T00:00:00Z[Etc/UTC]", comments = "Generator version: 7.10.0")
 public class Configuration {
-    public static final String VERSION = "0.1.0";
+    public static final String VERSION = "1.0.0";
 
     private static ApiClient defaultApiClient = new ApiClient();
 
