@@ -522,7 +522,8 @@ let javaPom = readFileSync(javaPomPath, 'utf8')
   .replace(/<name>OpenAPI-Generator Contributors<\/name>/, '<name>TimeLogic API LLC</name>')
   .replace(/<email>team@openapitools\.org<\/email>/, '<email>dev@timelogicapi.com</email>')
   .replace(/<organization>OpenAPITools\.org<\/organization>/, '<organization>TimeLogic API LLC</organization>')
-  .replace(/<organizationUrl>http:\/\/openapitools\.org<\/organizationUrl>/, '<organizationUrl>https://timelogicapi.com</organizationUrl>');
+  .replace(/<organizationUrl>http:\/\/openapitools\.org<\/organizationUrl>/, '<organizationUrl>https://timelogicapi.com</organizationUrl>')
+  .replaceAll('3.17.0', '3.18.0');
 
 javaPom = javaPom.replace(
   /\n\s*<scm>[\s\S]*?<\/scm>/,
@@ -586,13 +587,15 @@ const javaGradlePath = 'packages/java/build.gradle';
 writeFileSync(javaGradlePath, readFileSync(javaGradlePath, 'utf8')
   .replace("group = 'com.timelogic'", "group = 'com.timelogicapi'")
   .replace("version = '0.1.0'", `version = '${releaseVersion}'`)
-  .replace("artifactId = 'timelogic-direct-api'", "artifactId = 'timelogic-api'"));
+  .replace("artifactId = 'timelogic-direct-api'", "artifactId = 'timelogic-api'")
+  .replaceAll('3.17.0', '3.18.0'));
 
 const javaSbtPath = 'packages/java/build.sbt';
 writeFileSync(javaSbtPath, readFileSync(javaSbtPath, 'utf8')
   .replace('organization := "com.timelogic"', 'organization := "com.timelogicapi"')
   .replace('name := "timelogic-direct-api"', 'name := "timelogic-api"')
-  .replace('version := "0.1.0"', `version := "${releaseVersion}"`));
+  .replace('version := "0.1.0"', `version := "${releaseVersion}"`)
+  .replaceAll('3.17.0', '3.18.0'));
 
 for (const file of filesUnder('packages/java')) {
   if (!/\.(java|md|xml|gradle|sbt|properties|yaml|yml)$/.test(file)) continue;
@@ -811,6 +814,12 @@ writeFileSync(typescriptPackagePath, `${JSON.stringify(typescriptPackage, null, 
 const pythonPyprojectPath = 'packages/python/pyproject.toml';
 let pythonPyproject = readFileSync(pythonPyprojectPath, 'utf8')
   .replace('name = "timelogic_direct_api"', 'name = "timelogic-api"')
+  .replace('python = "^3.8"', 'python = "^3.9"')
+  .replace('urllib3 = ">= 1.25.3 < 3.0.0"', 'urllib3 = ">= 2.6.3 < 3.0.0"')
+  .replace('pytest = ">= 7.2.1"', 'pytest = { version = ">= 9.0.3", python = ">=3.10" }')
+  .replace('pytest-cov = ">= 2.8.1"', 'pytest-cov = { version = ">= 6.2.1", python = ">=3.10" }')
+  .replace('tox = ">= 3.9.0"', 'tox = ">= 4.27.0"')
+  .replace('filelock = ">= 3.20.3"', 'filelock = ">= 3.20.3"')
   .replace(/^description = ".*"$/m, 'description = "TimeLogic API | A World Time API"')
   .replaceAll('OpenAPI Generator community', 'TimeLogic API LLC')
   .replaceAll('team@openapitools.org', '')
@@ -818,10 +827,18 @@ let pythonPyproject = readFileSync(pythonPyprojectPath, 'utf8')
     'repository = "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go"',
     'repository = "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks"'
   );
+if (!pythonPyproject.includes('filelock =')) {
+  pythonPyproject = pythonPyproject.replace(
+    'pytest-cov = { version = ">= 6.2.1", python = ">=3.10" }',
+    'pytest-cov = { version = ">= 6.2.1", python = ">=3.10" }\nfilelock = ">= 3.20.3"'
+  );
+}
 writeFileSync(pythonPyprojectPath, pythonPyproject);
 
 const pythonSetupPath = 'packages/python/setup.py';
 let pythonSetup = readFileSync(pythonSetupPath, 'utf8')
+  .replace('PYTHON_REQUIRES = ">= 3.8"', 'PYTHON_REQUIRES = ">= 3.9"')
+  .replace('urllib3 >= 1.25.3, < 3.0.0', 'urllib3 >= 2.6.3, < 3.0.0')
   .replace('url="",', 'url="https://github.com/TimeLogic-API-LLC/timelogic-api-sdks",')
   .replace(/description="[^"]*"/, 'description="TimeLogic API | A World Time API"')
   .replaceAll('OpenAPI Generator community', 'TimeLogic API LLC')
@@ -848,9 +865,27 @@ See the API reference and source code at https://github.com/TimeLogic-API-LLC/ti
   );
 writeFileSync(pythonSetupPath, pythonSetup);
 
+const pythonRequirementsPath = 'packages/python/requirements.txt';
+writeFileSync(
+  pythonRequirementsPath,
+  readFileSync(pythonRequirementsPath, 'utf8').replace('urllib3 >= 1.25.3, < 3.0.0', 'urllib3 >= 2.6.3, < 3.0.0')
+);
+
+const pythonTestRequirementsPath = 'packages/python/test-requirements.txt';
+writeFileSync(
+  pythonTestRequirementsPath,
+  readFileSync(pythonTestRequirementsPath, 'utf8')
+    .replace('pytest >= 7.2.1', 'pytest >= 9.0.3; python_version >= "3.10"')
+    .replace('pytest-cov >= 2.8.1', 'pytest-cov >= 6.2.1; python_version >= "3.10"')
+    .replace('tox >= 3.9.0', 'tox >= 4.27.0')
+    .replace(/(^|\n)filelock[^\n]*/g, '$1filelock >= 3.20.3')
+    .replace(/\n?$/, '\n')
+);
+
 const pythonReadmePath = 'packages/python/README.md';
 let pythonReadme = readFileSync(pythonReadmePath, 'utf8')
   .replace('# timelogic-direct-api', '# timelogic-api')
+  .replace('Python 3.8+', 'Python 3.9+')
   .replace(
     /git\+https:\/\/github\.com\/TimeLogic-API-LLC\/timelogic-api(?:-sdks)?\.git(?:#subdirectory=packages\/python)?/g,
     'git+https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git#subdirectory=packages/python'
