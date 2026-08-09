@@ -37,7 +37,7 @@ go get golang.org/x/net/context
 Put the package under your project folder and add the following in import:
 
 ```go
-import timelogicdirectapi "github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go"
+import timelogicapi "github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go"
 ```
 
 To use a proxy, set the environment variable `HTTP_PROXY`:
@@ -52,18 +52,18 @@ Default configuration comes with `Servers` field that contains server objects as
 
 ### Select Server Configuration
 
-For using other server than the one defined on index 0 set context value `timelogicdirectapi.ContextServerIndex` of type `int`.
+For using other server than the one defined on index 0 set context value `timelogicapi.ContextServerIndex` of type `int`.
 
 ```go
-ctx := context.WithValue(context.Background(), timelogicdirectapi.ContextServerIndex, 1)
+ctx := context.WithValue(context.Background(), timelogicapi.ContextServerIndex, 1)
 ```
 
 ### Templated Server URL
 
-Templated server URL is formatted using default variables from configuration or from context value `timelogicdirectapi.ContextServerVariables` of type `map[string]string`.
+Templated server URL is formatted using default variables from configuration or from context value `timelogicapi.ContextServerVariables` of type `map[string]string`.
 
 ```go
-ctx := context.WithValue(context.Background(), timelogicdirectapi.ContextServerVariables, map[string]string{
+ctx := context.WithValue(context.Background(), timelogicapi.ContextServerVariables, map[string]string{
 	"basePath": "v2",
 })
 ```
@@ -74,13 +74,13 @@ Note, enum values are always validated and all unused variables are silently ign
 
 Each operation can use different server URL defined using `OperationServers` map in the `Configuration`.
 An operation is uniquely identified by `"{classname}Service.{nickname}"` string.
-Similar rules for overriding default operation server index and variables applies by using `timelogicdirectapi.ContextOperationServerIndices` and `timelogicdirectapi.ContextOperationServerVariables` context maps.
+Similar rules for overriding default operation server index and variables applies by using `timelogicapi.ContextOperationServerIndices` and `timelogicapi.ContextOperationServerVariables` context maps.
 
 ```go
-ctx := context.WithValue(context.Background(), timelogicdirectapi.ContextOperationServerIndices, map[string]int{
+ctx := context.WithValue(context.Background(), timelogicapi.ContextOperationServerIndices, map[string]int{
 	"{classname}Service.{nickname}": 2,
 })
-ctx = context.WithValue(context.Background(), timelogicdirectapi.ContextOperationServerVariables, map[string]map[string]string{
+ctx = context.WithValue(context.Background(), timelogicapi.ContextOperationServerVariables, map[string]map[string]string{
 	"{classname}Service.{nickname}": {
 		"port": "8443",
 	},
@@ -131,54 +131,54 @@ Class | Method | HTTP request | Description
 
 
 Authentication schemes defined for the API:
-### directBearerAuth
+### bearerAuth
 
 - **Type**: HTTP Bearer token authentication
 
 Example
 
 ```go
-auth := context.WithValue(context.Background(), timelogicdirectapi.ContextAccessToken, "BEARER_TOKEN_STRING")
+auth := context.WithValue(context.Background(), timelogicapi.ContextAccessToken, "BEARER_TOKEN_STRING")
 r, err := client.Service.Operation(auth, args)
 ```
 
-### directApiKeyHeader
+### apiKeyHeader
 
 - **Type**: API key
 - **API key parameter name**: X-API-Key
 - **Location**: HTTP header
 
-Note, each API key must be added to a map of `map[string]APIKey` where the key is: directApiKeyHeader and passed in as the auth context for each request.
+Note, each API key must be added to a map of `map[string]APIKey` where the key is: apiKeyHeader and passed in as the auth context for each request.
 
 Example
 
 ```go
 auth := context.WithValue(
 		context.Background(),
-		timelogicdirectapi.ContextAPIKeys,
-		map[string]timelogicdirectapi.APIKey{
-			"directApiKeyHeader": {Key: "API_KEY_STRING"},
+		timelogicapi.ContextAPIKeys,
+		map[string]timelogicapi.APIKey{
+			"apiKeyHeader": {Key: "API_KEY_STRING"},
 		},
 	)
 r, err := client.Service.Operation(auth, args)
 ```
 
-### directApiKeyQuery
+### apiKeyQuery
 
 - **Type**: API key
 - **API key parameter name**: api_key
 - **Location**: URL query string
 
-Note, each API key must be added to a map of `map[string]APIKey` where the key is: directApiKeyQuery and passed in as the auth context for each request.
+Note, each API key must be added to a map of `map[string]APIKey` where the key is: apiKeyQuery and passed in as the auth context for each request.
 
 Example
 
 ```go
 auth := context.WithValue(
 		context.Background(),
-		timelogicdirectapi.ContextAPIKeys,
-		map[string]timelogicdirectapi.APIKey{
-			"directApiKeyQuery": {Key: "API_KEY_STRING"},
+		timelogicapi.ContextAPIKeys,
+		map[string]timelogicapi.APIKey{
+			"apiKeyQuery": {Key: "API_KEY_STRING"},
 		},
 	)
 r, err := client.Service.Operation(auth, args)
@@ -197,8 +197,8 @@ Example
 ```go
 auth := context.WithValue(
 		context.Background(),
-		timelogicdirectapi.ContextAPIKeys,
-		map[string]timelogicdirectapi.APIKey{
+		timelogicapi.ContextAPIKeys,
+		map[string]timelogicapi.APIKey{
 			"rapidApiKey": {Key: "API_KEY_STRING"},
 		},
 	)
@@ -218,8 +218,8 @@ Example
 ```go
 auth := context.WithValue(
 		context.Background(),
-		timelogicdirectapi.ContextAPIKeys,
-		map[string]timelogicdirectapi.APIKey{
+		timelogicapi.ContextAPIKeys,
+		map[string]timelogicapi.APIKey{
 			"rapidApiHost": {Key: "API_KEY_STRING"},
 		},
 	)

@@ -1,4 +1,4 @@
-package timelogicdirectapi
+package timelogicapi
 
 import (
     "context"

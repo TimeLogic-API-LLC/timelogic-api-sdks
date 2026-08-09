@@ -35,9 +35,9 @@ servers:
       description: RapidAPI gateway hostname. Override for a compatible proxy or test
         gateway.
 security:
-- directBearerAuth: []
-- directApiKeyHeader: []
-- directApiKeyQuery: []
+- bearerAuth: []
+- apiKeyHeader: []
+- apiKeyQuery: []
 - rapidApiKey: []
   rapidApiHost: []
 tags:
@@ -4515,17 +4515,17 @@ components:
       - $ref: '#/components/schemas/TimezoneResolvedResponse'
       - $ref: '#/components/schemas/TimezoneOffsetResponse'
   securitySchemes:
-    directBearerAuth:
+    bearerAuth:
       bearerFormat: TimeLogic API key
       description: "API key supplied as Authorization: Bearer."
       scheme: bearer
       type: http
-    directApiKeyHeader:
+    apiKeyHeader:
       description: API key supplied as X-API-Key.
       in: header
       name: X-API-Key
       type: apiKey
-    directApiKeyQuery:
+    apiKeyQuery:
       description: API key supplied as a query parameter; headers are preferred.
       in: query
       name: api_key
