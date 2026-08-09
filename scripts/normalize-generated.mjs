@@ -1086,6 +1086,12 @@ swiftSource = swiftSource.replace(
   '        } else {\n            if let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension as NSString, nil)?.takeRetainedValue(),\n                    let mimetype = UTTypeCopyPreferredTagWithClass(uti, kUTTagClassMIMEType)?.takeRetainedValue() {\n                return mimetype as String\n            }\n            return "application/octet-stream"\n',
   '        } else {\n            #if canImport(MobileCoreServices)\n            if let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension as NSString, nil)?.takeRetainedValue(),\n                    let mimetype = UTTypeCopyPreferredTagWithClass(uti, kUTTagClassMIMEType)?.takeRetainedValue() {\n                return mimetype as String\n            }\n            #endif\n            return "application/octet-stream"\n'
 );
+if (!swiftSource.includes('#endif\n            return "application/octet-stream"\n        } else {\n            #if canImport(MobileCoreServices)')) {
+  swiftSource = swiftSource.replace(
+    '            #endif\n        } else {\n            #if canImport(MobileCoreServices)',
+    '            #endif\n            return "application/octet-stream"\n        } else {\n            #if canImport(MobileCoreServices)'
+  );
+}
 swiftSource = swiftSource.replace(
   '            #endif\n            return "application/octet-stream"\n        }\n        return "application/octet-stream"\n    }',
   '            #endif\n            return "application/octet-stream"\n        }\n    }'
