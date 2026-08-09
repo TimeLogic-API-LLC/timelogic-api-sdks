@@ -221,10 +221,10 @@ jobs:
           cache: gradle
       - uses: gradle/actions/setup-gradle@v4
       - name: Run Kotlin tests
-        run: ./gradlew --no-daemon test
+        run: bash ./gradlew --no-daemon test
         working-directory: packages/kotlin
       - name: Publish signed Kotlin SDK to Maven Central
-        run: ./gradlew --no-daemon publishToMavenCentral
+        run: bash ./gradlew --no-daemon publishToMavenCentral
         working-directory: packages/kotlin
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
