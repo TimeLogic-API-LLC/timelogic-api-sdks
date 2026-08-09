@@ -16,7 +16,7 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotless_version"
-        classpath "com.vanniktech.maven.publish:com.vanniktech.maven.publish.gradle.plugin:0.37.0"
+        classpath "com.vanniktech.maven.publish:com.vanniktech.maven.publish.gradle.plugin:0.34.0"
     }
 }
 

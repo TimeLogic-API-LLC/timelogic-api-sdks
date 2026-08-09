@@ -129,7 +129,7 @@ let kotlinBuild = readFileSync(kotlinBuildPath, 'utf8')
 if (!kotlinBuild.includes('com.vanniktech.maven.publish.gradle.plugin')) {
   kotlinBuild = kotlinBuild.replace(
     '        classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotless_version"',
-    '        classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotless_version"\n        classpath "com.vanniktech.maven.publish:com.vanniktech.maven.publish.gradle.plugin:0.37.0"'
+    '        classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotless_version"\n        classpath "com.vanniktech.maven.publish:com.vanniktech.maven.publish.gradle.plugin:0.34.0"'
   );
 }
 if (!kotlinBuild.includes("apply plugin: 'com.vanniktech.maven.publish'")) {
