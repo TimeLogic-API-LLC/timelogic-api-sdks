@@ -1,5 +1,9 @@
-group 'com.timelogic'
-version '0.1.0'
+plugins {
+    id 'com.vanniktech.maven.publish' version '0.37.0'
+}
+
+group 'com.timelogicapi'
+version '1.0.0'
 
 wrapper {
     gradleVersion = '8.7'
@@ -59,4 +63,37 @@ dependencies {
     implementation "com.squareup.moshi:moshi-adapters:1.15.1"
     implementation "com.squareup.okhttp3:okhttp:4.12.0"
     testImplementation "io.kotlintest:kotlintest-runner-junit5:3.4.2"
+}
+
+mavenPublishing {
+    coordinates('com.timelogicapi', 'timelogic-api-kotlin', project.version.toString())
+    publishToMavenCentral(true)
+    signAllPublications()
+
+    pom {
+        name = 'TimeLogic API Kotlin SDK'
+        description = 'Official Kotlin SDK for TimeLogic API, a world time API.'
+        url = 'https://api.timelogicapi.com'
+        licenses {
+            license {
+                name = 'The Unlicense'
+                url = 'https://unlicense.org'
+                distribution = 'repo'
+            }
+        }
+        developers {
+            developer {
+                id = 'timelogicapi'
+                name = 'TimeLogic API LLC'
+                email = 'dev@timelogicapi.com'
+                organization = 'TimeLogic API LLC'
+                organizationUrl = 'https://timelogicapi.com'
+            }
+        }
+        scm {
+            url = 'https://github.com/TimeLogic-API-LLC/timelogic-api-sdks'
+            connection = 'scm:git:git://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git'
+            developerConnection = 'scm:git:ssh://git@github.com/TimeLogic-API-LLC/timelogic-api-sdks.git'
+        }
+    }
 }

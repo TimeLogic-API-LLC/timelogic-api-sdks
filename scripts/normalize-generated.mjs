@@ -122,6 +122,70 @@ for (const file of filesUnder('packages/java')) {
   if (normalized !== original) writeFileSync(file, normalized);
 }
 
+const kotlinBuildPath = 'packages/kotlin/build.gradle';
+let kotlinBuild = readFileSync(kotlinBuildPath, 'utf8')
+  .replace("group 'com.timelogic'", "group 'com.timelogicapi'")
+  .replace("version '0.1.0'", "version '1.0.0'");
+if (!kotlinBuild.includes("com.vanniktech.maven.publish")) {
+  kotlinBuild = `plugins {
+    id 'com.vanniktech.maven.publish' version '0.37.0'
+}
+
+${kotlinBuild}`;
+}
+if (!kotlinBuild.includes('mavenPublishing {')) {
+  kotlinBuild += `
+
+mavenPublishing {
+    coordinates('com.timelogicapi', 'timelogic-api-kotlin', project.version.toString())
+    publishToMavenCentral(true)
+    signAllPublications()
+
+    pom {
+        name = 'TimeLogic API Kotlin SDK'
+        description = 'Official Kotlin SDK for TimeLogic API, a world time API.'
+        url = 'https://api.timelogicapi.com'
+        licenses {
+            license {
+                name = 'The Unlicense'
+                url = 'https://unlicense.org'
+                distribution = 'repo'
+            }
+        }
+        developers {
+            developer {
+                id = 'timelogicapi'
+                name = 'TimeLogic API LLC'
+                email = 'dev@timelogicapi.com'
+                organization = 'TimeLogic API LLC'
+                organizationUrl = 'https://timelogicapi.com'
+            }
+        }
+        scm {
+            url = 'https://github.com/TimeLogic-API-LLC/timelogic-api-sdks'
+            connection = 'scm:git:git://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git'
+            developerConnection = 'scm:git:ssh://git@github.com/TimeLogic-API-LLC/timelogic-api-sdks.git'
+        }
+    }
+}
+`;
+}
+writeFileSync(kotlinBuildPath, kotlinBuild.trimEnd() + '\n');
+
+const kotlinSettingsPath = 'packages/kotlin/settings.gradle';
+writeFileSync(kotlinSettingsPath, readFileSync(kotlinSettingsPath, 'utf8')
+  .replaceAll('timelogic-direct-api', 'timelogic-api-kotlin').trimEnd() + '\n');
+
+const kotlinReadmePath = 'packages/kotlin/README.md';
+let kotlinReadme = readFileSync(kotlinReadmePath, 'utf8')
+  .replace(/^# [^\r\n]*Kotlin client library[^\r\n]*$/m, '# TimeLogic API Kotlin SDK | A World Time API')
+  .replaceAll('Public direct-access contract for the TimeLogic gateway.', 'Official public API contract for TimeLogic API.')
+  .replace(/^- Package version:\s*$/m, '- Package version: 1.0.0')
+  .replaceAll('com.timelogic:timelogic-direct-api', 'com.timelogicapi:timelogic-api-kotlin')
+  .replaceAll('timelogic-direct-api', 'timelogic-api-kotlin')
+  .trimEnd() + '\n';
+writeFileSync(kotlinReadmePath, kotlinReadme);
+
 const csharpPackageName = 'TimeLogic.Api';
 const csharpSolutionPath = `packages/csharp/${csharpPackageName}.sln`;
 const csharpFixedProjectGuid = '{0F073C98-0C47-4A15-B71F-D69526FB4A50}';

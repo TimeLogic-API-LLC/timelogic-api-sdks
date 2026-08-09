@@ -21,7 +21,7 @@ const properties = {
   csharp: 'packageName=TimeLogic.Api,packageVersion=1.0.0,generateAliasAsModel=true,gitUserId=TimeLogic-API-LLC,gitRepoId=timelogic-api-sdks',
   php: 'invokerPackage=TimeLogic\\DirectApi,variableNamingConvention=camelCase,generateAliasAsModel=true,gitUserId=TimeLogic-API-LLC,gitRepoId=timelogic-api-sdks',
   ruby: 'gemName=timelogic-api,moduleName=TimeLogic::Api,generateAliasAsModel=true,gitUserId=TimeLogic-API-LLC,gitRepoId=timelogic-api-sdks',
-  kotlin: 'packageName=com.timelogic.direct.api,artifactId=timelogic-direct-api,groupId=com.timelogic,artifactVersion=0.1.0,generateAliasAsModel=true,gitUserId=TimeLogic-API-LLC,gitRepoId=timelogic-api-sdks',
+  kotlin: 'packageName=com.timelogic.direct.api,artifactId=timelogic-api-kotlin,groupId=com.timelogicapi,artifactVersion=1.0.0,generateAliasAsModel=true,gitUserId=TimeLogic-API-LLC,gitRepoId=timelogic-api-sdks',
   swift: 'packageName=TimeLogicDirectAPI,generateAliasAsModel=true,gitUserId=TimeLogic-API-LLC,gitRepoId=timelogic-api-sdks'
 };
 

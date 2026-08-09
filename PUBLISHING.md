@@ -13,8 +13,8 @@ This repository has ten generated SDKs. A release tag publishes the TypeScript/n
 | Java | Maven Central | `com.timelogicapi:timelogic-api` | Yes | Requires the protected `maven-central` environment's signing secrets |
 | C# | NuGet.org | `TimeLogic.Api` | Yes | Requires NuGet trusted publishing and the `NUGET_USER` repository variable |
 | PHP | Packagist | Not yet declared | No | Blocked: `composer.json` has no required `name` |
-| Ruby | RubyGems.org | `timelogic-direct-api` | No | Requires RubyGems publisher setup and automation |
-| Kotlin | Maven Central | Intended: `com.timelogic:timelogic-direct-api` | No | Blocked: no Maven publication is defined |
+| Ruby | RubyGems.org | `timelogic-api` | Yes | Published 1.0.0; future metadata uses `dev@timelogicapi.com` |
+| Kotlin | Maven Central | `com.timelogicapi:timelogic-api-kotlin` | Yes | Ready for its first publication through the protected `maven-central` environment |
 | Swift | Swift Package Manager | Git source package (currently `OpenAPIClient`) | No | Release by Git tag after package identity cleanup |
 
 The existing release workflow is [`.github/workflows/release.yml`](.github/workflows/release.yml). After shared verification, npm, PyPI, crates.io, NuGet.org, and the GitHub release run independently and in parallel. A failure in one registry does not block publishing to the others.
@@ -255,15 +255,15 @@ Release a tag such as `v1.0.0`, or manually run the root `Release SDKs` workflow
 
 ### Kotlin / Maven Central
 
-The Kotlin package has `maven-publish` applied in [`packages/kotlin/build.gradle`](packages/kotlin/build.gradle), but it defines no `MavenPublication`, repository, source/Javadoc artifacts, or signing. `publish` therefore cannot publish a usable artifact today.
+The Kotlin package is configured as a distinct Maven Central artifact:
 
-First add a Maven Central-ready publication with:
+- group ID: `com.timelogicapi`;
+- artifact ID: `timelogic-api-kotlin`;
+- version: `1.0.0` for the first publication;
+- sources and documentation artifacts: supplied by the Vanniktech Maven Publish plugin;
+- GPG signing and Central Portal upload: supplied by the protected `maven-central` environment.
 
-- `groupId` `com.timelogic`, artifact ID `timelogic-direct-api`, and the release version;
-- `components.java`, a sources JAR, and a Dokka/Javadoc JAR;
-- a Central Portal repository and environment-supplied credentials;
-- GPG signing and complete POM metadata (license, developers, SCM);
-- a `maven-central` protected environment in GitHub Actions.
+It reuses the existing Maven Central account, namespace, `MAVEN_CENTRAL_USERNAME`, `MAVEN_CENTRAL_PASSWORD`, `MAVEN_GPG_PRIVATE_KEY`, and `MAVEN_GPG_PASSPHRASE` secrets. No new Maven account or GPG key is required.
 
 Then run:
 
@@ -274,7 +274,7 @@ Push-Location packages/kotlin
 Pop-Location
 ```
 
-After verifying the local repository contains `com/timelogic/timelogic-direct-api/0.1.1`, publish through the CI-only Central task. Keep Kotlin and Java as distinct Central artifacts even though their coordinates would otherwise collide; use a different artifact ID (for example `timelogic-direct-api-kotlin`) or publish only one of them. This collision must be resolved before either is released.
+After verifying the local repository contains `com/timelogicapi/timelogic-api-kotlin/1.0.0`, use **Actions → Release SDKs → Run workflow → target `kotlin`**. The Kotlin job is independent of Java and the other registries after shared verification. For later versions, update the shared generator version inputs, regenerate, commit, and publish a new immutable version.
 
 ### Swift / Swift Package Manager (and CocoaPods)
 
