@@ -1,33 +1,34 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.timelogic</groupId>
-    <artifactId>timelogic-direct-api</artifactId>
+    <groupId>com.timelogicapi</groupId>
+    <artifactId>timelogic-api</artifactId>
     <packaging>jar</packaging>
-    <name>timelogic-direct-api</name>
-    <version>0.1.0</version>
-    <url>https://github.com/openapitools/openapi-generator</url>
-    <description>OpenAPI Java</description>
+    <name>TimeLogic API Java SDK</name>
+    <version>1.0.0</version>
+    <url>https://api.timelogicapi.com</url>
+    <description>Official Java SDK for TimeLogic API, a world time API.</description>
     <scm>
-        <connection>scm:git:git@github.com:openapitools/openapi-generator.git</connection>
-        <developerConnection>scm:git:git@github.com:openapitools/openapi-generator.git</developerConnection>
-        <url>https://github.com/openapitools/openapi-generator</url>
+        <connection>scm:git:git://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/TimeLogic-API-LLC/timelogic-api-sdks.git</developerConnection>
+        <url>https://github.com/TimeLogic-API-LLC/timelogic-api-sdks</url>
+        <tag>HEAD</tag>
     </scm>
 
     <licenses>
         <license>
             <name>Unlicense</name>
-            <url>http://unlicense.org</url>
+            <url>https://unlicense.org</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
 
     <developers>
         <developer>
-            <name>OpenAPI-Generator Contributors</name>
-            <email>team@openapitools.org</email>
-            <organization>OpenAPITools.org</organization>
-            <organizationUrl>http://openapitools.org</organizationUrl>
+            <name>TimeLogic API LLC</name>
+            <email>support@timelogicapi.com</email>
+            <organization>TimeLogic API LLC</organization>
+            <organizationUrl>https://timelogicapi.com</organizationUrl>
         </developer>
     </developers>
 
@@ -230,6 +231,17 @@
                 </java>
               </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.9.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <autoPublish>true</autoPublish>
+                    <waitUntil>published</waitUntil>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -242,6 +254,14 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
                         <version>3.2.1</version>
+                        <configuration>
+                            <gpgArguments>
+                                <arg>--batch</arg>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                            <passphrase>${env.MAVEN_GPG_PASSPHRASE}</passphrase>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>

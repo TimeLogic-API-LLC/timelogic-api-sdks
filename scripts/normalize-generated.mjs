@@ -29,6 +29,76 @@ for (const file of filesUnder('packages')) {
   if (normalized !== original) writeFileSync(file, normalized);
 }
 
+const javaPomPath = 'packages/java/pom.xml';
+let javaPom = readFileSync(javaPomPath, 'utf8')
+  .replace(/<groupId>com\.timelogic<\/groupId>/, '<groupId>com.timelogicapi</groupId>')
+  .replace(/<artifactId>timelogic-direct-api<\/artifactId>/g, '<artifactId>timelogic-api</artifactId>')
+  .replace(/<name>timelogic-direct-api<\/name>/, '<name>TimeLogic API Java SDK</name>')
+  .replace(/<version>0\.1\.0<\/version>/, '<version>1.0.0</version>')
+  .replace(/<url>https:\/\/github\.com\/openapitools\/openapi-generator<\/url>/g, '<url>https://api.timelogicapi.com</url>')
+  .replace(/<description>OpenAPI Java<\/description>/, '<description>Official Java SDK for TimeLogic API, a world time API.</description>')
+  .replace(/scm:git:git@github\.com:openapitools\/openapi-generator\.git/g, 'scm:git:git://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git')
+  .replace(/scm:git:ssh:\/\/git@github\.com:openapitools\/openapi-generator\.git/g, 'scm:git:ssh://git@github.com/TimeLogic-API-LLC/timelogic-api-sdks.git')
+  .replace(/<url>http:\/\/unlicense\.org<\/url>/g, '<url>https://unlicense.org</url>')
+  .replace(/<name>OpenAPI-Generator Contributors<\/name>/, '<name>TimeLogic API LLC</name>')
+  .replace(/<email>team@openapitools\.org<\/email>/, '<email>support@timelogicapi.com</email>')
+  .replace(/<organization>OpenAPITools\.org<\/organization>/, '<organization>TimeLogic API LLC</organization>')
+  .replace(/<organizationUrl>http:\/\/openapitools\.org<\/organizationUrl>/, '<organizationUrl>https://timelogicapi.com</organizationUrl>');
+
+if (!javaPom.includes('central-publishing-maven-plugin')) {
+  javaPom = javaPom.replace(
+    '        </plugins>\n    </build>',
+    `            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.9.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <autoPublish>true</autoPublish>
+                    <waitUntil>published</waitUntil>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>`
+  );
+}
+
+if (javaPom.includes('<artifactId>maven-gpg-plugin</artifactId>') && !javaPom.includes('<passphrase>${env.MAVEN_GPG_PASSPHRASE}</passphrase>')) {
+  javaPom = javaPom.replace(
+    /(<artifactId>maven-gpg-plugin<\/artifactId>\s*<version>[^<]+<\/version>)/,
+    `$1
+                        <configuration>
+                            <gpgArguments>
+                                <arg>--batch</arg>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                            <passphrase>\${env.MAVEN_GPG_PASSPHRASE}</passphrase>
+                        </configuration>`
+  );
+}
+writeFileSync(javaPomPath, javaPom);
+
+const javaReadmePath = 'packages/java/README.md';
+let javaReadme = readFileSync(javaReadmePath, 'utf8')
+  .replace(/^# timelogic-direct-api$/m, '# TimeLogic API Java SDK')
+  .replaceAll('timelogic-direct-api', 'timelogic-api')
+  .replaceAll('Public direct-access contract for the TimeLogic gateway.', 'Official public API contract for TimeLogic API.')
+  .replace('<groupId>com.timelogic</groupId>', '<groupId>com.timelogicapi</groupId>')
+  .replaceAll('com.timelogic:timelogic-api', 'com.timelogicapi:timelogic-api')
+  .replaceAll('0.1.0', '1.0.0');
+writeFileSync(javaReadmePath, javaReadme.trimEnd() + '\n');
+
+const javaSettingsPath = 'packages/java/settings.gradle';
+writeFileSync(javaSettingsPath, readFileSync(javaSettingsPath, 'utf8').replaceAll('timelogic-direct-api', 'timelogic-api'));
+
+const javaGradlePath = 'packages/java/build.gradle';
+writeFileSync(javaGradlePath, readFileSync(javaGradlePath, 'utf8')
+  .replace("group = 'com.timelogic'", "group = 'com.timelogicapi'")
+  .replace("version = '0.1.0'", "version = '1.0.0'")
+  .replace("artifactId = 'timelogic-direct-api'", "artifactId = 'timelogic-api'"));
+
 const csharpPackageName = 'TimeLogic.Api';
 const csharpSolutionPath = `packages/csharp/${csharpPackageName}.sln`;
 const csharpFixedProjectGuid = '{0F073C98-0C47-4A15-B71F-D69526FB4A50}';

@@ -14,6 +14,7 @@ on:
           - all
           - crates
           - nuget
+          - maven
           - ruby
 
 permissions:
@@ -169,6 +170,39 @@ jobs:
       - uses: rubygems/release-gem@v1
         with:
           working-directory: packages/ruby
+
+  maven:
+    needs: verify
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.target == 'all' || inputs.target == 'maven' }}
+    runs-on: ubuntu-latest
+    environment: maven-central
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+          cache: maven
+          server-id: central
+          server-username: MAVEN_CENTRAL_USERNAME
+          server-password: MAVEN_CENTRAL_PASSWORD
+      - uses: crazy-max/ghaction-import-gpg@v6
+        id: import-gpg
+        with:
+          gpg_private_key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      - name: Run Java tests
+        run: mvn -B --no-transfer-progress test
+        working-directory: packages/java
+      - name: Publish signed Java SDK to Maven Central
+        run: mvn -B --no-transfer-progress -Psign-artifacts deploy -DskipTests
+        working-directory: packages/java
+        env:
+          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
 
   github-release:
     needs: verify

@@ -10,7 +10,7 @@ This repository has ten generated SDKs. A release tag publishes the TypeScript/n
 | Python | PyPI | `timelogic-api` | Yes | Ready after trusted-publisher setup |
 | Rust | crates.io | `timelogic-api` | Optional | Gated: requires crates.io publisher setup and `PUBLISH_CRATES=true` |
 | Go | Go module proxy | `github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go` | No | Publish with a matching module tag |
-| Java | Maven Central | `com.timelogic:timelogic-direct-api` | No | Requires Central publishing/signing configuration |
+| Java | Maven Central | `com.timelogicapi:timelogic-api` | Yes | Requires the protected `maven-central` environment's signing secrets |
 | C# | NuGet.org | `TimeLogic.Api` | Yes | Requires NuGet trusted publishing and the `NUGET_USER` repository variable |
 | PHP | Packagist | Not yet declared | No | Blocked: `composer.json` has no required `name` |
 | Ruby | RubyGems.org | `timelogic-direct-api` | No | Requires RubyGems publisher setup and automation |
@@ -163,11 +163,20 @@ The root `v0.1.1` tag does not create a Go release for this nested module. Autom
 
 ### Java / Maven Central
 
-Coordinates: `com.timelogic:timelogic-direct-api`, defined in [`packages/java/pom.xml`](packages/java/pom.xml).
+Coordinates: `com.timelogicapi:timelogic-api`, defined in [`packages/java/pom.xml`](packages/java/pom.xml). The Java package keeps its generated `com.timelogic.direct.*` source namespace for compatibility, but the public Maven coordinates no longer contain `direct`.
 
-The POM has source and Javadoc attachment plugins, but it lacks Maven Central deployment configuration, signing, a Central Portal token setup, and TimeLogic SCM/developer metadata. Update those before the first release. In particular, replace the current OpenAPI Generator URLs in the POM with this SDK repository.
+The package is configured for Sonatype Central Portal publishing with the `central-publishing-maven-plugin`, source/Javadoc attachments, and GPG signatures. The namespace `com.timelogicapi` must be verified in Central Portal before the first release.
 
-Recommended path: use the Maven Central Publishing Portal with a `central`/Nexus-compatible Maven deployment plugin, a GPG signing plugin, and environment-injected credentials. Then verify locally:
+Create a protected GitHub environment named `maven-central` with these secrets:
+
+- `MAVEN_CENTRAL_USERNAME` — the Central Portal token username;
+- `MAVEN_CENTRAL_PASSWORD` — the Central Portal token password;
+- `MAVEN_GPG_PRIVATE_KEY` — the ASCII-armored signing private key;
+- `MAVEN_GPG_PASSPHRASE` — the signing key passphrase.
+
+The release workflow imports the signing key, runs tests, signs all published artifacts, and deploys through Central Portal. It runs independently when a tag is pushed, or when `Release SDKs` is manually dispatched with target `maven`.
+
+Verify locally:
 
 ```powershell
 Push-Location packages/java
@@ -177,7 +186,13 @@ mvn -B -ntp verify
 Pop-Location
 ```
 
-After the portal and signing configuration exist, publish through CI, not a developer workstation. The exact final command depends on the chosen Maven plugin; document it in `release.yml` beside its protected `maven-central` environment. Do not use the current Gradle `publish` task as a Central release mechanism: it declares no remote repository or signing.
+After the portal and signing configuration exist, publish through CI, not a developer workstation. Because `v1.0.0` already exists in this repository, use **Actions → Release SDKs → Run workflow → target `maven`** for this first Maven publication. For a future version, push its new immutable tag:
+
+```powershell
+git push origin v1.0.1
+```
+
+For an independent release, manually dispatch `Release SDKs` with target `maven`; a Maven failure does not block npm, PyPI, NuGet, RubyGems, or other jobs.
 
 ### C# / NuGet.org
 

@@ -1,11 +1,11 @@
-# timelogic-direct-api
+# TimeLogic API Java SDK
 
 TimeLogic API | A World Time API
 - API version: 1.0.0
   - Build date: 1970-01-01T00:00:00Z[Etc/UTC]
   - Generator version: 7.10.0
 
-Public direct-access contract for the TimeLogic gateway.
+Official public API contract for TimeLogic API.
 
 This public spec excludes `/healthz` and the shared clock asset routes. It keeps `/.well-known/time-api-public-key`, `/v1/time/clock`, and signed JSON response controls because public consumers may need them.
 
@@ -54,9 +54,9 @@ Add this dependency to your project's POM:
 
 ```xml
 <dependency>
-  <groupId>com.timelogic</groupId>
-  <artifactId>timelogic-direct-api</artifactId>
-  <version>0.1.0</version>
+  <groupId>com.timelogicapi</groupId>
+  <artifactId>timelogic-api</artifactId>
+  <version>1.0.0</version>
   <scope>compile</scope>
 </dependency>
 ```
@@ -67,12 +67,12 @@ Add this dependency to your project's build file:
 
 ```groovy
   repositories {
-    mavenCentral()     // Needed if the 'timelogic-direct-api' jar has been published to maven central.
-    mavenLocal()       // Needed if the 'timelogic-direct-api' jar has been published to the local maven repo.
+    mavenCentral()     // Needed if the 'timelogic-api' jar has been published to maven central.
+    mavenLocal()       // Needed if the 'timelogic-api' jar has been published to the local maven repo.
   }
 
   dependencies {
-     implementation "com.timelogic:timelogic-direct-api:0.1.0"
+     implementation "com.timelogicapi:timelogic-api:1.0.0"
   }
 ```
 
@@ -86,7 +86,7 @@ mvn clean package
 
 Then manually install the following JARs:
 
-* `target/timelogic-direct-api-0.1.0.jar`
+* `target/timelogic-api-1.0.0.jar`
 * `target/lib/*.jar`
 
 ## Getting Started
@@ -257,6 +257,3 @@ Authentication schemes defined for the API:
 It's recommended to create an instance of `ApiClient` per thread in a multithreaded environment to avoid any potential issues.
 
 ## Author
-
-
-
