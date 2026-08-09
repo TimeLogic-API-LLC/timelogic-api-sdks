@@ -32,6 +32,11 @@ import com.squareup.moshi.adapter
 val EMPTY_REQUEST: RequestBody = ByteArray(0).toRequestBody()
 
 open class ApiClient(val baseUrl: String, val client: Call.Factory = defaultClient) {
+    // Keep the static setters for source compatibility, but snapshot their
+    // values per client so different transports cannot share credentials.
+    private val instanceApiKey: MutableMap<String, String> = apiKey.toMutableMap()
+    private val instanceApiKeyPrefix: MutableMap<String, String> = apiKeyPrefix.toMutableMap()
+    private val instanceAccessToken: String? = accessToken
     companion object {
         protected const val ContentType: String = "Content-Type"
         protected const val Accept: String = "Accept"
@@ -184,7 +189,7 @@ open class ApiClient(val baseUrl: String, val client: Call.Factory = defaultClie
                 }
             }
 
-            // Attention: if you are developing an android app that supports API Level 25 and bellow, please check flag supportAndroidApiLevel25AndBelow in https://openapi-generator.tech/docs/generators/kotlin#config-options
+            // Attention: if you are developing an android app that supports API Level 25 and bellow, please check flag supportAndroidApiLevel25AndBelow in https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git/docs/generators/kotlin#config-options
             val tempFile = java.nio.file.Files.createTempFile(prefix, suffix).toFile()
             tempFile.deleteOnExit()
             body.byteStream().use { inputStream ->
@@ -210,43 +215,43 @@ open class ApiClient(val baseUrl: String, val client: Call.Factory = defaultClie
 
     protected fun <T> updateAuthParams(requestConfig: RequestConfig<T>) {
         if (requestConfig.headers[Authorization].isNullOrEmpty()) {
-            accessToken?.let { accessToken ->
+            instanceAccessToken?.let { accessToken ->
                 requestConfig.headers[Authorization] = "Bearer $accessToken"
             }
         }
         if (requestConfig.headers["X-API-Key"].isNullOrEmpty()) {
-            if (apiKey["X-API-Key"] != null) {
-                if (apiKeyPrefix["X-API-Key"] != null) {
-                    requestConfig.headers["X-API-Key"] = apiKeyPrefix["X-API-Key"]!! + " " + apiKey["X-API-Key"]!!
+            if (instanceApiKey["X-API-Key"] != null) {
+                if (instanceApiKeyPrefix["X-API-Key"] != null) {
+                    requestConfig.headers["X-API-Key"] = instanceApiKeyPrefix["X-API-Key"]!! + " " + instanceApiKey["X-API-Key"]!!
                 } else {
-                    requestConfig.headers["X-API-Key"] = apiKey["X-API-Key"]!!
+                    requestConfig.headers["X-API-Key"] = instanceApiKey["X-API-Key"]!!
                 }
             }
         }
         if (requestConfig.query["api_key"].isNullOrEmpty()) {
-            if (apiKey["api_key"] != null) {
-                if (apiKeyPrefix["api_key"] != null) {
-                    requestConfig.query["api_key"] = listOf(apiKeyPrefix["api_key"]!! + " " + apiKey["api_key"]!!)
+            if (instanceApiKey["api_key"] != null) {
+                if (instanceApiKeyPrefix["api_key"] != null) {
+                    requestConfig.query["api_key"] = listOf(instanceApiKeyPrefix["api_key"]!! + " " + instanceApiKey["api_key"]!!)
                 } else {
-                    requestConfig.query["api_key"] = listOf(apiKey["api_key"]!!)
+                    requestConfig.query["api_key"] = listOf(instanceApiKey["api_key"]!!)
                 }
             }
         }
         if (requestConfig.headers["X-RapidAPI-Key"].isNullOrEmpty()) {
-            if (apiKey["X-RapidAPI-Key"] != null) {
-                if (apiKeyPrefix["X-RapidAPI-Key"] != null) {
-                    requestConfig.headers["X-RapidAPI-Key"] = apiKeyPrefix["X-RapidAPI-Key"]!! + " " + apiKey["X-RapidAPI-Key"]!!
+            if (instanceApiKey["X-RapidAPI-Key"] != null) {
+                if (instanceApiKeyPrefix["X-RapidAPI-Key"] != null) {
+                    requestConfig.headers["X-RapidAPI-Key"] = instanceApiKeyPrefix["X-RapidAPI-Key"]!! + " " + instanceApiKey["X-RapidAPI-Key"]!!
                 } else {
-                    requestConfig.headers["X-RapidAPI-Key"] = apiKey["X-RapidAPI-Key"]!!
+                    requestConfig.headers["X-RapidAPI-Key"] = instanceApiKey["X-RapidAPI-Key"]!!
                 }
             }
         }
         if (requestConfig.headers["X-RapidAPI-Host"].isNullOrEmpty()) {
-            if (apiKey["X-RapidAPI-Host"] != null) {
-                if (apiKeyPrefix["X-RapidAPI-Host"] != null) {
-                    requestConfig.headers["X-RapidAPI-Host"] = apiKeyPrefix["X-RapidAPI-Host"]!! + " " + apiKey["X-RapidAPI-Host"]!!
+            if (instanceApiKey["X-RapidAPI-Host"] != null) {
+                if (instanceApiKeyPrefix["X-RapidAPI-Host"] != null) {
+                    requestConfig.headers["X-RapidAPI-Host"] = instanceApiKeyPrefix["X-RapidAPI-Host"]!! + " " + instanceApiKey["X-RapidAPI-Host"]!!
                 } else {
-                    requestConfig.headers["X-RapidAPI-Host"] = apiKey["X-RapidAPI-Host"]!!
+                    requestConfig.headers["X-RapidAPI-Host"] = instanceApiKey["X-RapidAPI-Host"]!!
                 }
             }
         }

@@ -1,6 +1,6 @@
 <?php
 
-namespace TimeLogic\DirectApi;
+namespace TimeLogic\Api;
 
 final class TransportConfiguration
 {

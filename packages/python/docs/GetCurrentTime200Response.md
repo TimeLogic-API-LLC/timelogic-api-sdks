@@ -5,17 +5,17 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**unix** | **int** |  | 
-**unix_ms** | **int** |  | 
-**utc** | **datetime** |  | 
-**iso_local** | **str** |  | 
-**rfc2822** | **str** |  | 
-**human** | **str** |  | 
-**day_number** | **int** |  | 
-**day_short** | **str** |  | 
-**day_full** | **str** |  | 
-**timezone** | **str** |  | 
-**formatted** | **str** |  | [optional] 
+**unix** | **int** |  |
+**unix_ms** | **int** |  |
+**utc** | **datetime** |  |
+**iso_local** | **str** |  |
+**rfc2822** | **str** |  |
+**human** | **str** |  |
+**day_number** | **int** |  |
+**day_short** | **str** |  |
+**day_full** | **str** |  |
+**timezone** | **str** |  |
+**formatted** | **str** |  | [optional]
 
 ## Example
 

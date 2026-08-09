@@ -6,7 +6,7 @@ Resolved endpoint reference for diff calculations. This object intentionally inc
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**unix_ms** | **int** |  | 
+**unix_ms** | **int** |  |
 
 ## Example
 

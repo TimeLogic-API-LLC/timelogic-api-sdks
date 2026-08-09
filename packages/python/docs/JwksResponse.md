@@ -5,7 +5,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**keys** | [**List[JwkKey]**](JwkKey.md) |  | 
+**keys** | [**List[JwkKey]**](JwkKey.md) |  |
 
 ## Example
 

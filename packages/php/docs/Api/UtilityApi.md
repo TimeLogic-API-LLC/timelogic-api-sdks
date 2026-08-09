@@ -1,4 +1,4 @@
-# TimeLogic\DirectApi\UtilityApi
+# TimeLogic\Api\UtilityApi
 
 All URIs are relative to https://api.timelogicapi.com, except if the operation defines another base path.
 
@@ -10,7 +10,7 @@ All URIs are relative to https://api.timelogicapi.com, except if the operation d
 ## `getPublicSigningKey()`
 
 ```php
-getPublicSigningKey($kid): \TimeLogic\DirectApi\Model\JwksResponse
+getPublicSigningKey($kid): \TimeLogic\Api\Model\JwksResponse
 ```
 
 Public signing key set
@@ -25,7 +25,7 @@ require_once(__DIR__ . '/vendor/autoload.php');
 
 
 
-$apiInstance = new TimeLogic\DirectApi\Api\UtilityApi(
+$apiInstance = new TimeLogic\Api\Api\UtilityApi(
     // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
     // This is optional, `GuzzleHttp\Client` will be used as default.
     new GuzzleHttp\Client()
@@ -48,7 +48,7 @@ try {
 
 ### Return type
 
-[**\TimeLogic\DirectApi\Model\JwksResponse**](../Model/JwksResponse.md)
+[**\TimeLogic\Api\Model\JwksResponse**](../Model/JwksResponse.md)
 
 ### Authorization
 

@@ -1,0 +1,48 @@
+{
+    "name": "timelogic-api/php-sdk",
+    "description": "TimeLogic API | A World Time API",
+    "keywords": [
+        "time",
+        "timezone",
+        "world-time",
+        "php",
+        "sdk",
+        "rest",
+        "api",
+        "rapidapi"
+    ],
+    "homepage": "https://api.timelogicapi.com",
+    "license": "Unlicense",
+    "authors": [
+        {
+            "name": "TimeLogic API LLC",
+            "homepage": "https://timelogicapi.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/issues",
+        "source": "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks"
+    },
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "guzzlehttp/guzzle": "^7.3",
+        "guzzlehttp/psr7": "^1.7 || ^2.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.0 || ^9.0",
+        "friendsofphp/php-cs-fixer": "^3.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "TimeLogic\\Api\\": "packages/php/lib/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TimeLogic\\Api\\Test\\": "packages/php/test/"
+        }
+    }
+}

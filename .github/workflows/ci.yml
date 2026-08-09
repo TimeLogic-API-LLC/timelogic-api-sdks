@@ -27,7 +27,7 @@ jobs:
       - run: npm run verify-generated
       - run: npm run test:contract
       - name: Ensure generated output is committed
-        run: git diff --exit-code -- openapi packages config
+        run: git diff --exit-code -- openapi packages config Package.swift Package.resolved composer.json phpunit.xml.dist
 
   package-smoke:
     name: Package smoke tests (${{ matrix.language }})
@@ -44,3 +44,63 @@ jobs:
         run: test -d "packages/${{ matrix.language }}"
       - name: Show package contents
         run: find "packages/${{ matrix.language }}" -maxdepth 2 -type f | sort | head -80
+
+  php-build-test:
+    name: Validate and test PHP SDK
+    needs: validate-generate-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: curl, mbstring
+          tools: composer:v2
+      - run: composer validate --strict
+      - run: composer install --no-interaction --prefer-dist
+      - run: vendor/bin/phpunit -c phpunit.xml.dist
+
+  java-build-test:
+    name: Build and test Java SDK
+    needs: validate-generate-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+          cache: maven
+      - name: Test Java SDK
+        run: mvn -B --no-transfer-progress test
+        working-directory: packages/java
+
+  kotlin-build-test:
+    name: Build and test Kotlin SDK
+    needs: validate-generate-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+          cache: gradle
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Test Kotlin SDK
+        run: bash ./gradlew --no-daemon test
+        working-directory: packages/kotlin
+
+  swift-build-test:
+    name: Build and test Swift SDK
+    needs: validate-generate-test
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Resolve Swift dependencies
+        run: swift package resolve
+      - name: Build Swift SDK
+        run: swift build
+      - name: Test Swift SDK
+        run: swift test

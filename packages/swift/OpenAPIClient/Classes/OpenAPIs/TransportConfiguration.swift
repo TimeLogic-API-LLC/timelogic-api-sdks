@@ -10,13 +10,13 @@ public enum TransportConfiguration {
         precondition(!apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, "apiKey is required")
         let host = rapidApiHost?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false ? rapidApiHost! : defaultRapidApiHost
         let resolvedBaseURL = (baseURL?.isEmpty == false ? baseURL! : (rapidApi ? "https://\(host)" : defaultApiBaseURL)).trimmingCharacters(in: CharacterSet(charactersIn: "/"))
-        OpenAPIClientAPI.basePath = resolvedBaseURL
-        OpenAPIClientAPI.customHeaders.removeAll()
+        TimeLogicAPIClient.basePath = resolvedBaseURL
+        TimeLogicAPIClient.customHeaders.removeAll()
         if rapidApi {
-            OpenAPIClientAPI.customHeaders["X-RapidAPI-Key"] = apiKey
-            OpenAPIClientAPI.customHeaders["X-RapidAPI-Host"] = host
+            TimeLogicAPIClient.customHeaders["X-RapidAPI-Key"] = apiKey
+            TimeLogicAPIClient.customHeaders["X-RapidAPI-Host"] = host
         } else {
-            OpenAPIClientAPI.customHeaders["Authorization"] = "Bearer \(apiKey)"
+            TimeLogicAPIClient.customHeaders["Authorization"] = "Bearer \(apiKey)"
         }
         return resolvedBaseURL
     }

@@ -1,12 +1,12 @@
 openapi: 3.0.3
 info:
   description: |-
-    Public direct-access contract for the TimeLogic gateway.
+    Official public API contract for TimeLogic API.
 
     This public spec excludes `/healthz` and the shared clock asset routes. It keeps `/.well-known/time-api-public-key`, `/v1/time/clock`, and signed JSON response controls because public consumers may need them.
 
     Authentication:
-    - direct access supports `Authorization: Bearer <token>`, `X-API-Key`, and `api_key` query credentials
+    - the API supports `Authorization: Bearer <token>`, `X-API-Key`, and `api_key` query credentials
     - RapidAPI access uses `X-RapidAPI-Key` and `X-RapidAPI-Host`; the SDKs expose this as a `rapidApi` transport option that accepts only the RapidAPI key
 
     Behavioral notes:
@@ -15,12 +15,12 @@ info:
     - current and convert support bulk only through one comma-separated `tz`, `ip`, or `offset` selector
     - add, diff, calendar, dst, elapsed, timezone, and clock are single-target routes
     - credentials are extracted in Authorization, X-API-Key, then api_key query order; conflicting values are rejected
-    - the first server is the default direct API host. The second server is the RapidAPI gateway and can be selected or overridden by SDK configuration
+    - the first server is the default API host. The second server is the RapidAPI gateway and can be selected or overridden by SDK configuration
     - `sign` is available on supported JSON routes and is not supported on `/v1/time/clock`
   title: TimeLogic API | A World Time API
   version: 1.0.0
 servers:
-- description: Default direct customer API host; override `host` for a customer-specific
+- description: Default TimeLogic API host; override `host` for a customer-specific
     domain or subdomain.
   url: "https://{host}"
   variables:
@@ -35,9 +35,9 @@ servers:
       description: RapidAPI gateway hostname. Override for a compatible proxy or test
         gateway.
 security:
-- directBearerAuth: []
-- directApiKeyHeader: []
-- directApiKeyQuery: []
+- bearerAuth: []
+- apiKeyHeader: []
+- apiKeyQuery: []
 - rapidApiKey: []
   rapidApiHost: []
 tags:
@@ -4536,18 +4536,18 @@ components:
       - $ref: '#/components/schemas/TimezoneResolvedResponse'
       - $ref: '#/components/schemas/TimezoneOffsetResponse'
   securitySchemes:
-    directBearerAuth:
+    bearerAuth:
       bearerFormat: TimeLogic API key
-      description: "Direct API key supplied as Authorization: Bearer."
+      description: "API key supplied as Authorization: Bearer."
       scheme: bearer
       type: http
-    directApiKeyHeader:
-      description: Direct API key supplied as X-API-Key.
+    apiKeyHeader:
+      description: API key supplied as X-API-Key.
       in: header
       name: X-API-Key
       type: apiKey
-    directApiKeyQuery:
-      description: Direct API key supplied as a query parameter; headers are preferred.
+    apiKeyQuery:
+      description: API key supplied as a query parameter; headers are preferred.
       in: query
       name: api_key
       type: apiKey

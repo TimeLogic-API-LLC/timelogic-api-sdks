@@ -18,8 +18,8 @@ Unauthenticated JWKS endpoint for verifying signed JSON responses.  The public g
 
 ### Example
 ```swift
-// The following code samples are still beta. For any issue, please report via http://github.com/OpenAPITools/openapi-generator/issues/new
-import OpenAPIClient
+// For support, visit https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/issues
+import TimeLogicAPI
 
 let kid = "kid_example" // String | Optional signing key identifier filter, for example `ed25519-2026-07-19`. When present, the response returns only the matching retained public key. (optional)
 
@@ -40,7 +40,7 @@ UtilityAPI.getPublicSigningKey(kid: kid) { (response, error) in
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **kid** | **String** | Optional signing key identifier filter, for example &#x60;ed25519-2026-07-19&#x60;. When present, the response returns only the matching retained public key. | [optional] 
+ **kid** | **String** | Optional signing key identifier filter, for example &#x60;ed25519-2026-07-19&#x60;. When present, the response returns only the matching retained public key. | [optional]
 
 ### Return type
 

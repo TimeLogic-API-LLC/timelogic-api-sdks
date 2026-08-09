@@ -1,6 +1,6 @@
 [package]
 name = "timelogic-api"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["TimeLogic API LLC"]
 description = "Official Rust SDK for TimeLogic API, a world time API."
 # Override this license by providing a License Object in the OpenAPI.

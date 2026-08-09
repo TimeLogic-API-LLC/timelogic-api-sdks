@@ -82,27 +82,27 @@ Other parameters are passed through a pointer to a apiAddTimeRequest struct via 
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **unix** | **int64** |  | 
- **unixMs** | **int64** |  | 
- **iso** | **string** | ISO-8601 timestamp. To supply a local wall-clock time without an explicit offset, pair it with one of &#x60;source_tz&#x3D;Area/City&#x60;, &#x60;source_ip&#x3D;...&#x60;, &#x60;source_lat&#x3D;...&amp;source_lon&#x3D;...&#x60;, or &#x60;source_offset&#x3D;±HH:MM&#x60;. | 
- **sourceTz** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. | 
- **sourceIp** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Resolves that local wall-clock time through the timezone mapped from this IP address. | 
- **sourceLat** | **float64** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;source_lon&#x60; to resolve that local wall-clock time through the timezone mapped from these coordinates. | 
- **sourceLon** | **float64** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;source_lat&#x60;. | 
- **sourceOffset** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Interprets that local wall-clock time at this fixed UTC offset. | 
- **seconds** | **int32** |  | 
- **minutes** | **int32** |  | 
- **hours** | **int32** |  | 
- **days** | **int32** |  | 
- **tz** | **string** | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **ip** | **string** | IP address. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **lat** | **float64** | Latitude. Must be provided together with &#x60;lon&#x60;. | 
- **lon** | **float64** | Longitude. Must be provided together with &#x60;lat&#x60;. | 
- **offset** | **string** | Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **autoTz** | **bool** | Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. | 
- **utc** | **bool** | Set to &#x60;true&#x60; to force UTC on routes that support it. | 
- **format** | **string** | Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Reference: [strftime](https://strftime.net/). | 
- **sign** | **bool** | Set to exactly &#x60;true&#x60; to ask the gateway to sign the final JSON response. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. | 
+ **unix** | **int64** |  |
+ **unixMs** | **int64** |  |
+ **iso** | **string** | ISO-8601 timestamp. To supply a local wall-clock time without an explicit offset, pair it with one of &#x60;source_tz&#x3D;Area/City&#x60;, &#x60;source_ip&#x3D;...&#x60;, &#x60;source_lat&#x3D;...&amp;source_lon&#x3D;...&#x60;, or &#x60;source_offset&#x3D;±HH:MM&#x60;. |
+ **sourceTz** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. |
+ **sourceIp** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Resolves that local wall-clock time through the timezone mapped from this IP address. |
+ **sourceLat** | **float64** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;source_lon&#x60; to resolve that local wall-clock time through the timezone mapped from these coordinates. |
+ **sourceLon** | **float64** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;source_lat&#x60;. |
+ **sourceOffset** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Interprets that local wall-clock time at this fixed UTC offset. |
+ **seconds** | **int32** |  |
+ **minutes** | **int32** |  |
+ **hours** | **int32** |  |
+ **days** | **int32** |  |
+ **tz** | **string** | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **ip** | **string** | IP address. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **lat** | **float64** | Latitude. Must be provided together with &#x60;lon&#x60;. |
+ **lon** | **float64** | Longitude. Must be provided together with &#x60;lat&#x60;. |
+ **offset** | **string** | Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **autoTz** | **bool** | Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. |
+ **utc** | **bool** | Set to &#x60;true&#x60; to force UTC on routes that support it. |
+ **format** | **string** | Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Reference: [strftime](https://strftime.net/). |
+ **sign** | **bool** | Set to exactly &#x60;true&#x60; to ask the gateway to sign the final JSON response. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. |
 
 ### Return type
 
@@ -184,23 +184,23 @@ Other parameters are passed through a pointer to a apiConvertTimeRequest struct 
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **unix** | **int64** |  | 
- **unixMs** | **int64** |  | 
- **iso** | **string** | ISO-8601 timestamp. To supply a local wall-clock time without an explicit offset, pair it with one of &#x60;source_tz&#x3D;Area/City&#x60;, &#x60;source_ip&#x3D;...&#x60;, &#x60;source_lat&#x3D;...&amp;source_lon&#x3D;...&#x60;, or &#x60;source_offset&#x3D;±HH:MM&#x60;. | 
- **sourceTz** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. | 
- **sourceIp** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Resolves that local wall-clock time through the timezone mapped from this IP address. | 
- **sourceLat** | **float64** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;source_lon&#x60; to resolve that local wall-clock time through the timezone mapped from these coordinates. | 
- **sourceLon** | **float64** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;source_lat&#x60;. | 
- **sourceOffset** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Interprets that local wall-clock time at this fixed UTC offset. | 
- **tz** | **string** | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **ip** | **string** | IP address. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **lat** | **float64** | Latitude. Must be provided together with &#x60;lon&#x60;. | 
- **lon** | **float64** | Longitude. Must be provided together with &#x60;lat&#x60;. | 
- **offset** | **string** | Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **autoTz** | **bool** | Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. | 
- **utc** | **bool** | Set to &#x60;true&#x60; to force UTC on routes that support it. | 
- **format** | **string** | Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Reference: [strftime](https://strftime.net/). | 
- **sign** | **bool** | Set to exactly &#x60;true&#x60; to ask the gateway to sign the final JSON response. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. | 
+ **unix** | **int64** |  |
+ **unixMs** | **int64** |  |
+ **iso** | **string** | ISO-8601 timestamp. To supply a local wall-clock time without an explicit offset, pair it with one of &#x60;source_tz&#x3D;Area/City&#x60;, &#x60;source_ip&#x3D;...&#x60;, &#x60;source_lat&#x3D;...&amp;source_lon&#x3D;...&#x60;, or &#x60;source_offset&#x3D;±HH:MM&#x60;. |
+ **sourceTz** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. |
+ **sourceIp** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Resolves that local wall-clock time through the timezone mapped from this IP address. |
+ **sourceLat** | **float64** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;source_lon&#x60; to resolve that local wall-clock time through the timezone mapped from these coordinates. |
+ **sourceLon** | **float64** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;source_lat&#x60;. |
+ **sourceOffset** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Interprets that local wall-clock time at this fixed UTC offset. |
+ **tz** | **string** | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **ip** | **string** | IP address. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **lat** | **float64** | Latitude. Must be provided together with &#x60;lon&#x60;. |
+ **lon** | **float64** | Longitude. Must be provided together with &#x60;lat&#x60;. |
+ **offset** | **string** | Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **autoTz** | **bool** | Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. |
+ **utc** | **bool** | Set to &#x60;true&#x60; to force UTC on routes that support it. |
+ **format** | **string** | Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Reference: [strftime](https://strftime.net/). |
+ **sign** | **bool** | Set to exactly &#x60;true&#x60; to ask the gateway to sign the final JSON response. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. |
 
 ### Return type
 
@@ -282,23 +282,23 @@ Other parameters are passed through a pointer to a apiDiffTimeRequest struct via
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **from** | **string** | Time specifier. Supported forms are &#x60;now&#x60;, &#x60;unix&#x3D;&lt;seconds&gt;&#x60;, &#x60;unix_ms&#x3D;&lt;milliseconds&gt;&#x60;, &#x60;iso&#x3D;&lt;ISO-8601&gt;&#x60;, &#x60;offset&#x3D;±HH:MM&#x60;, &#x60;tz&#x3D;&lt;IANA timezone&gt;&#x60;, and &#x60;ip&#x3D;&lt;IP address&gt;&#x60;. For &#x60;tz&#x3D;...&#x60;, &#x60;ip&#x3D;...&#x60;, and &#x60;offset&#x3D;...&#x60;, the specifier means the current request-time instant resolved through that selector. To express a local wall-clock time, use &#x60;from&#x3D;iso&#x3D;...&#x60; together with one of &#x60;from_tz&#x60;, &#x60;from_ip&#x60;, &#x60;from_lat&#x60;+&#x60;from_lon&#x60;, or &#x60;from_offset&#x60;. | 
- **to** | **string** | Time specifier. Supported forms are &#x60;now&#x60;, &#x60;unix&#x3D;&lt;seconds&gt;&#x60;, &#x60;unix_ms&#x3D;&lt;milliseconds&gt;&#x60;, &#x60;iso&#x3D;&lt;ISO-8601&gt;&#x60;, &#x60;offset&#x3D;±HH:MM&#x60;, &#x60;tz&#x3D;&lt;IANA timezone&gt;&#x60;, and &#x60;ip&#x3D;&lt;IP address&gt;&#x60;. For &#x60;tz&#x3D;...&#x60;, &#x60;ip&#x3D;...&#x60;, and &#x60;offset&#x3D;...&#x60;, the specifier means the current request-time instant resolved through that selector. To express a local wall-clock time, use &#x60;to&#x3D;iso&#x3D;...&#x60; together with one of &#x60;to_tz&#x60;, &#x60;to_ip&#x60;, &#x60;to_lat&#x60;+&#x60;to_lon&#x60;, or &#x60;to_offset&#x60;. | 
- **fromTz** | **string** | Used only with &#x60;from&#x3D;iso&#x3D;...&#x60; when the ISO value has no explicit offset. | 
- **fromIp** | **string** | Used only with &#x60;from&#x3D;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Resolves that local wall-clock time through the timezone mapped from this IP address. | 
- **fromLat** | **float64** | Used only with &#x60;from&#x3D;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;from_lon&#x60; to resolve that local wall-clock time through the timezone mapped from these coordinates. | 
- **fromLon** | **float64** | Used only with &#x60;from&#x3D;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;from_lat&#x60;. | 
- **fromOffset** | **string** | Used only with &#x60;from&#x3D;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Interprets that local wall-clock time at this fixed UTC offset. | 
- **toTz** | **string** | Used only with &#x60;to&#x3D;iso&#x3D;...&#x60; when the ISO value has no explicit offset. | 
- **toIp** | **string** | Used only with &#x60;to&#x3D;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Resolves that local wall-clock time through the timezone mapped from this IP address. | 
- **toLat** | **float64** | Used only with &#x60;to&#x3D;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;to_lon&#x60; to resolve that local wall-clock time through the timezone mapped from these coordinates. | 
- **toLon** | **float64** | Used only with &#x60;to&#x3D;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;to_lat&#x60;. | 
- **toOffset** | **string** | Used only with &#x60;to&#x3D;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Interprets that local wall-clock time at this fixed UTC offset. | 
- **format** | **string** | Custom duration format template using &#x60;%days&#x60;, &#x60;%hours&#x60;, &#x60;%minutes&#x60;, and &#x60;%seconds&#x60;. | 
- **businessDays** | **bool** | Set to &#x60;true&#x60; to enable weekday/business-day counting. | 
- **holidayCountry** | **string** | ISO 3166-1 alpha-2 holiday calendar country code. Requires &#x60;business_days&#x3D;true&#x60;. | 
- **holidaySubdivision** | **string** | Holiday calendar subdivision code from the upstream &#x60;python-holidays&#x60; calendar, for example &#x60;CA&#x60; or &#x60;ENG&#x60;. Requires &#x60;holiday_country&#x60; and &#x60;business_days&#x3D;true&#x60;. | 
- **sign** | **bool** | Set to exactly &#x60;true&#x60; to ask the gateway to sign the final JSON response. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. | 
+ **from** | **string** | Time specifier. Supported forms are &#x60;now&#x60;, &#x60;unix&#x3D;&lt;seconds&gt;&#x60;, &#x60;unix_ms&#x3D;&lt;milliseconds&gt;&#x60;, &#x60;iso&#x3D;&lt;ISO-8601&gt;&#x60;, &#x60;offset&#x3D;±HH:MM&#x60;, &#x60;tz&#x3D;&lt;IANA timezone&gt;&#x60;, and &#x60;ip&#x3D;&lt;IP address&gt;&#x60;. For &#x60;tz&#x3D;...&#x60;, &#x60;ip&#x3D;...&#x60;, and &#x60;offset&#x3D;...&#x60;, the specifier means the current request-time instant resolved through that selector. To express a local wall-clock time, use &#x60;from&#x3D;iso&#x3D;...&#x60; together with one of &#x60;from_tz&#x60;, &#x60;from_ip&#x60;, &#x60;from_lat&#x60;+&#x60;from_lon&#x60;, or &#x60;from_offset&#x60;. |
+ **to** | **string** | Time specifier. Supported forms are &#x60;now&#x60;, &#x60;unix&#x3D;&lt;seconds&gt;&#x60;, &#x60;unix_ms&#x3D;&lt;milliseconds&gt;&#x60;, &#x60;iso&#x3D;&lt;ISO-8601&gt;&#x60;, &#x60;offset&#x3D;±HH:MM&#x60;, &#x60;tz&#x3D;&lt;IANA timezone&gt;&#x60;, and &#x60;ip&#x3D;&lt;IP address&gt;&#x60;. For &#x60;tz&#x3D;...&#x60;, &#x60;ip&#x3D;...&#x60;, and &#x60;offset&#x3D;...&#x60;, the specifier means the current request-time instant resolved through that selector. To express a local wall-clock time, use &#x60;to&#x3D;iso&#x3D;...&#x60; together with one of &#x60;to_tz&#x60;, &#x60;to_ip&#x60;, &#x60;to_lat&#x60;+&#x60;to_lon&#x60;, or &#x60;to_offset&#x60;. |
+ **fromTz** | **string** | Used only with &#x60;from&#x3D;iso&#x3D;...&#x60; when the ISO value has no explicit offset. |
+ **fromIp** | **string** | Used only with &#x60;from&#x3D;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Resolves that local wall-clock time through the timezone mapped from this IP address. |
+ **fromLat** | **float64** | Used only with &#x60;from&#x3D;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;from_lon&#x60; to resolve that local wall-clock time through the timezone mapped from these coordinates. |
+ **fromLon** | **float64** | Used only with &#x60;from&#x3D;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;from_lat&#x60;. |
+ **fromOffset** | **string** | Used only with &#x60;from&#x3D;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Interprets that local wall-clock time at this fixed UTC offset. |
+ **toTz** | **string** | Used only with &#x60;to&#x3D;iso&#x3D;...&#x60; when the ISO value has no explicit offset. |
+ **toIp** | **string** | Used only with &#x60;to&#x3D;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Resolves that local wall-clock time through the timezone mapped from this IP address. |
+ **toLat** | **float64** | Used only with &#x60;to&#x3D;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;to_lon&#x60; to resolve that local wall-clock time through the timezone mapped from these coordinates. |
+ **toLon** | **float64** | Used only with &#x60;to&#x3D;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;to_lat&#x60;. |
+ **toOffset** | **string** | Used only with &#x60;to&#x3D;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Interprets that local wall-clock time at this fixed UTC offset. |
+ **format** | **string** | Custom duration format template using &#x60;%days&#x60;, &#x60;%hours&#x60;, &#x60;%minutes&#x60;, and &#x60;%seconds&#x60;. |
+ **businessDays** | **bool** | Set to &#x60;true&#x60; to enable weekday/business-day counting. |
+ **holidayCountry** | **string** | ISO 3166-1 alpha-2 holiday calendar country code. Requires &#x60;business_days&#x3D;true&#x60;. |
+ **holidaySubdivision** | **string** | Holiday calendar subdivision code from the upstream &#x60;python-holidays&#x60; calendar, for example &#x60;CA&#x60; or &#x60;ENG&#x60;. Requires &#x60;holiday_country&#x60; and &#x60;business_days&#x3D;true&#x60;. |
+ **sign** | **bool** | Set to exactly &#x60;true&#x60; to ask the gateway to sign the final JSON response. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. |
 
 ### Return type
 
@@ -380,23 +380,23 @@ Other parameters are passed through a pointer to a apiGetCalendarRequest struct 
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **unix** | **int64** |  | 
- **unixMs** | **int64** |  | 
- **iso** | **string** | ISO-8601 timestamp. To supply a local wall-clock time without an explicit offset, pair it with one of &#x60;source_tz&#x3D;Area/City&#x60;, &#x60;source_ip&#x3D;...&#x60;, &#x60;source_lat&#x3D;...&amp;source_lon&#x3D;...&#x60;, or &#x60;source_offset&#x3D;±HH:MM&#x60;. | 
- **sourceTz** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. | 
- **sourceIp** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Resolves that local wall-clock time through the timezone mapped from this IP address. | 
- **sourceLat** | **float64** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;source_lon&#x60; to resolve that local wall-clock time through the timezone mapped from these coordinates. | 
- **sourceLon** | **float64** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;source_lat&#x60;. | 
- **sourceOffset** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Interprets that local wall-clock time at this fixed UTC offset. | 
- **tz** | **string** | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **ip** | **string** | IP address. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **lat** | **float64** | Latitude. Must be provided together with &#x60;lon&#x60;. | 
- **lon** | **float64** | Longitude. Must be provided together with &#x60;lat&#x60;. | 
- **offset** | **string** | Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **autoTz** | **bool** | Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. | 
- **format** | **string** | Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Reference: [strftime](https://strftime.net/). | 
- **week** | **bool** |  | 
- **sign** | **bool** | Set to exactly &#x60;true&#x60; to ask the gateway to sign the final JSON response. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. | 
+ **unix** | **int64** |  |
+ **unixMs** | **int64** |  |
+ **iso** | **string** | ISO-8601 timestamp. To supply a local wall-clock time without an explicit offset, pair it with one of &#x60;source_tz&#x3D;Area/City&#x60;, &#x60;source_ip&#x3D;...&#x60;, &#x60;source_lat&#x3D;...&amp;source_lon&#x3D;...&#x60;, or &#x60;source_offset&#x3D;±HH:MM&#x60;. |
+ **sourceTz** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. |
+ **sourceIp** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Resolves that local wall-clock time through the timezone mapped from this IP address. |
+ **sourceLat** | **float64** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;source_lon&#x60; to resolve that local wall-clock time through the timezone mapped from these coordinates. |
+ **sourceLon** | **float64** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;source_lat&#x60;. |
+ **sourceOffset** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Interprets that local wall-clock time at this fixed UTC offset. |
+ **tz** | **string** | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **ip** | **string** | IP address. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **lat** | **float64** | Latitude. Must be provided together with &#x60;lon&#x60;. |
+ **lon** | **float64** | Longitude. Must be provided together with &#x60;lat&#x60;. |
+ **offset** | **string** | Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **autoTz** | **bool** | Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. |
+ **format** | **string** | Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Reference: [strftime](https://strftime.net/). |
+ **week** | **bool** |  |
+ **sign** | **bool** | Set to exactly &#x60;true&#x60; to ask the gateway to sign the final JSON response. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. |
 
 ### Return type
 
@@ -476,21 +476,21 @@ Other parameters are passed through a pointer to a apiGetClockRequest struct via
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **style** | **string** | Clock style name. Valid values are enumerated here; there is no separate style discovery endpoint. | 
- **unix** | **int64** |  | 
- **unixMs** | **int64** |  | 
- **iso** | **string** | ISO-8601 timestamp. To supply a local wall-clock time without an explicit offset, pair it with one of &#x60;source_tz&#x3D;Area/City&#x60;, &#x60;source_ip&#x3D;...&#x60;, &#x60;source_lat&#x3D;...&amp;source_lon&#x3D;...&#x60;, or &#x60;source_offset&#x3D;±HH:MM&#x60;. | 
- **sourceTz** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. | 
- **sourceIp** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Resolves that local wall-clock time through the timezone mapped from this IP address. | 
- **sourceLat** | **float64** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;source_lon&#x60; to resolve that local wall-clock time through the timezone mapped from these coordinates. | 
- **sourceLon** | **float64** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;source_lat&#x60;. | 
- **sourceOffset** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Interprets that local wall-clock time at this fixed UTC offset. | 
- **tz** | **string** | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **ip** | **string** | IP address. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **lat** | **float64** | Latitude. Must be provided together with &#x60;lon&#x60;. | 
- **lon** | **float64** | Longitude. Must be provided together with &#x60;lat&#x60;. | 
- **offset** | **string** | Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **format** | **string** | Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Reference: [strftime](https://strftime.net/). | 
+ **style** | **string** | Clock style name. Valid values are enumerated here; there is no separate style discovery endpoint. |
+ **unix** | **int64** |  |
+ **unixMs** | **int64** |  |
+ **iso** | **string** | ISO-8601 timestamp. To supply a local wall-clock time without an explicit offset, pair it with one of &#x60;source_tz&#x3D;Area/City&#x60;, &#x60;source_ip&#x3D;...&#x60;, &#x60;source_lat&#x3D;...&amp;source_lon&#x3D;...&#x60;, or &#x60;source_offset&#x3D;±HH:MM&#x60;. |
+ **sourceTz** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. |
+ **sourceIp** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Resolves that local wall-clock time through the timezone mapped from this IP address. |
+ **sourceLat** | **float64** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;source_lon&#x60; to resolve that local wall-clock time through the timezone mapped from these coordinates. |
+ **sourceLon** | **float64** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;source_lat&#x60;. |
+ **sourceOffset** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Interprets that local wall-clock time at this fixed UTC offset. |
+ **tz** | **string** | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **ip** | **string** | IP address. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **lat** | **float64** | Latitude. Must be provided together with &#x60;lon&#x60;. |
+ **lon** | **float64** | Longitude. Must be provided together with &#x60;lat&#x60;. |
+ **offset** | **string** | Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **format** | **string** | Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Reference: [strftime](https://strftime.net/). |
 
 ### Return type
 
@@ -563,14 +563,14 @@ Other parameters are passed through a pointer to a apiGetCurrentTimeRequest stru
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **tz** | **string** | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **ip** | **string** | IP address. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **lat** | **float64** | Latitude. Must be provided together with &#x60;lon&#x60;. | 
- **lon** | **float64** | Longitude. Must be provided together with &#x60;lat&#x60;. | 
- **offset** | **string** | Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **autoTz** | **bool** | Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. | 
- **format** | **string** | Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Reference: [strftime](https://strftime.net/). | 
- **sign** | **bool** | Set to exactly &#x60;true&#x60; to ask the gateway to sign the final JSON response. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. | 
+ **tz** | **string** | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **ip** | **string** | IP address. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **lat** | **float64** | Latitude. Must be provided together with &#x60;lon&#x60;. |
+ **lon** | **float64** | Longitude. Must be provided together with &#x60;lat&#x60;. |
+ **offset** | **string** | Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **autoTz** | **bool** | Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. |
+ **format** | **string** | Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Reference: [strftime](https://strftime.net/). |
+ **sign** | **bool** | Set to exactly &#x60;true&#x60; to ask the gateway to sign the final JSON response. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. |
 
 ### Return type
 
@@ -644,15 +644,15 @@ Other parameters are passed through a pointer to a apiGetDstRequest struct via t
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **tz** | **string** | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **ip** | **string** | IP address. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **lat** | **float64** | Latitude. Must be provided together with &#x60;lon&#x60;. | 
- **lon** | **float64** | Longitude. Must be provided together with &#x60;lat&#x60;. | 
- **offset** | **string** | Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **autoTz** | **bool** | Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. | 
- **format** | **string** | Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Reference: [strftime](https://strftime.net/). | 
- **next** | **bool** |  | 
- **sign** | **bool** | Set to exactly &#x60;true&#x60; to ask the gateway to sign the final JSON response. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. | 
+ **tz** | **string** | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **ip** | **string** | IP address. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **lat** | **float64** | Latitude. Must be provided together with &#x60;lon&#x60;. |
+ **lon** | **float64** | Longitude. Must be provided together with &#x60;lat&#x60;. |
+ **offset** | **string** | Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **autoTz** | **bool** | Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. |
+ **format** | **string** | Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Reference: [strftime](https://strftime.net/). |
+ **next** | **bool** |  |
+ **sign** | **bool** | Set to exactly &#x60;true&#x60; to ask the gateway to sign the final JSON response. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. |
 
 ### Return type
 
@@ -744,33 +744,33 @@ Other parameters are passed through a pointer to a apiGetElapsedRequest struct v
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **unix** | **int64** |  | 
- **unixMs** | **int64** |  | 
- **iso** | **string** | ISO-8601 timestamp. To supply a local wall-clock time without an explicit offset, pair it with one of &#x60;source_tz&#x3D;Area/City&#x60;, &#x60;source_ip&#x3D;...&#x60;, &#x60;source_lat&#x3D;...&amp;source_lon&#x3D;...&#x60;, or &#x60;source_offset&#x3D;±HH:MM&#x60;. | 
- **sourceTz** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. | 
- **sourceIp** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Resolves that local wall-clock time through the timezone mapped from this IP address. | 
- **sourceLat** | **float64** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;source_lon&#x60; to resolve that local wall-clock time through the timezone mapped from these coordinates. | 
- **sourceLon** | **float64** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;source_lat&#x60;. | 
- **sourceOffset** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Interprets that local wall-clock time at this fixed UTC offset. | 
- **compareUnix** | **int64** |  | 
- **compareUnixMs** | **int64** |  | 
- **compareIso** | **string** | ISO-8601 comparison timestamp. To supply a local wall-clock time without an explicit offset, pair it with one of &#x60;compare_source_tz&#x3D;Area/City&#x60;, &#x60;compare_source_ip&#x3D;...&#x60;, &#x60;compare_source_lat&#x3D;...&amp;compare_source_lon&#x3D;...&#x60;, or &#x60;compare_source_offset&#x3D;±HH:MM&#x60;. | 
- **compareSourceTz** | **string** | Used only with &#x60;compare_iso&#x3D;...&#x60; when the ISO value has no explicit offset. | 
- **compareSourceIp** | **string** | Used only with &#x60;compare_iso&#x3D;...&#x60; when the ISO value has no explicit offset. Resolves that local wall-clock time through the timezone mapped from this IP address. | 
- **compareSourceLat** | **float64** | Used only with &#x60;compare_iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;compare_source_lon&#x60; to resolve that local wall-clock time through the timezone mapped from these coordinates. | 
- **compareSourceLon** | **float64** | Used only with &#x60;compare_iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;compare_source_lat&#x60;. | 
- **compareSourceOffset** | **string** | Used only with &#x60;compare_iso&#x3D;...&#x60; when the ISO value has no explicit offset. Interprets that local wall-clock time at this fixed UTC offset. | 
- **tz** | **string** | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **ip** | **string** | IP address. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **lat** | **float64** | Latitude. Must be provided together with &#x60;lon&#x60;. | 
- **lon** | **float64** | Longitude. Must be provided together with &#x60;lat&#x60;. | 
- **offset** | **string** | Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **autoTz** | **bool** | Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. | 
- **format** | **string** | Custom duration format template using &#x60;%days&#x60;, &#x60;%hours&#x60;, &#x60;%minutes&#x60;, and &#x60;%seconds&#x60;. | 
- **businessDays** | **bool** | Set to &#x60;true&#x60; to enable weekday/business-day counting. | 
- **holidayCountry** | **string** | ISO 3166-1 alpha-2 holiday calendar country code. Requires &#x60;business_days&#x3D;true&#x60;. | 
- **holidaySubdivision** | **string** | Holiday calendar subdivision code from the upstream &#x60;python-holidays&#x60; calendar, for example &#x60;CA&#x60; or &#x60;ENG&#x60;. Requires &#x60;holiday_country&#x60; and &#x60;business_days&#x3D;true&#x60;. | 
- **sign** | **bool** | Set to exactly &#x60;true&#x60; to ask the gateway to sign the final JSON response. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. | 
+ **unix** | **int64** |  |
+ **unixMs** | **int64** |  |
+ **iso** | **string** | ISO-8601 timestamp. To supply a local wall-clock time without an explicit offset, pair it with one of &#x60;source_tz&#x3D;Area/City&#x60;, &#x60;source_ip&#x3D;...&#x60;, &#x60;source_lat&#x3D;...&amp;source_lon&#x3D;...&#x60;, or &#x60;source_offset&#x3D;±HH:MM&#x60;. |
+ **sourceTz** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. |
+ **sourceIp** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Resolves that local wall-clock time through the timezone mapped from this IP address. |
+ **sourceLat** | **float64** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;source_lon&#x60; to resolve that local wall-clock time through the timezone mapped from these coordinates. |
+ **sourceLon** | **float64** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;source_lat&#x60;. |
+ **sourceOffset** | **string** | Used only with &#x60;iso&#x3D;...&#x60; when the ISO value has no explicit offset. Interprets that local wall-clock time at this fixed UTC offset. |
+ **compareUnix** | **int64** |  |
+ **compareUnixMs** | **int64** |  |
+ **compareIso** | **string** | ISO-8601 comparison timestamp. To supply a local wall-clock time without an explicit offset, pair it with one of &#x60;compare_source_tz&#x3D;Area/City&#x60;, &#x60;compare_source_ip&#x3D;...&#x60;, &#x60;compare_source_lat&#x3D;...&amp;compare_source_lon&#x3D;...&#x60;, or &#x60;compare_source_offset&#x3D;±HH:MM&#x60;. |
+ **compareSourceTz** | **string** | Used only with &#x60;compare_iso&#x3D;...&#x60; when the ISO value has no explicit offset. |
+ **compareSourceIp** | **string** | Used only with &#x60;compare_iso&#x3D;...&#x60; when the ISO value has no explicit offset. Resolves that local wall-clock time through the timezone mapped from this IP address. |
+ **compareSourceLat** | **float64** | Used only with &#x60;compare_iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;compare_source_lon&#x60; to resolve that local wall-clock time through the timezone mapped from these coordinates. |
+ **compareSourceLon** | **float64** | Used only with &#x60;compare_iso&#x3D;...&#x60; when the ISO value has no explicit offset. Provide together with &#x60;compare_source_lat&#x60;. |
+ **compareSourceOffset** | **string** | Used only with &#x60;compare_iso&#x3D;...&#x60; when the ISO value has no explicit offset. Interprets that local wall-clock time at this fixed UTC offset. |
+ **tz** | **string** | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **ip** | **string** | IP address. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **lat** | **float64** | Latitude. Must be provided together with &#x60;lon&#x60;. |
+ **lon** | **float64** | Longitude. Must be provided together with &#x60;lat&#x60;. |
+ **offset** | **string** | Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **autoTz** | **bool** | Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. |
+ **format** | **string** | Custom duration format template using &#x60;%days&#x60;, &#x60;%hours&#x60;, &#x60;%minutes&#x60;, and &#x60;%seconds&#x60;. |
+ **businessDays** | **bool** | Set to &#x60;true&#x60; to enable weekday/business-day counting. |
+ **holidayCountry** | **string** | ISO 3166-1 alpha-2 holiday calendar country code. Requires &#x60;business_days&#x3D;true&#x60;. |
+ **holidaySubdivision** | **string** | Holiday calendar subdivision code from the upstream &#x60;python-holidays&#x60; calendar, for example &#x60;CA&#x60; or &#x60;ENG&#x60;. Requires &#x60;holiday_country&#x60; and &#x60;business_days&#x3D;true&#x60;. |
+ **sign** | **bool** | Set to exactly &#x60;true&#x60; to ask the gateway to sign the final JSON response. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. |
 
 ### Return type
 
@@ -842,13 +842,13 @@ Other parameters are passed through a pointer to a apiGetTimezoneRequest struct 
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **tz** | **string** | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **ip** | **string** | IP address. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **lat** | **float64** | Latitude. Must be provided together with &#x60;lon&#x60;. | 
- **lon** | **float64** | Longitude. Must be provided together with &#x60;lat&#x60;. | 
- **offset** | **string** | Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format. On bulk-capable routes, a comma-separated list enables bulk mode. | 
- **autoTz** | **bool** | Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. | 
- **sign** | **bool** | Set to exactly &#x60;true&#x60; to ask the gateway to sign the final JSON response. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. | 
+ **tz** | **string** | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **ip** | **string** | IP address. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **lat** | **float64** | Latitude. Must be provided together with &#x60;lon&#x60;. |
+ **lon** | **float64** | Longitude. Must be provided together with &#x60;lat&#x60;. |
+ **offset** | **string** | Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format. On bulk-capable routes, a comma-separated list enables bulk mode. |
+ **autoTz** | **bool** | Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. |
+ **sign** | **bool** | Set to exactly &#x60;true&#x60; to ask the gateway to sign the final JSON response. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. |
 
 ### Return type
 

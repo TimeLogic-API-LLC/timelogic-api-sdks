@@ -5,9 +5,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**error** | [**ApiError**](ApiError.md) |  | 
-**request_id** | **str** |  | 
-**timestamp** | **datetime** | Intentionally omitted from public API error responses to avoid exposing request timing; use request_id for support correlation. | [optional] 
+**error** | [**ApiError**](ApiError.md) |  |
+**request_id** | **str** |  |
+**timestamp** | **datetime** | Intentionally omitted from public API error responses to avoid exposing request timing; use request_id for support correlation. | [optional]
 
 ## Example
 

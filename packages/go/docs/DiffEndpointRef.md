@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**UnixMs** | **int64** |  | 
+**UnixMs** | **int64** |  |
 
 ## Methods
 

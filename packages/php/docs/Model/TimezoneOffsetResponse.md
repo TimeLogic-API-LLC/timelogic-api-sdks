@@ -17,6 +17,6 @@ Name | Type | Description | Notes
 **formatted** | **string** |  | [optional]
 **offset** | **int** |  |
 **dst** | **bool** |  |
-**matchingZones** | [**\TimeLogic\DirectApi\Model\TimezoneMatch[]**](TimezoneMatch.md) |  |
+**matchingZones** | [**\TimeLogic\Api\Model\TimezoneMatch[]**](TimezoneMatch.md) |  |
 
 [[Back to Model list]](../../README.md#models) [[Back to API list]](../../README.md#endpoints) [[Back to README]](../../README.md)

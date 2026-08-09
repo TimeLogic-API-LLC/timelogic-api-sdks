@@ -15,16 +15,16 @@ gem build timelogic-api.gemspec
 Then either install the gem locally:
 
 ```shell
-gem install ./timelogic-api-1.0.0.gem
+gem install ./timelogic-api-1.0.1.gem
 ```
 
-(for development, run `gem install --dev ./timelogic-api-1.0.0.gem` to install the development dependencies)
+(for development, run `gem install --dev ./timelogic-api-1.0.1.gem` to install the development dependencies)
 
 or publish the gem to a gem hosting service, e.g. [RubyGems](https://rubygems.org/).
 
 Finally add this to the Gemfile:
 
-    gem 'timelogic-api', '~> 1.0.0'
+    gem 'timelogic-api', '~> 1.0.1'
 
 ### Install from Git
 
@@ -50,17 +50,17 @@ require 'timelogic-api'
 
 # Setup authorization
 TimeLogic::Api.configure do |config|
-  # Configure API key authorization: directApiKeyHeader
+  # Configure API key authorization: apiKeyHeader
   config.api_key['X-API-Key'] = 'YOUR API KEY'
   # Uncomment the following line to set a prefix for the API key, e.g. 'Bearer' (defaults to nil)
   # config.api_key_prefix['X-API-Key'] = 'Bearer'
 
-  # Configure Bearer authorization (TimeLogic API key): directBearerAuth
+  # Configure Bearer authorization (TimeLogic API key): bearerAuth
   config.access_token = 'YOUR_BEARER_TOKEN'
   # Configure a proc to get access tokens in lieu of the static access_token configuration
-  config.access_token_getter = -> { 'YOUR TOKEN GETTER PROC' } 
+  config.access_token_getter = -> { 'YOUR TOKEN GETTER PROC' }
 
-  # Configure API key authorization: directApiKeyQuery
+  # Configure API key authorization: apiKeyQuery
   config.api_key['api_key'] = 'YOUR API KEY'
   # Uncomment the following line to set a prefix for the API key, e.g. 'Bearer' (defaults to nil)
   # config.api_key_prefix['api_key'] = 'Bearer'
@@ -78,18 +78,18 @@ end
 
 api_instance = TimeLogic::Api::TimeApi.new
 opts = {
-  unix: 1711300000, # Integer | 
-  unix_ms: 1711300000000, # Integer | 
+  unix: 1711300000, # Integer |
+  unix_ms: 1711300000000, # Integer |
   iso: '2024-03-24T15:00:00', # String | ISO-8601 timestamp. To supply a local wall-clock time without an explicit offset, pair it with one of `source_tz=Area/City`, `source_ip=...`, `source_lat=...&source_lon=...`, or `source_offset=±HH:MM`.
   source_tz: 'America/New_York', # String | Used only with `iso=...` when the ISO value has no explicit offset.
   source_ip: '8.8.8.8', # String | Used only with `iso=...` when the ISO value has no explicit offset. Resolves that local wall-clock time through the timezone mapped from this IP address.
   source_lat: 40.7128, # Float | Used only with `iso=...` when the ISO value has no explicit offset. Provide together with `source_lon` to resolve that local wall-clock time through the timezone mapped from these coordinates.
   source_lon: -74.006, # Float | Used only with `iso=...` when the ISO value has no explicit offset. Provide together with `source_lat`.
   source_offset: '-05:00', # String | Used only with `iso=...` when the ISO value has no explicit offset. Interprets that local wall-clock time at this fixed UTC offset.
-  seconds: 30, # Integer | 
-  minutes: 15, # Integer | 
-  hours: 2, # Integer | 
-  days: 7, # Integer | 
+  seconds: 30, # Integer |
+  minutes: 15, # Integer |
+  hours: 2, # Integer |
+  days: 7, # Integer |
   tz: 'America/New_York', # String | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode.
   ip: '8.8.8.8', # String | IP address. On bulk-capable routes, a comma-separated list enables bulk mode.
   lat: 40.7128, # Float | Latitude. Must be provided together with `lon`.
@@ -155,18 +155,18 @@ Class | Method | HTTP request | Description
 
 
 Authentication schemes defined for the API:
-### directBearerAuth
+### bearerAuth
 
 - **Type**: Bearer authentication (TimeLogic API key)
 
-### directApiKeyHeader
+### apiKeyHeader
 
 
 - **Type**: API key
 - **API key parameter name**: X-API-Key
 - **Location**: HTTP header
 
-### directApiKeyQuery
+### apiKeyQuery
 
 
 - **Type**: API key

@@ -1,68 +1,74 @@
 # TimeLogic API SDKs
 
-This repository contains generated client SDKs for the direct TimeLogic API. It remains private while the generated clients and release automation are verified.
+Official client libraries for [TimeLogic API](https://api.timelogicapi.com), a world-time API for current time, time zones, calendars, daylight-saving rules, elapsed time, and signed JSON responses.
 
-The checked-in contract is always named:
+All SDKs are generated from the checked-in contract at [`openapi/openapi.yaml`](openapi/openapi.yaml). Generated changes are reviewed in pull requests and release jobs verify the generated tree before publishing.
 
-```text
-openapi/openapi.yaml
+## SDKs and package managers
+
+| Language | Package | Install / consume |
+| --- | --- | --- |
+| TypeScript | `@timelogic/direct-api` | `npm install @timelogic/direct-api` |
+| Python | `timelogic-api` | `python -m pip install timelogic-api` |
+| Rust | `timelogic-api` | `cargo add timelogic-api` |
+| Go | `github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go` | `go get github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go` |
+| Java | `com.timelogicapi:timelogic-api` | Maven Central |
+| Kotlin | `com.timelogicapi:timelogic-api-kotlin` | Maven Central |
+| .NET | `TimeLogic.Api` | `dotnet add package TimeLogic.Api` |
+| PHP | `timelogic-api/php-sdk` | `composer require timelogic-api/php-sdk` |
+| Ruby | `timelogic-api` | `gem install timelogic-api` |
+| Swift | `TimeLogicAPI` | Swift Package Manager |
+
+The TypeScript, Python module, Java namespace, Kotlin namespace, and generated source paths retain their v1.0.0 identities for source compatibility. The public package descriptions, titles, coordinates, and documentation use the TimeLogic API brand.
+
+## Quick start
+
+Every SDK accepts an API key through its language-specific configuration. Keep credentials in environment variables or your platform secret store; never commit them.
+
+```powershell
+$env:TIMELOGIC_API_KEY = "your-test-key"
 ```
 
-It is synchronized from `TimeLogic-API-LLC/timelogic-api/openapi-direct.yaml` by a workflow in the API repository. The synchronization workflow creates a pull request here; it does not silently overwrite `main`.
+TypeScript example:
+
+```ts
+import { TimeApi, createConfiguration } from '@timelogic/direct-api';
+
+const configuration = createConfiguration({ apiKey: process.env.TIMELOGIC_API_KEY! });
+const api = new TimeApi(configuration);
+const result = await api.getCurrentTime({ tz: 'America/New_York' });
+```
+
+RapidAPI is available through each SDK's `rapidApi`/`rapid_api` transport option. Supply only the RapidAPI subscription key; the SDK sets the required RapidAPI headers. Custom base URLs are explicit caller configuration for compatible gateways or tests.
 
 ## Local validation
 
-Requirements: Node.js 22+, Docker Desktop, and the local direct stack when live tests are desired.
+Requirements: Node.js 22+, Docker Desktop, and the toolchain for any language you want to test.
 
 ```powershell
-npm install
+npm ci
 npm run validate
 npm run generate
 npm run verify-generated
 npm run test:contract
 ```
 
-Without `TIMELOGIC_SDK_TEST_API_KEY`, live HTTP tests are skipped and the command succeeds after static validation. With the variable present, live tests run and any failure exits non-zero.
+Without `TIMELOGIC_SDK_TEST_API_KEY`, live HTTP checks are skipped and static contract checks still run. For local live checks, use a dedicated low-quota test key:
 
 ```powershell
 $env:TIMELOGIC_SDK_TEST_BASE_URL = "http://127.0.0.1:8787"
-$env:TIMELOGIC_SDK_TEST_API_KEY = Get-Content "..\timelogic-api\.wrangler\direct-stack\direct-api-key.txt"
+$env:TIMELOGIC_SDK_TEST_API_KEY = "your-dedicated-test-key"
 npm run test:contract
 ```
 
-For CI, configure `TIMELOGIC_SDK_TEST_API_KEY` as a GitHub Actions secret containing a dedicated, low-quota SDK test key. Never use a master, billing, or unrestricted production key.
+Never use a master, billing, or unrestricted production key in tests.
 
-## Generated targets
+## Releases
 
-TypeScript/npm, Python/PyPI, Rust/crates.io, Go, Java, C#/.NET, PHP, Ruby, Kotlin, and Swift are generated from the same OpenAPI contract. Generated output is reviewed in pull requests before release.
+Releases use immutable `vMAJOR.MINOR.PATCH` tags. The release workflow has independent jobs for npm, PyPI, crates.io, NuGet, Maven Central, Kotlin/Maven Central, RubyGems, Packagist indexing, the Go module tag, and the Swift source tag. Swift Package Manager consumes the repository tag directly. See [`PUBLISHING.md`](PUBLISHING.md) for registry setup and release checks.
 
-## Direct API and RapidAPI transports
+## Security and support
 
-Every SDK defaults to the direct API at `https://api.timelogicapi.com`. Customer or local testing can override the base URL. RapidAPI is selected with the SDK's `rapidApi`/`rapid_api` option; the caller supplies only the RapidAPI subscription key. The SDK automatically switches to:
+Please report security issues privately using the process in [`SECURITY.md`](SECURITY.md). For general questions, use the [issue tracker](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/issues).
 
-```text
-https://timelogic-api-world-time-timezones-time-calculations.p.rapidapi.com
-X-RapidAPI-Key: <key>
-X-RapidAPI-Host: timelogic-api-world-time-timezones-time-calculations.p.rapidapi.com
-```
-
-The RapidAPI base URL and host header can both be overridden for a compatible proxy or test gateway. The direct default remains unchanged. The OpenAPI source documents both servers and both required RapidAPI headers in `openapi/openapi.yaml`.
-
-TypeScript example:
-
-```ts
-import { Configuration, TimeApi, createConfiguration } from '@timelogic/direct-api';
-
-const configuration = createConfiguration({ apiKey: process.env.TIMELOGIC_API_KEY! });
-const api = new TimeApi(configuration);
-
-const rapidConfiguration = createConfiguration({
-  apiKey: process.env.RAPIDAPI_KEY!,
-  rapidApi: true,
-});
-const rapidApi = new TimeApi(rapidConfiguration);
-```
-
-For local testing, pass `baseUrl: "http://127.0.0.1:8787"`. In RapidAPI mode, pass `rapidApiHost` when the host header must differ from the default; `baseUrl` may be overridden independently.
-
-Releases use `vMAJOR.MINOR.PATCH` tags. npm and PyPI use GitHub OIDC trusted publishing. crates.io is gated behind the `PUBLISH_CRATES` repository variable and a protected `CARGO_REGISTRY_TOKEN` environment secret. No registry is published by ordinary commits or pull requests.
+Licensed under the [Unlicense](LICENSE).

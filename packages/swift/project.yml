@@ -1,13 +1,13 @@
-name: OpenAPIClient
+name: TimeLogicAPI
 targets:
-  OpenAPIClient:
+  TimeLogicAPI:
     type: framework
     platform: iOS
     deploymentTarget: "11.0"
     sources: [OpenAPIClient]
     info:
       path: ./Info.plist
-      version: 1.0.0
+      version: 1.0.1
     settings:
       APPLICATION_EXTENSION_API_ONLY: true
     scheme: {}

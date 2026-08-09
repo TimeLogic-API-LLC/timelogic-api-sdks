@@ -5,7 +5,7 @@
     <artifactId>timelogic-api</artifactId>
     <packaging>jar</packaging>
     <name>TimeLogic API Java SDK</name>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <url>https://api.timelogicapi.com</url>
     <description>Official Java SDK for TimeLogic API, a world time API.</description>
     <scm>

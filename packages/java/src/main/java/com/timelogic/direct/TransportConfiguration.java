@@ -20,7 +20,7 @@ public final class TransportConfiguration {
             ((ApiKeyAuth) client.getAuthentication("rapidApiKey")).setApiKey(apiKey.trim());
             ((ApiKeyAuth) client.getAuthentication("rapidApiHost")).setApiKey(host);
         } else {
-            ((HttpBearerAuth) client.getAuthentication("directBearerAuth")).setBearerToken(apiKey.trim());
+            ((HttpBearerAuth) client.getAuthentication("bearerAuth")).setBearerToken(apiKey.trim());
         }
         return client;
     }

@@ -31,7 +31,7 @@ namespace Example
             Configuration config = new Configuration();
             config.BasePath = "https://api.timelogicapi.com";
             var apiInstance = new UtilityApi(config);
-            var kid = "kid_example";  // string? | Optional signing key identifier filter, for example `ed25519-2026-07-19`. When present, the response returns only the matching retained public key. (optional) 
+            var kid = "kid_example";  // string? | Optional signing key identifier filter, for example `ed25519-2026-07-19`. When present, the response returns only the matching retained public key. (optional)
 
             try
             {

@@ -1,8 +1,8 @@
 {
   "name": "@timelogic/direct-api",
-  "version": "1.0.0",
-  "description": "OpenAPI client for @timelogic/direct-api",
-  "author": "OpenAPI-Generator",
+  "version": "1.0.1",
+  "description": "Official TypeScript SDK for TimeLogic API, a world time API.",
+  "author": "TimeLogic API LLC <dev@timelogicapi.com>",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git"
@@ -21,5 +21,18 @@
   "files": [
     "dist",
     "README.md"
+  ],
+  "license": "Unlicense",
+  "homepage": "https://api.timelogicapi.com",
+  "bugs": {
+    "url": "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/issues"
+  },
+  "keywords": [
+    "time",
+    "timezone",
+    "world-time",
+    "api",
+    "sdk",
+    "rapidapi"
   ]
 }

@@ -2,6 +2,8 @@ node_modules/
 packages/**/package-lock.json
 packages/**/__rapid_transport_test__/
 packages/**/composer.lock
+/composer.lock
+/vendor/
 packages/**/vendor/
 **/.gradle/
 **/build/
@@ -11,6 +13,7 @@ coverage/
 __pycache__/
 *.pyc
 target/
+.build/
 bin/
 obj/
 .openapi-generator/
@@ -20,3 +23,15 @@ obj/
 .env
 .env.*
 !.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.gpg
+*.asc
+*-credentials.*
+*-secret.*
+*-token.*
+maven.txt

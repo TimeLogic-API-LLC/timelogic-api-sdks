@@ -18,6 +18,7 @@ on:
           - maven
           - kotlin
           - ruby
+          - php
 
 permissions:
   contents: write
@@ -37,7 +38,7 @@ jobs:
       - run: npm run generate
       - run: npm run verify-generated
       - run: npm run test:contract
-      - run: git diff --exit-code -- openapi packages config
+      - run: git diff --exit-code -- openapi packages config Package.swift Package.resolved composer.json phpunit.xml.dist
 
   npm:
     needs: verify
@@ -130,14 +131,19 @@ jobs:
       - name: Publish Go module tag
         shell: bash
         run: |
-          tag='packages/go/v1.0.0'
+          if [[ "${GITHUB_REF_TYPE}" != "tag" ]]; then
+            echo "Go module publication requires a semver release tag (for example v1.0.1)."
+            exit 1
+          fi
+          version_tag="${GITHUB_REF_NAME#v}"
+          tag="packages/go/v${version_tag}"
           if git ls-remote --exit-code --tags origin "refs/tags/${tag}" >/dev/null 2>&1; then
             echo "${tag} already exists; Go proxy publication is already complete."
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git tag -a "${tag}" -m "Release Go SDK v1.0.0"
+          git tag -a "${tag}" -m "Release Go SDK v${version_tag}"
           git push origin "${tag}"
 
   nuget:
@@ -181,6 +187,54 @@ jobs:
           done
           echo "NuGet accepted the upload but did not expose ${package_id} ${package_version} in the public catalog within five minutes."
           exit 1
+
+  php:
+    needs: verify
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.target == 'all' || inputs.target == 'php' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: curl, mbstring
+          tools: composer:v2
+      - run: composer validate --strict
+      - run: composer install --no-interaction --prefer-dist
+      - run: vendor/bin/phpunit -c phpunit.xml.dist
+      - name: Report Packagist release behavior
+        run: echo "Packagist indexes the committed Git tag through its repository webhook; no archive upload is required."
+
+  swift:
+    needs: verify
+    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Publish Swift source tag
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" != "tag" ]]; then
+            echo "Swift source-tag publication requires a semver release tag (for example v1.0.1)."
+            exit 1
+          fi
+          version_tag="${GITHUB_REF_NAME#v}"
+          tag="packages/swift/v${version_tag}"
+          if git ls-remote --exit-code --tags origin "refs/tags/${tag}" >/dev/null 2>&1; then
+            echo "${tag} already exists; Swift source publication is already complete."
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git tag -a "${tag}" -m "Release Swift SDK v${version_tag}"
+          git push origin "${tag}"
 
   ruby:
     needs: verify

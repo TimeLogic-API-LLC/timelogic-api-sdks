@@ -4,16 +4,16 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Seconds** | **int32** |  | 
-**Minutes** | **int32** |  | 
-**Hours** | **int32** |  | 
-**Days** | **int32** |  | 
-**Direction** | **string** | &#x60;forward&#x60; means &#x60;to&#x60; is after &#x60;from&#x60;. &#x60;backward&#x60; means &#x60;to&#x60; is before &#x60;from&#x60;. &#x60;same&#x60; means both sides resolve to the same instant. | 
-**Human** | **string** |  | 
-**Formatted** | Pointer to **string** |  | [optional] 
-**BusinessDays** | Pointer to **int32** |  | [optional] 
-**From** | [**DiffEndpointRef**](DiffEndpointRef.md) |  | 
-**To** | [**DiffEndpointRef**](DiffEndpointRef.md) |  | 
+**Seconds** | **int32** |  |
+**Minutes** | **int32** |  |
+**Hours** | **int32** |  |
+**Days** | **int32** |  |
+**Direction** | **string** | &#x60;forward&#x60; means &#x60;to&#x60; is after &#x60;from&#x60;. &#x60;backward&#x60; means &#x60;to&#x60; is before &#x60;from&#x60;. &#x60;same&#x60; means both sides resolve to the same instant. |
+**Human** | **string** |  |
+**Formatted** | Pointer to **string** |  | [optional]
+**BusinessDays** | Pointer to **int32** |  | [optional]
+**From** | [**DiffEndpointRef**](DiffEndpointRef.md) |  |
+**To** | [**DiffEndpointRef**](DiffEndpointRef.md) |  |
 
 ## Methods
 

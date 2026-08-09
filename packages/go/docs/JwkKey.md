@@ -4,12 +4,12 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Kty** | **string** |  | 
-**Crv** | **string** |  | 
-**Alg** | **string** |  | 
-**Use** | **string** |  | 
-**Kid** | **string** |  | 
-**X** | **string** |  | 
+**Kty** | **string** |  |
+**Crv** | **string** |  |
+**Alg** | **string** |  |
+**Use** | **string** |  |
+**Kid** | **string** |  |
+**X** | **string** |  |
 
 ## Methods
 

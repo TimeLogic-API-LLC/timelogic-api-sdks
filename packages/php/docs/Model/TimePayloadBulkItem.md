@@ -15,7 +15,7 @@ Name | Type | Description | Notes
 **dayFull** | **string** |  |
 **timezone** | **string** |  |
 **formatted** | **string** |  | [optional]
-**error** | [**\TimeLogic\DirectApi\Model\ApiError**](ApiError.md) |  |
+**error** | [**\TimeLogic\Api\Model\ApiError**](ApiError.md) |  |
 **requestId** | **string** |  |
 **timestamp** | **\DateTime** | Intentionally omitted from public API error responses to avoid exposing request timing; use request_id for support correlation. | [optional]
 **item** | **string** |  |

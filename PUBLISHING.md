@@ -1,6 +1,6 @@
 # Publishing TimeLogic SDKs
 
-This repository has ten generated SDKs. A release tag publishes the TypeScript/npm, Python/PyPI, Rust/crates.io (when `PUBLISH_CRATES=true`), and C#/NuGet.org packages independently after shared verification. The remaining packages must not be represented as released until their registry metadata and automation have been added.
+This repository has ten generated SDKs. A release tag publishes the registry-backed packages in independent jobs after shared verification. Go and Packagist are tag/index-driven, and Swift Package Manager consumes the repository tag directly.
 
 ## Current release status
 
@@ -12,10 +12,10 @@ This repository has ten generated SDKs. A release tag publishes the TypeScript/n
 | Go | Go module proxy | `github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go` | No | Publish with a matching module tag |
 | Java | Maven Central | `com.timelogicapi:timelogic-api` | Yes | Requires the protected `maven-central` environment's signing secrets |
 | C# | NuGet.org | `TimeLogic.Api` | Yes | Requires NuGet trusted publishing and the `NUGET_USER` repository variable |
-| PHP | Packagist | Not yet declared | No | Blocked: `composer.json` has no required `name` |
-| Ruby | RubyGems.org | `timelogic-api` | Yes | Published 1.0.0; future metadata uses `dev@timelogicapi.com` |
+| PHP | Packagist | `timelogic-api/php-sdk` | Tag-indexed | Root Composer manifest added; requires Packagist registration and a public repository |
+| Ruby | RubyGems.org | `timelogic-api` | Yes | Release target v1.0.1; metadata uses `dev@timelogicapi.com` |
 | Kotlin | Maven Central | `com.timelogicapi:timelogic-api-kotlin` | Yes | Ready for its first publication through the protected `maven-central` environment |
-| Swift | Swift Package Manager | Git source package (currently `OpenAPIClient`) | No | Release by Git tag after package identity cleanup |
+| Swift | Swift Package Manager / CocoaPods source | Root Git package (`TimeLogicAPI`) | Source tag | Requires a public repository; the release job also creates `packages/swift/vMAJOR.MINOR.PATCH` for the podspec |
 
 The existing release workflow is [`.github/workflows/release.yml`](.github/workflows/release.yml). After shared verification, npm, PyPI, crates.io, NuGet.org, and the GitHub release run independently and in parallel. A failure in one registry does not block publishing to the others.
 
@@ -23,11 +23,10 @@ The existing release workflow is [`.github/workflows/release.yml`](.github/workf
 
 Use this sequence for every production release. Do not publish a version that is already present in a registry: registry releases are immutable.
 
-1. Choose the next semantic version, for example `0.1.1`. Use the same version for all registry-backed SDKs unless there is a deliberate per-language release policy.
+1. Choose the next semantic version, for example `1.0.1`. Use the same version for all registry-backed SDKs unless there is a deliberate per-language release policy.
 2. Update the version inputs **before regeneration**:
-   - In [`scripts/generate-all.mjs`](scripts/generate-all.mjs), replace every `packageVersion=0.1.0` / `artifactVersion=0.1.0` / `npmVersion=0.1.0` value.
-   - Update the hard-coded Ruby value in [`scripts/normalize-generated.mjs`](scripts/normalize-generated.mjs). That script otherwise restores `0.1.0` after every generation.
-   - For PHP and Swift, add intentional registry/package metadata as described below; neither target currently gets a release version from the generator configuration.
+   - Update the shared release version in [`scripts/generate-all.mjs`](scripts/generate-all.mjs) and `scripts/normalize-generated.mjs`.
+   - For PHP, add intentional registry/package metadata as described below. Swift now has an intentional root package identity; it still needs a public repository and a Swift-specific release tag.
 3. Regenerate and review the complete generated diff:
 
    ```powershell
@@ -47,8 +46,8 @@ Use this sequence for every production release. Do not publish a version that is
    ```powershell
    git switch main
    git pull --ff-only
-   git tag -a v0.1.1 -m "Release v0.1.1"
-   git push origin v0.1.1
+   git tag -a v1.0.1 -m "Release v1.0.1"
+   git push origin v1.0.1
    ```
 
 7. Monitor `Release SDKs`; then install each published artifact in a clean sample project and exercise a simple authenticated request.
@@ -127,7 +126,7 @@ cargo publish --dry-run
 Pop-Location
 ```
 
-For an independently published Rust version, create a dedicated immutable tag such as `rust-v1.0.0`, then manually dispatch `Release SDKs` with target `crates`. This skips npm, PyPI, and GitHub-release creation while using the same verified workflow. Do not invoke a second publish after the job succeeds. The crate metadata includes its repository, homepage, readme, keywords, and categories for a complete crates.io listing.
+For an independently published Rust version, create a dedicated immutable tag such as `rust-v1.0.1`, then manually dispatch `Release SDKs` with target `crates`. This skips npm, PyPI, and GitHub-release creation while using the same verified workflow. Do not invoke a second publish after the job succeeds. The crate metadata includes its repository, homepage, readme, keywords, and categories for a complete crates.io listing.
 
 ## Manual targets and required one-time setup
 
@@ -214,26 +213,25 @@ For the first independent NuGet release, manually dispatch `Release SDKs` with t
 
 ### PHP / Packagist
 
-This package is not publishable to Packagist yet. [`packages/php/composer.json`](packages/php/composer.json) is missing Composer's required `name` field.
+The PHP SDK is now exposed by the repository-root [`composer.json`](composer.json) as `timelogic-api/php-sdk`. Generated PHP sources remain under `packages/php`, and regeneration rewrites both manifests consistently. The manifest deliberately omits a `version`; Composer libraries derive versions from Git tags.
 
 Before registration:
 
-1. Add a stable identity such as `timelogic/direct-api`, proper `homepage`, `support`, license, authors, and `version` policy. Composer libraries normally derive versions from VCS tags, so do not hard-code a `version` unless there is a strong reason.
-2. Commit that metadata after regeneration has been made to preserve it (the generator currently overwrites the directory).
-3. Move this Composer package to a repository root or a dedicated public repository. Packagist indexes the root `composer.json`; it cannot directly publish this `packages/php` subdirectory as an independent package.
-4. Register that public package repository at Packagist and enable the Packagist GitHub webhook. Packagist then discovers its `v0.1.1` tags automatically.
+1. Make the repository public (or use a private Packagist plan for private consumers).
+2. Register the GitHub repository at Packagist and enable its GitHub webhook.
+3. Commit the root Composer metadata and create a new semver tag. Packagist then indexes that tag; there is no archive upload step.
 
 Preflight:
 
 ```powershell
-Push-Location packages/php
+Push-Location .
 composer validate --strict
 composer install
-./vendor/bin/phpunit
+vendor/bin/phpunit -c phpunit.xml.dist
 Pop-Location
 ```
 
-Packagist does not receive an uploaded archive. Its “publish” action is a committed, reachable Git tag plus webhook/index update. Tagging only makes sense after the package is at the repository root (or split into its own repository) and the name/metadata work has been committed.
+Packagist does not receive an uploaded archive. Its publish action is a committed, reachable Git tag plus webhook/index update. The root `composer.json` and root `Package.swift` can coexist in this monorepo.
 
 ### Ruby / RubyGems.org
 
@@ -251,7 +249,7 @@ gem build timelogic-api.gemspec
 Pop-Location
 ```
 
-Release a tag such as `v1.0.0`, or manually run the root `Release SDKs` workflow with target `ruby`. The Ruby job runs independently after the shared verification job and uses `rubygems/release-gem@v1` with OIDC. Its gemspec includes only the public README, API documentation, and `lib/` code.
+Release a tag such as `v1.0.1`, or manually run the root `Release SDKs` workflow with target `ruby`. The Ruby job runs independently after the shared verification job and uses `rubygems/release-gem@v1` with OIDC. Its gemspec includes only the public README, API documentation, and `lib/` code.
 
 ### Kotlin / Maven Central
 
@@ -259,7 +257,7 @@ The Kotlin package is configured as a distinct Maven Central artifact:
 
 - group ID: `com.timelogicapi`;
 - artifact ID: `timelogic-api-kotlin`;
-- version: `1.0.0` for the first publication;
+- version: `1.0.1` for this release;
 - sources and documentation artifacts: supplied by the Vanniktech Maven Publish plugin;
 - GPG signing and Central Portal upload: supplied by the protected `maven-central` environment.
 
@@ -274,36 +272,33 @@ Push-Location packages/kotlin
 Pop-Location
 ```
 
-After verifying the local repository contains `com/timelogicapi/timelogic-api-kotlin/1.0.0`, use **Actions → Release SDKs → Run workflow → target `kotlin`**. The Kotlin job is independent of Java and the other registries after shared verification. For later versions, update the shared generator version inputs, regenerate, commit, and publish a new immutable version.
+After verifying the local repository contains `com/timelogicapi/timelogic-api-kotlin/1.0.1`, use **Actions → Release SDKs → Run workflow → target `kotlin`**. The Kotlin job is independent of Java and the other registries after shared verification. For later versions, update the shared generator version inputs, regenerate, commit, and publish a new immutable version.
 
 ### Swift / Swift Package Manager (and CocoaPods)
 
-Swift Package Manager consumes Git repositories and tags. [`packages/swift/Package.swift`](packages/swift/Package.swift) currently calls the package and library `OpenAPIClient`; its CocoaPods podspec also has the placeholder name, source URL, license, and version. Do not release this branding publicly unchanged.
+The Swift package uses the public identity `TimeLogicAPI` and the summary `TimeLogic API | A World Time API`. The repository-root `Package.swift` exposes that library while generated sources remain under `packages/swift`. The podspec uses the repository HTTPS URL, the Unlicense, and the immutable tag `packages/swift/v1.0.1`.
 
-One-time cleanup:
-
-1. Rename the SPM package/product/target as appropriate (for example `TimeLogicDirectAPI`) and update import examples.
-2. Update `OpenAPIClient.podspec` with the same public identity, the SDK repository HTTPS URL, a real license, summary, and version/tag source.
-3. Move the Swift package to a repository root or a dedicated public repository. Swift Package Manager evaluates `Package.swift` at a dependency repository's root and has no dependency-URL option for selecting this `packages/swift` subdirectory.
+The repository is currently private, so public SPM/CocoaPods consumers still need the repository made public (or granted Git access). The existing root `v1.0.0` tag predates this manifest; use a new semver tag (for example `v1.0.1`). The release workflow creates the matching `packages/swift/v1.0.1` source tag used by the podspec.
 
 Preflight:
 
 ```powershell
-Push-Location packages/swift
+Push-Location .
 swift package resolve
 swift build
+swift test
 Pop-Location
 ```
 
-After moving it to a package root, release it using `v0.1.1`. CocoaPods additionally requires a public specs trunk account and then `pod trunk push OpenAPIClient.podspec`. Automate either tag/pod release only after the identity cleanup passes review.
+Publish the Swift package with the new semver tag. CocoaPods additionally requires a public specs trunk account and then `pod trunk push OpenAPIClient.podspec` from `packages/swift` (the pod name is `TimeLogicAPI`).
 
 ## Automation target
 
-The durable end state is one protected tag workflow that publishes every configured registry package, with a separate job and protected environment for npm, PyPI, crates.io, Maven Central, NuGet, and RubyGems. Keep Go, Packagist, and Swift as tag-driven jobs that create their required nested-module tags or trigger package-index updates. Each job should:
+The durable end state is one protected tag workflow that publishes every configured registry package, with a separate job and protected environment for npm, PyPI, crates.io, Maven Central, NuGet, and RubyGems. Keep Go, Packagist, and Swift as tag/index-driven jobs that create their required source tags or trigger package-index updates. Each release job should:
 
 1. validate, build, and package its SDK;
 2. publish only its declared version;
 3. verify that the registry resolves the just-published version; and
 4. be a required dependency of the GitHub release job.
 
-Until those jobs exist, the only release claim supported by the current workflow is: “TypeScript and Python published; Rust published only when explicitly enabled.”
+The release workflow now contains independent jobs for every configured registry target. A release claim is made only after the corresponding job reports success; a failed registry job does not block the other registry jobs. Swift remains a tag-consumed source package, and Packagist remains Git-tag/index driven rather than an archive upload.

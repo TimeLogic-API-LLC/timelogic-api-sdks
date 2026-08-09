@@ -5,12 +5,12 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**kty** | **str** |  | 
-**crv** | **str** |  | 
-**alg** | **str** |  | 
-**use** | **str** |  | 
-**kid** | **str** |  | 
-**x** | **str** |  | 
+**kty** | **str** |  |
+**crv** | **str** |  |
+**alg** | **str** |  |
+**use** | **str** |  |
+**kid** | **str** |  |
+**x** | **str** |  |
 
 ## Example
 

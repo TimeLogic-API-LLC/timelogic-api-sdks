@@ -12,7 +12,7 @@ Name | Type | Description | Notes
 **human** | **string** |  |
 **formatted** | **string** |  | [optional]
 **businessDays** | **int** |  | [optional]
-**from** | [**\TimeLogic\DirectApi\Model\DiffEndpointRef**](DiffEndpointRef.md) |  |
-**to** | [**\TimeLogic\DirectApi\Model\DiffEndpointRef**](DiffEndpointRef.md) |  |
+**from** | [**\TimeLogic\Api\Model\DiffEndpointRef**](DiffEndpointRef.md) |  |
+**to** | [**\TimeLogic\Api\Model\DiffEndpointRef**](DiffEndpointRef.md) |  |
 
 [[Back to Model list]](../../README.md#models) [[Back to API list]](../../README.md#endpoints) [[Back to README]](../../README.md)

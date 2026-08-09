@@ -54,7 +54,7 @@ Other parameters are passed through a pointer to a apiGetPublicSigningKeyRequest
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **kid** | **string** | Optional signing key identifier filter, for example &#x60;ed25519-2026-07-19&#x60;. When present, the response returns only the matching retained public key. | 
+ **kid** | **string** | Optional signing key identifier filter, for example &#x60;ed25519-2026-07-19&#x60;. When present, the response returns only the matching retained public key. |
 
 ### Return type
 

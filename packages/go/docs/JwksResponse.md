@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Keys** | [**[]JwkKey**](JwkKey.md) |  | 
+**Keys** | [**[]JwkKey**](JwkKey.md) |  |
 
 ## Methods
 

@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "timelogic-api"
-version = "1.0.0"
+version = "1.0.1"
 description = "TimeLogic API | A World Time API"
-authors = ["OpenAPI Generator Community <>"]
-license = "NoLicense"
+authors = ["TimeLogic API LLC <dev@timelogicapi.com>"]
+license = "Unlicense"
 readme = "README.md"
 repository = "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks"
-keywords = ["OpenAPI", "OpenAPI-Generator", "TimeLogic API | A World Time API"]
+keywords = ["time", "timezone", "world-time", "api", "sdk", "rapidapi"]
 include = ["timelogic_direct_api/py.typed"]
 
 [tool.poetry.dependencies]

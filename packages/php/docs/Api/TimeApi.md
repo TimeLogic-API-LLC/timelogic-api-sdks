@@ -1,4 +1,4 @@
-# TimeLogic\DirectApi\TimeApi
+# TimeLogic\Api\TimeApi
 
 All URIs are relative to https://api.timelogicapi.com, except if the operation defines another base path.
 
@@ -18,7 +18,7 @@ All URIs are relative to https://api.timelogicapi.com, except if the operation d
 ## `addTime()`
 
 ```php
-addTime($unix, $unixMs, $iso, $sourceTz, $sourceIp, $sourceLat, $sourceLon, $sourceOffset, $seconds, $minutes, $hours, $days, $tz, $ip, $lat, $lon, $offset, $autoTz, $utc, $format, $sign): \TimeLogic\DirectApi\Model\TimePayload
+addTime($unix, $unixMs, $iso, $sourceTz, $sourceIp, $sourceLat, $sourceLon, $sourceOffset, $seconds, $minutes, $hours, $days, $tz, $ip, $lat, $lon, $offset, $autoTz, $utc, $format, $sign): \TimeLogic\Api\Model\TimePayload
 ```
 
 Add modifiers to a timestamp
@@ -32,31 +32,31 @@ Adds `seconds`, `minutes`, `hours`, and `days` to an optional base timestamp.  I
 require_once(__DIR__ . '/vendor/autoload.php');
 
 
-// Configure API key authorization: directApiKeyHeader
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-API-Key', 'YOUR_API_KEY');
+// Configure API key authorization: apiKeyHeader
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-API-Key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-API-Key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-API-Key', 'Bearer');
 
-// Configure Bearer (TimeLogic API key) authorization: directBearerAuth
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
+// Configure Bearer (TimeLogic API key) authorization: bearerAuth
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
 
-// Configure API key authorization: directApiKeyQuery
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('api_key', 'YOUR_API_KEY');
+// Configure API key authorization: apiKeyQuery
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('api_key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('api_key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('api_key', 'Bearer');
 
 // Configure API key authorization: rapidApiKey
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Key', 'YOUR_API_KEY');
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Key', 'Bearer');
 
 // Configure API key authorization: rapidApiHost
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Host', 'YOUR_API_KEY');
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Host', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Host', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Host', 'Bearer');
 
 
-$apiInstance = new TimeLogic\DirectApi\Api\TimeApi(
+$apiInstance = new TimeLogic\Api\Api\TimeApi(
     // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
     // This is optional, `GuzzleHttp\Client` will be used as default.
     new GuzzleHttp\Client(),
@@ -120,11 +120,11 @@ try {
 
 ### Return type
 
-[**\TimeLogic\DirectApi\Model\TimePayload**](../Model/TimePayload.md)
+[**\TimeLogic\Api\Model\TimePayload**](../Model/TimePayload.md)
 
 ### Authorization
 
-[directApiKeyHeader](../../README.md#directApiKeyHeader), [directBearerAuth](../../README.md#directBearerAuth), [directApiKeyQuery](../../README.md#directApiKeyQuery), [rapidApiKey](../../README.md#rapidApiKey), [rapidApiHost](../../README.md#rapidApiHost)
+[apiKeyHeader](../../README.md#apiKeyHeader), [bearerAuth](../../README.md#bearerAuth), [apiKeyQuery](../../README.md#apiKeyQuery), [rapidApiKey](../../README.md#rapidApiKey), [rapidApiHost](../../README.md#rapidApiHost)
 
 ### HTTP request headers
 
@@ -138,7 +138,7 @@ try {
 ## `convertTime()`
 
 ```php
-convertTime($unix, $unixMs, $iso, $sourceTz, $sourceIp, $sourceLat, $sourceLon, $sourceOffset, $tz, $ip, $lat, $lon, $offset, $autoTz, $utc, $format, $sign): \TimeLogic\DirectApi\Model\GetCurrentTime200Response
+convertTime($unix, $unixMs, $iso, $sourceTz, $sourceIp, $sourceLat, $sourceLon, $sourceOffset, $tz, $ip, $lat, $lon, $offset, $autoTz, $utc, $format, $sign): \TimeLogic\Api\Model\GetCurrentTime200Response
 ```
 
 Convert a timestamp into a target timezone or offset
@@ -152,31 +152,31 @@ Converts one required input timestamp into a single target or a bulk array.  Inp
 require_once(__DIR__ . '/vendor/autoload.php');
 
 
-// Configure API key authorization: directApiKeyHeader
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-API-Key', 'YOUR_API_KEY');
+// Configure API key authorization: apiKeyHeader
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-API-Key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-API-Key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-API-Key', 'Bearer');
 
-// Configure Bearer (TimeLogic API key) authorization: directBearerAuth
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
+// Configure Bearer (TimeLogic API key) authorization: bearerAuth
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
 
-// Configure API key authorization: directApiKeyQuery
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('api_key', 'YOUR_API_KEY');
+// Configure API key authorization: apiKeyQuery
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('api_key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('api_key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('api_key', 'Bearer');
 
 // Configure API key authorization: rapidApiKey
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Key', 'YOUR_API_KEY');
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Key', 'Bearer');
 
 // Configure API key authorization: rapidApiHost
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Host', 'YOUR_API_KEY');
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Host', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Host', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Host', 'Bearer');
 
 
-$apiInstance = new TimeLogic\DirectApi\Api\TimeApi(
+$apiInstance = new TimeLogic\Api\Api\TimeApi(
     // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
     // This is optional, `GuzzleHttp\Client` will be used as default.
     new GuzzleHttp\Client(),
@@ -232,11 +232,11 @@ try {
 
 ### Return type
 
-[**\TimeLogic\DirectApi\Model\GetCurrentTime200Response**](../Model/GetCurrentTime200Response.md)
+[**\TimeLogic\Api\Model\GetCurrentTime200Response**](../Model/GetCurrentTime200Response.md)
 
 ### Authorization
 
-[directApiKeyHeader](../../README.md#directApiKeyHeader), [directBearerAuth](../../README.md#directBearerAuth), [directApiKeyQuery](../../README.md#directApiKeyQuery), [rapidApiKey](../../README.md#rapidApiKey), [rapidApiHost](../../README.md#rapidApiHost)
+[apiKeyHeader](../../README.md#apiKeyHeader), [bearerAuth](../../README.md#bearerAuth), [apiKeyQuery](../../README.md#apiKeyQuery), [rapidApiKey](../../README.md#rapidApiKey), [rapidApiHost](../../README.md#rapidApiHost)
 
 ### HTTP request headers
 
@@ -250,7 +250,7 @@ try {
 ## `diffTime()`
 
 ```php
-diffTime($from, $to, $fromTz, $fromIp, $fromLat, $fromLon, $fromOffset, $toTz, $toIp, $toLat, $toLon, $toOffset, $format, $businessDays, $holidayCountry, $holidaySubdivision, $sign): \TimeLogic\DirectApi\Model\DiffResponse
+diffTime($from, $to, $fromTz, $fromIp, $fromLat, $fromLon, $fromOffset, $toTz, $toIp, $toLat, $toLon, $toOffset, $format, $businessDays, $holidayCountry, $holidaySubdivision, $sign): \TimeLogic\Api\Model\DiffResponse
 ```
 
 Difference between two instants
@@ -264,31 +264,31 @@ Computes the duration between `from` and `to`.  Required query fields: `from` an
 require_once(__DIR__ . '/vendor/autoload.php');
 
 
-// Configure API key authorization: directApiKeyHeader
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-API-Key', 'YOUR_API_KEY');
+// Configure API key authorization: apiKeyHeader
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-API-Key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-API-Key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-API-Key', 'Bearer');
 
-// Configure Bearer (TimeLogic API key) authorization: directBearerAuth
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
+// Configure Bearer (TimeLogic API key) authorization: bearerAuth
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
 
-// Configure API key authorization: directApiKeyQuery
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('api_key', 'YOUR_API_KEY');
+// Configure API key authorization: apiKeyQuery
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('api_key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('api_key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('api_key', 'Bearer');
 
 // Configure API key authorization: rapidApiKey
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Key', 'YOUR_API_KEY');
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Key', 'Bearer');
 
 // Configure API key authorization: rapidApiHost
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Host', 'YOUR_API_KEY');
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Host', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Host', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Host', 'Bearer');
 
 
-$apiInstance = new TimeLogic\DirectApi\Api\TimeApi(
+$apiInstance = new TimeLogic\Api\Api\TimeApi(
     // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
     // This is optional, `GuzzleHttp\Client` will be used as default.
     new GuzzleHttp\Client(),
@@ -344,11 +344,11 @@ try {
 
 ### Return type
 
-[**\TimeLogic\DirectApi\Model\DiffResponse**](../Model/DiffResponse.md)
+[**\TimeLogic\Api\Model\DiffResponse**](../Model/DiffResponse.md)
 
 ### Authorization
 
-[directApiKeyHeader](../../README.md#directApiKeyHeader), [directBearerAuth](../../README.md#directBearerAuth), [directApiKeyQuery](../../README.md#directApiKeyQuery), [rapidApiKey](../../README.md#rapidApiKey), [rapidApiHost](../../README.md#rapidApiHost)
+[apiKeyHeader](../../README.md#apiKeyHeader), [bearerAuth](../../README.md#bearerAuth), [apiKeyQuery](../../README.md#apiKeyQuery), [rapidApiKey](../../README.md#rapidApiKey), [rapidApiHost](../../README.md#rapidApiHost)
 
 ### HTTP request headers
 
@@ -362,7 +362,7 @@ try {
 ## `getCalendar()`
 
 ```php
-getCalendar($unix, $unixMs, $iso, $sourceTz, $sourceIp, $sourceLat, $sourceLon, $sourceOffset, $tz, $ip, $lat, $lon, $offset, $autoTz, $format, $week, $sign): \TimeLogic\DirectApi\Model\CalendarResponse
+getCalendar($unix, $unixMs, $iso, $sourceTz, $sourceIp, $sourceLat, $sourceLon, $sourceOffset, $tz, $ip, $lat, $lon, $offset, $autoTz, $format, $week, $sign): \TimeLogic\Api\Model\CalendarResponse
 ```
 
 Calendar projection for a target instant
@@ -376,31 +376,31 @@ Returns calendar fields for an optional timestamp and target.  Input timestamp f
 require_once(__DIR__ . '/vendor/autoload.php');
 
 
-// Configure API key authorization: directApiKeyHeader
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-API-Key', 'YOUR_API_KEY');
+// Configure API key authorization: apiKeyHeader
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-API-Key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-API-Key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-API-Key', 'Bearer');
 
-// Configure Bearer (TimeLogic API key) authorization: directBearerAuth
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
+// Configure Bearer (TimeLogic API key) authorization: bearerAuth
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
 
-// Configure API key authorization: directApiKeyQuery
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('api_key', 'YOUR_API_KEY');
+// Configure API key authorization: apiKeyQuery
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('api_key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('api_key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('api_key', 'Bearer');
 
 // Configure API key authorization: rapidApiKey
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Key', 'YOUR_API_KEY');
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Key', 'Bearer');
 
 // Configure API key authorization: rapidApiHost
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Host', 'YOUR_API_KEY');
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Host', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Host', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Host', 'Bearer');
 
 
-$apiInstance = new TimeLogic\DirectApi\Api\TimeApi(
+$apiInstance = new TimeLogic\Api\Api\TimeApi(
     // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
     // This is optional, `GuzzleHttp\Client` will be used as default.
     new GuzzleHttp\Client(),
@@ -456,11 +456,11 @@ try {
 
 ### Return type
 
-[**\TimeLogic\DirectApi\Model\CalendarResponse**](../Model/CalendarResponse.md)
+[**\TimeLogic\Api\Model\CalendarResponse**](../Model/CalendarResponse.md)
 
 ### Authorization
 
-[directApiKeyHeader](../../README.md#directApiKeyHeader), [directBearerAuth](../../README.md#directBearerAuth), [directApiKeyQuery](../../README.md#directApiKeyQuery), [rapidApiKey](../../README.md#rapidApiKey), [rapidApiHost](../../README.md#rapidApiHost)
+[apiKeyHeader](../../README.md#apiKeyHeader), [bearerAuth](../../README.md#bearerAuth), [apiKeyQuery](../../README.md#apiKeyQuery), [rapidApiKey](../../README.md#rapidApiKey), [rapidApiHost](../../README.md#rapidApiHost)
 
 ### HTTP request headers
 
@@ -488,31 +488,31 @@ Returns an embeddable HTML clock fragment.  Input timestamp forms: - `unix=17113
 require_once(__DIR__ . '/vendor/autoload.php');
 
 
-// Configure API key authorization: directApiKeyHeader
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-API-Key', 'YOUR_API_KEY');
+// Configure API key authorization: apiKeyHeader
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-API-Key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-API-Key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-API-Key', 'Bearer');
 
-// Configure Bearer (TimeLogic API key) authorization: directBearerAuth
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
+// Configure Bearer (TimeLogic API key) authorization: bearerAuth
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
 
-// Configure API key authorization: directApiKeyQuery
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('api_key', 'YOUR_API_KEY');
+// Configure API key authorization: apiKeyQuery
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('api_key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('api_key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('api_key', 'Bearer');
 
 // Configure API key authorization: rapidApiKey
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Key', 'YOUR_API_KEY');
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Key', 'Bearer');
 
 // Configure API key authorization: rapidApiHost
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Host', 'YOUR_API_KEY');
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Host', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Host', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Host', 'Bearer');
 
 
-$apiInstance = new TimeLogic\DirectApi\Api\TimeApi(
+$apiInstance = new TimeLogic\Api\Api\TimeApi(
     // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
     // This is optional, `GuzzleHttp\Client` will be used as default.
     new GuzzleHttp\Client(),
@@ -568,7 +568,7 @@ try {
 
 ### Authorization
 
-[directApiKeyHeader](../../README.md#directApiKeyHeader), [directBearerAuth](../../README.md#directBearerAuth), [directApiKeyQuery](../../README.md#directApiKeyQuery), [rapidApiKey](../../README.md#rapidApiKey), [rapidApiHost](../../README.md#rapidApiHost)
+[apiKeyHeader](../../README.md#apiKeyHeader), [bearerAuth](../../README.md#bearerAuth), [apiKeyQuery](../../README.md#apiKeyQuery), [rapidApiKey](../../README.md#rapidApiKey), [rapidApiHost](../../README.md#rapidApiHost)
 
 ### HTTP request headers
 
@@ -582,7 +582,7 @@ try {
 ## `getCurrentTime()`
 
 ```php
-getCurrentTime($tz, $ip, $lat, $lon, $offset, $autoTz, $format, $sign): \TimeLogic\DirectApi\Model\GetCurrentTime200Response
+getCurrentTime($tz, $ip, $lat, $lon, $offset, $autoTz, $format, $sign): \TimeLogic\Api\Model\GetCurrentTime200Response
 ```
 
 Get the current time for a target
@@ -596,31 +596,31 @@ Returns current time data for a single target, or a bulk array when exactly one 
 require_once(__DIR__ . '/vendor/autoload.php');
 
 
-// Configure API key authorization: directApiKeyHeader
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-API-Key', 'YOUR_API_KEY');
+// Configure API key authorization: apiKeyHeader
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-API-Key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-API-Key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-API-Key', 'Bearer');
 
-// Configure Bearer (TimeLogic API key) authorization: directBearerAuth
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
+// Configure Bearer (TimeLogic API key) authorization: bearerAuth
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
 
-// Configure API key authorization: directApiKeyQuery
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('api_key', 'YOUR_API_KEY');
+// Configure API key authorization: apiKeyQuery
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('api_key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('api_key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('api_key', 'Bearer');
 
 // Configure API key authorization: rapidApiKey
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Key', 'YOUR_API_KEY');
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Key', 'Bearer');
 
 // Configure API key authorization: rapidApiHost
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Host', 'YOUR_API_KEY');
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Host', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Host', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Host', 'Bearer');
 
 
-$apiInstance = new TimeLogic\DirectApi\Api\TimeApi(
+$apiInstance = new TimeLogic\Api\Api\TimeApi(
     // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
     // This is optional, `GuzzleHttp\Client` will be used as default.
     new GuzzleHttp\Client(),
@@ -658,11 +658,11 @@ try {
 
 ### Return type
 
-[**\TimeLogic\DirectApi\Model\GetCurrentTime200Response**](../Model/GetCurrentTime200Response.md)
+[**\TimeLogic\Api\Model\GetCurrentTime200Response**](../Model/GetCurrentTime200Response.md)
 
 ### Authorization
 
-[directApiKeyHeader](../../README.md#directApiKeyHeader), [directBearerAuth](../../README.md#directBearerAuth), [directApiKeyQuery](../../README.md#directApiKeyQuery), [rapidApiKey](../../README.md#rapidApiKey), [rapidApiHost](../../README.md#rapidApiHost)
+[apiKeyHeader](../../README.md#apiKeyHeader), [bearerAuth](../../README.md#bearerAuth), [apiKeyQuery](../../README.md#apiKeyQuery), [rapidApiKey](../../README.md#rapidApiKey), [rapidApiHost](../../README.md#rapidApiHost)
 
 ### HTTP request headers
 
@@ -676,7 +676,7 @@ try {
 ## `getDst()`
 
 ```php
-getDst($tz, $ip, $lat, $lon, $offset, $autoTz, $format, $next, $sign): \TimeLogic\DirectApi\Model\DstResponse
+getDst($tz, $ip, $lat, $lon, $offset, $autoTz, $format, $next, $sign): \TimeLogic\Api\Model\DstResponse
 ```
 
 Daylight-saving status for a target
@@ -690,31 +690,31 @@ Returns daylight-saving status for the selected target.  Target selector rules: 
 require_once(__DIR__ . '/vendor/autoload.php');
 
 
-// Configure API key authorization: directApiKeyHeader
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-API-Key', 'YOUR_API_KEY');
+// Configure API key authorization: apiKeyHeader
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-API-Key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-API-Key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-API-Key', 'Bearer');
 
-// Configure Bearer (TimeLogic API key) authorization: directBearerAuth
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
+// Configure Bearer (TimeLogic API key) authorization: bearerAuth
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
 
-// Configure API key authorization: directApiKeyQuery
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('api_key', 'YOUR_API_KEY');
+// Configure API key authorization: apiKeyQuery
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('api_key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('api_key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('api_key', 'Bearer');
 
 // Configure API key authorization: rapidApiKey
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Key', 'YOUR_API_KEY');
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Key', 'Bearer');
 
 // Configure API key authorization: rapidApiHost
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Host', 'YOUR_API_KEY');
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Host', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Host', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Host', 'Bearer');
 
 
-$apiInstance = new TimeLogic\DirectApi\Api\TimeApi(
+$apiInstance = new TimeLogic\Api\Api\TimeApi(
     // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
     // This is optional, `GuzzleHttp\Client` will be used as default.
     new GuzzleHttp\Client(),
@@ -754,11 +754,11 @@ try {
 
 ### Return type
 
-[**\TimeLogic\DirectApi\Model\DstResponse**](../Model/DstResponse.md)
+[**\TimeLogic\Api\Model\DstResponse**](../Model/DstResponse.md)
 
 ### Authorization
 
-[directApiKeyHeader](../../README.md#directApiKeyHeader), [directBearerAuth](../../README.md#directBearerAuth), [directApiKeyQuery](../../README.md#directApiKeyQuery), [rapidApiKey](../../README.md#rapidApiKey), [rapidApiHost](../../README.md#rapidApiHost)
+[apiKeyHeader](../../README.md#apiKeyHeader), [bearerAuth](../../README.md#bearerAuth), [apiKeyQuery](../../README.md#apiKeyQuery), [rapidApiKey](../../README.md#rapidApiKey), [rapidApiHost](../../README.md#rapidApiHost)
 
 ### HTTP request headers
 
@@ -772,7 +772,7 @@ try {
 ## `getElapsed()`
 
 ```php
-getElapsed($unix, $unixMs, $iso, $sourceTz, $sourceIp, $sourceLat, $sourceLon, $sourceOffset, $compareUnix, $compareUnixMs, $compareIso, $compareSourceTz, $compareSourceIp, $compareSourceLat, $compareSourceLon, $compareSourceOffset, $tz, $ip, $lat, $lon, $offset, $autoTz, $format, $businessDays, $holidayCountry, $holidaySubdivision, $sign): \TimeLogic\DirectApi\Model\ElapsedResponse
+getElapsed($unix, $unixMs, $iso, $sourceTz, $sourceIp, $sourceLat, $sourceLon, $sourceOffset, $compareUnix, $compareUnixMs, $compareIso, $compareSourceTz, $compareSourceIp, $compareSourceLat, $compareSourceLon, $compareSourceOffset, $tz, $ip, $lat, $lon, $offset, $autoTz, $format, $businessDays, $holidayCountry, $holidaySubdivision, $sign): \TimeLogic\Api\Model\ElapsedResponse
 ```
 
 Time elapsed since or remaining until a reference instant
@@ -786,31 +786,31 @@ Computes elapsed or remaining duration relative to one required reference timest
 require_once(__DIR__ . '/vendor/autoload.php');
 
 
-// Configure API key authorization: directApiKeyHeader
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-API-Key', 'YOUR_API_KEY');
+// Configure API key authorization: apiKeyHeader
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-API-Key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-API-Key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-API-Key', 'Bearer');
 
-// Configure Bearer (TimeLogic API key) authorization: directBearerAuth
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
+// Configure Bearer (TimeLogic API key) authorization: bearerAuth
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
 
-// Configure API key authorization: directApiKeyQuery
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('api_key', 'YOUR_API_KEY');
+// Configure API key authorization: apiKeyQuery
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('api_key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('api_key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('api_key', 'Bearer');
 
 // Configure API key authorization: rapidApiKey
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Key', 'YOUR_API_KEY');
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Key', 'Bearer');
 
 // Configure API key authorization: rapidApiHost
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Host', 'YOUR_API_KEY');
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Host', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Host', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Host', 'Bearer');
 
 
-$apiInstance = new TimeLogic\DirectApi\Api\TimeApi(
+$apiInstance = new TimeLogic\Api\Api\TimeApi(
     // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
     // This is optional, `GuzzleHttp\Client` will be used as default.
     new GuzzleHttp\Client(),
@@ -886,11 +886,11 @@ try {
 
 ### Return type
 
-[**\TimeLogic\DirectApi\Model\ElapsedResponse**](../Model/ElapsedResponse.md)
+[**\TimeLogic\Api\Model\ElapsedResponse**](../Model/ElapsedResponse.md)
 
 ### Authorization
 
-[directApiKeyHeader](../../README.md#directApiKeyHeader), [directBearerAuth](../../README.md#directBearerAuth), [directApiKeyQuery](../../README.md#directApiKeyQuery), [rapidApiKey](../../README.md#rapidApiKey), [rapidApiHost](../../README.md#rapidApiHost)
+[apiKeyHeader](../../README.md#apiKeyHeader), [bearerAuth](../../README.md#bearerAuth), [apiKeyQuery](../../README.md#apiKeyQuery), [rapidApiKey](../../README.md#rapidApiKey), [rapidApiHost](../../README.md#rapidApiHost)
 
 ### HTTP request headers
 
@@ -904,7 +904,7 @@ try {
 ## `getTimezone()`
 
 ```php
-getTimezone($tz, $ip, $lat, $lon, $offset, $autoTz, $sign): \TimeLogic\DirectApi\Model\GetTimezone200Response
+getTimezone($tz, $ip, $lat, $lon, $offset, $autoTz, $sign): \TimeLogic\Api\Model\GetTimezone200Response
 ```
 
 Resolve timezone information for a target
@@ -918,31 +918,31 @@ Resolves timezone metadata for a single target.  Target selector rules: - Use ex
 require_once(__DIR__ . '/vendor/autoload.php');
 
 
-// Configure API key authorization: directApiKeyHeader
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-API-Key', 'YOUR_API_KEY');
+// Configure API key authorization: apiKeyHeader
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-API-Key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-API-Key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-API-Key', 'Bearer');
 
-// Configure Bearer (TimeLogic API key) authorization: directBearerAuth
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
+// Configure Bearer (TimeLogic API key) authorization: bearerAuth
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
 
-// Configure API key authorization: directApiKeyQuery
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('api_key', 'YOUR_API_KEY');
+// Configure API key authorization: apiKeyQuery
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('api_key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('api_key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('api_key', 'Bearer');
 
 // Configure API key authorization: rapidApiKey
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Key', 'YOUR_API_KEY');
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Key', 'Bearer');
 
 // Configure API key authorization: rapidApiHost
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Host', 'YOUR_API_KEY');
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Host', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Host', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Host', 'Bearer');
 
 
-$apiInstance = new TimeLogic\DirectApi\Api\TimeApi(
+$apiInstance = new TimeLogic\Api\Api\TimeApi(
     // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
     // This is optional, `GuzzleHttp\Client` will be used as default.
     new GuzzleHttp\Client(),
@@ -978,11 +978,11 @@ try {
 
 ### Return type
 
-[**\TimeLogic\DirectApi\Model\GetTimezone200Response**](../Model/GetTimezone200Response.md)
+[**\TimeLogic\Api\Model\GetTimezone200Response**](../Model/GetTimezone200Response.md)
 
 ### Authorization
 
-[directApiKeyHeader](../../README.md#directApiKeyHeader), [directBearerAuth](../../README.md#directBearerAuth), [directApiKeyQuery](../../README.md#directApiKeyQuery), [rapidApiKey](../../README.md#rapidApiKey), [rapidApiHost](../../README.md#rapidApiHost)
+[apiKeyHeader](../../README.md#apiKeyHeader), [bearerAuth](../../README.md#bearerAuth), [apiKeyQuery](../../README.md#apiKeyQuery), [rapidApiKey](../../README.md#rapidApiKey), [rapidApiHost](../../README.md#rapidApiHost)
 
 ### HTTP request headers
 

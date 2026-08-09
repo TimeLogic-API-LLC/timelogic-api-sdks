@@ -4,21 +4,21 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Unix** | **int64** |  | 
-**UnixMs** | **int64** |  | 
-**Utc** | **time.Time** |  | 
-**IsoLocal** | **NullableString** |  | 
-**Rfc2822** | **string** |  | 
-**Human** | **string** |  | 
-**DayNumber** | **int32** |  | 
-**DayShort** | **string** |  | 
-**DayFull** | **string** |  | 
-**Timezone** | **NullableString** |  | 
-**Formatted** | Pointer to **string** |  | [optional] 
-**Error** | [**ApiError**](ApiError.md) |  | 
-**RequestId** | **string** |  | 
-**Timestamp** | Pointer to **time.Time** | Intentionally omitted from public API error responses to avoid exposing request timing; use request_id for support correlation. | [optional] 
-**Item** | **string** |  | 
+**Unix** | **int64** |  |
+**UnixMs** | **int64** |  |
+**Utc** | **time.Time** |  |
+**IsoLocal** | **NullableString** |  |
+**Rfc2822** | **string** |  |
+**Human** | **string** |  |
+**DayNumber** | **int32** |  |
+**DayShort** | **string** |  |
+**DayFull** | **string** |  |
+**Timezone** | **NullableString** |  |
+**Formatted** | Pointer to **string** |  | [optional]
+**Error** | [**ApiError**](ApiError.md) |  |
+**RequestId** | **string** |  |
+**Timestamp** | Pointer to **time.Time** | Intentionally omitted from public API error responses to avoid exposing request timing; use request_id for support correlation. | [optional]
+**Item** | **string** |  |
 
 ## Methods
 

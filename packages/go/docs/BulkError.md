@@ -4,10 +4,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Error** | [**ApiError**](ApiError.md) |  | 
-**RequestId** | **string** |  | 
-**Timestamp** | Pointer to **time.Time** | Intentionally omitted from public API error responses to avoid exposing request timing; use request_id for support correlation. | [optional] 
-**Item** | **string** |  | 
+**Error** | [**ApiError**](ApiError.md) |  |
+**RequestId** | **string** |  |
+**Timestamp** | Pointer to **time.Time** | Intentionally omitted from public API error responses to avoid exposing request timing; use request_id for support correlation. | [optional]
+**Item** | **string** |  |
 
 ## Methods
 

@@ -4,9 +4,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Code** | **string** |  | 
-**Message** | **string** |  | 
-**Details** | Pointer to **interface{}** | Optional implementation-specific detail payload. | [optional] 
+**Code** | **string** |  |
+**Message** | **string** |  |
+**Details** | Pointer to **interface{}** | Optional implementation-specific detail payload. | [optional]
 
 ## Methods
 

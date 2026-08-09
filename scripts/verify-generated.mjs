@@ -13,6 +13,11 @@ for (const target of targets) {
   console.log(`${target.id}: generated artifacts present (${files.join(', ')})`);
 }
 
+for (const file of ['Package.swift', 'Package.resolved', 'composer.json', 'phpunit.xml.dist']) {
+  if (!existsSync(file)) throw new Error(`Root package manifest: missing ${file}`);
+}
+console.log('root package manifests: Swift and Composer present');
+
 const transportArtifacts = {
   typescript: 'packages/typescript/src/transport.ts',
   python: 'packages/python/timelogic_direct_api/transport.py',

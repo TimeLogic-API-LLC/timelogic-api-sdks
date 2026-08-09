@@ -1,57 +1,13 @@
-# OpenAPIClient-php
+# TimeLogic API PHP SDK | A World Time API
 
-Public direct-access contract for the TimeLogic gateway.
-
-This public spec excludes `/healthz` and the shared clock asset routes. It keeps `/.well-known/time-api-public-key`, `/v1/time/clock`, and signed JSON response controls because public consumers may need them.
-
-Authentication:
-- direct access supports `Authorization: Bearer <token>`, `X-API-Key`, and `api_key` query credentials
-- RapidAPI access uses `X-RapidAPI-Key` and `X-RapidAPI-Host`; the SDKs expose this as a `rapidApi` transport option that accepts only the RapidAPI key
-
-Behavioral notes:
-- all documented operations are `GET`
-- only one selector family may be used at a time
-- current and convert support bulk only through one comma-separated `tz`, `ip`, or `offset` selector
-- add, diff, calendar, dst, elapsed, timezone, and clock are single-target routes
-- credentials are extracted in Authorization, X-API-Key, then api_key query order; conflicting values are rejected
-- the first server is the default direct API host. The second server is the RapidAPI gateway and can be selected or overridden by SDK configuration
-- `sign` is available on supported JSON routes and is not supported on `/v1/time/clock`
-
+Official PHP SDK for TimeLogic API, a world time API.
 
 ## Installation & Usage
 
-### Requirements
+Install the package after its Packagist release:
 
-PHP 7.4 and later.
-Should also work with PHP 8.0.
-
-### Composer
-
-To install the bindings via [Composer](https://getcomposer.org/), add the following to `composer.json`:
-
-```json
-{
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git"
-    }
-  ],
-  "require": {
-    "TimeLogic-API-LLC/timelogic-api-sdks": "*@dev"
-  }
-}
-```
-
-Then run `composer install`
-
-### Manual Installation
-
-Download the files and include `autoload.php`:
-
-```php
-<?php
-require_once('/path/to/OpenAPIClient-php/vendor/autoload.php');
+```bash
+composer require timelogic-api/php-sdk:^1.0
 ```
 
 ## Getting Started
@@ -64,31 +20,31 @@ require_once(__DIR__ . '/vendor/autoload.php');
 
 
 
-// Configure API key authorization: directApiKeyHeader
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-API-Key', 'YOUR_API_KEY');
+// Configure API key authorization: apiKeyHeader
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-API-Key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-API-Key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-API-Key', 'Bearer');
 
-// Configure Bearer (TimeLogic API key) authorization: directBearerAuth
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
+// Configure Bearer (TimeLogic API key) authorization: bearerAuth
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
 
-// Configure API key authorization: directApiKeyQuery
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('api_key', 'YOUR_API_KEY');
+// Configure API key authorization: apiKeyQuery
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('api_key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('api_key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('api_key', 'Bearer');
 
 // Configure API key authorization: rapidApiKey
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Key', 'YOUR_API_KEY');
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Key', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Key', 'Bearer');
 
 // Configure API key authorization: rapidApiHost
-$config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Host', 'YOUR_API_KEY');
+$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Host', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\DirectApi\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Host', 'Bearer');
+// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Host', 'Bearer');
 
 
-$apiInstance = new TimeLogic\DirectApi\Api\TimeApi(
+$apiInstance = new TimeLogic\Api\Api\TimeApi(
     // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
     // This is optional, `GuzzleHttp\Client` will be used as default.
     new GuzzleHttp\Client(),
@@ -96,24 +52,24 @@ $apiInstance = new TimeLogic\DirectApi\Api\TimeApi(
 );
 $unix = 1711300000; // int
 $unixMs = 1711300000000; // int
-$iso = 2024-03-24T15:00:00; // string | ISO-8601 timestamp. To supply a local wall-clock time without an explicit offset, pair it with one of `source_tz=Area/City`, `source_ip=...`, `source_lat=...&source_lon=...`, or `source_offset=±HH:MM`.
-$sourceTz = America/New_York; // string | Used only with `iso=...` when the ISO value has no explicit offset.
-$sourceIp = 8.8.8.8; // string | Used only with `iso=...` when the ISO value has no explicit offset. Resolves that local wall-clock time through the timezone mapped from this IP address.
+$iso = '2024-03-24T15:00:00'; // string | ISO-8601 timestamp. To supply a local wall-clock time without an explicit offset, pair it with one of `source_tz=Area/City`, `source_ip=...`, `source_lat=...&source_lon=...`, or `source_offset=±HH:MM`.
+$sourceTz = 'America/New_York'; // string | Used only with `iso=...` when the ISO value has no explicit offset.
+$sourceIp = '8.8.8.8'; // string | Used only with `iso=...` when the ISO value has no explicit offset. Resolves that local wall-clock time through the timezone mapped from this IP address.
 $sourceLat = 40.7128; // float | Used only with `iso=...` when the ISO value has no explicit offset. Provide together with `source_lon` to resolve that local wall-clock time through the timezone mapped from these coordinates.
 $sourceLon = -74.006; // float | Used only with `iso=...` when the ISO value has no explicit offset. Provide together with `source_lat`.
-$sourceOffset = -05:00; // string | Used only with `iso=...` when the ISO value has no explicit offset. Interprets that local wall-clock time at this fixed UTC offset.
+$sourceOffset = '-05:00'; // string | Used only with `iso=...` when the ISO value has no explicit offset. Interprets that local wall-clock time at this fixed UTC offset.
 $seconds = 30; // int
 $minutes = 15; // int
 $hours = 2; // int
 $days = 7; // int
-$tz = America/New_York; // string | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode.
-$ip = 8.8.8.8; // string | IP address. On bulk-capable routes, a comma-separated list enables bulk mode.
+$tz = 'America/New_York'; // string | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode.
+$ip = '8.8.8.8'; // string | IP address. On bulk-capable routes, a comma-separated list enables bulk mode.
 $lat = 40.7128; // float | Latitude. Must be provided together with `lon`.
 $lon = -74.006; // float | Longitude. Must be provided together with `lat`.
-$offset = -04:00; // string | Fixed UTC offset in `+HH:MM` or `-HH:MM` format. On bulk-capable routes, a comma-separated list enables bulk mode.
+$offset = '-04:00'; // string | Fixed UTC offset in `+HH:MM` or `-HH:MM` format. On bulk-capable routes, a comma-separated list enables bulk mode.
 $autoTz = true; // bool | Set to `true` to resolve using the caller IP from Cloudflare headers.
 $utc = true; // bool | Set to `true` to force UTC on routes that support it.
-$format = %Y-%m-%d %H:%M:%S; // string | Custom date/time format template using supported `strftime`-style directives such as `%Y-%m-%d %H:%M:%S`. Reference: [strftime](https://strftime.net/).
+$format = '%Y-%m-%d %H:%M:%S'; // string | Custom date/time format template using supported `strftime`-style directives such as `%Y-%m-%d %H:%M:%S`. Reference: [strftime](https://strftime.net/).
 $sign = true; // bool | Set to exactly `true` to ask the gateway to sign the final JSON response. Every authenticated JSON response, including errors, then includes signing headers. Not supported on `/v1/time/clock`.
 
 try {
@@ -166,18 +122,18 @@ Class | Method | HTTP request | Description
 ## Authorization
 
 Authentication schemes defined for the API:
-### directBearerAuth
+### bearerAuth
 
 - **Type**: Bearer authentication (TimeLogic API key)
 
-### directApiKeyHeader
+### apiKeyHeader
 
 - **Type**: API key
 - **API key parameter name**: X-API-Key
 - **Location**: HTTP header
 
 
-### directApiKeyQuery
+### apiKeyQuery
 
 - **Type**: API key
 - **API key parameter name**: api_key
@@ -213,7 +169,7 @@ vendor/bin/phpunit
 
 ## About this package
 
-This PHP package is automatically generated by the [OpenAPI Generator](https://openapi-generator.tech) project:
+This PHP package is automatically generated by the [TimeLogic API](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks) project:
 
 - API version: `1.0.0`
     - Generator version: `7.10.0`

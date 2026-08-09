@@ -5,9 +5,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**code** | **str** |  | 
-**message** | **str** |  | 
-**details** | **object** | Optional implementation-specific detail payload. | [optional] 
+**code** | **str** |  |
+**message** | **str** |  |
+**details** | **object** | Optional implementation-specific detail payload. | [optional]
 
 ## Example
 

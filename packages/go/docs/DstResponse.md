@@ -4,19 +4,19 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Unix** | **int64** |  | 
-**UnixMs** | **int64** |  | 
-**Utc** | **time.Time** |  | 
-**IsoLocal** | **NullableString** |  | 
-**Rfc2822** | **string** |  | 
-**Human** | **string** |  | 
-**DayNumber** | **int32** |  | 
-**DayShort** | **string** |  | 
-**DayFull** | **string** |  | 
-**Timezone** | **NullableString** |  | 
-**Formatted** | Pointer to **string** |  | [optional] 
-**DstActive** | **bool** |  | 
-**NextTransition** | Pointer to **NullableTime** |  | [optional] 
+**Unix** | **int64** |  |
+**UnixMs** | **int64** |  |
+**Utc** | **time.Time** |  |
+**IsoLocal** | **NullableString** |  |
+**Rfc2822** | **string** |  |
+**Human** | **string** |  |
+**DayNumber** | **int32** |  |
+**DayShort** | **string** |  |
+**DayFull** | **string** |  |
+**Timezone** | **NullableString** |  |
+**Formatted** | Pointer to **string** |  | [optional]
+**DstActive** | **bool** |  |
+**NextTransition** | Pointer to **NullableTime** |  | [optional]
 
 ## Methods
 
