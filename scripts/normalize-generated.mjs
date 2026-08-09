@@ -134,7 +134,7 @@ if (!kotlinBuild.includes("com.vanniktech.maven.publish")) {
 ${kotlinBuild}`;
 }
 if (!kotlinBuild.includes('mavenPublishing {')) {
-  kotlinBuild += `
+  kotlinBuild = `${kotlinBuild.trimEnd()}
 
 mavenPublishing {
     coordinates('com.timelogicapi', 'timelogic-api-kotlin', project.version.toString())
