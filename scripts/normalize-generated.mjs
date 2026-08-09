@@ -41,7 +41,7 @@ let javaPom = readFileSync(javaPomPath, 'utf8')
   .replace(/scm:git:ssh:\/\/git@github\.com:openapitools\/openapi-generator\.git/g, 'scm:git:ssh://git@github.com/TimeLogic-API-LLC/timelogic-api-sdks.git')
   .replace(/<url>http:\/\/unlicense\.org<\/url>/g, '<url>https://unlicense.org</url>')
   .replace(/<name>OpenAPI-Generator Contributors<\/name>/, '<name>TimeLogic API LLC</name>')
-  .replace(/<email>team@openapitools\.org<\/email>/, '<email>support@timelogicapi.com</email>')
+  .replace(/<email>team@openapitools\.org<\/email>/, '<email>dev@timelogicapi.com</email>')
   .replace(/<organization>OpenAPITools\.org<\/organization>/, '<organization>TimeLogic API LLC</organization>')
   .replace(/<organizationUrl>http:\/\/openapitools\.org<\/organizationUrl>/, '<organizationUrl>https://timelogicapi.com</organizationUrl>');
 
@@ -873,7 +873,7 @@ Gem::Specification.new do |s|
   s.version     = TimeLogic::Api::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['TimeLogic API LLC']
-  s.email       = ['support@timelogicapi.com']
+  s.email       = ['dev@timelogicapi.com']
   s.homepage    = 'https://github.com/TimeLogic-API-LLC/timelogic-api-sdks'
   s.summary     = 'TimeLogic API | A World Time API'
   s.description = 'Official Ruby SDK for TimeLogic API, providing world time, timezone, calendar, and signed response operations.'

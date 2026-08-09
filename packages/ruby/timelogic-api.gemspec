@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.version     = TimeLogic::Api::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['TimeLogic API LLC']
-  s.email       = ['support@timelogicapi.com']
+  s.email       = ['dev@timelogicapi.com']
   s.homepage    = 'https://github.com/TimeLogic-API-LLC/timelogic-api-sdks'
   s.summary     = 'TimeLogic API | A World Time API'
   s.description = 'Official Ruby SDK for TimeLogic API, providing world time, timezone, calendar, and signed response operations.'
