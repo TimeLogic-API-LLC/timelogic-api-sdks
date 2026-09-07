@@ -44,6 +44,10 @@ $env:TIMELOGIC_API_KEY = "your-api-key"
 
 Direct API clients use the key supplied through their language-specific configuration. RapidAPI clients use the `rapidApi` (or `rapid_api`) transport option and require only the RapidAPI subscription key; the SDK supplies the required RapidAPI headers.
 
+## Browser support
+
+The public gateway supports cross-origin resource sharing (CORS), so browser-based applications can call the direct API straight from the client with the TypeScript SDK (`@timelogic/direct-api`) using standard `fetch` — no proxy layer or backend required. Signature and quota response headers are exposed to browsers so signed responses can still be verified client-side. Keep API keys out of client-side bundles; prefer short-lived or scoped credentials for browser use.
+
 ## TypeScript quick start
 
 ```bash

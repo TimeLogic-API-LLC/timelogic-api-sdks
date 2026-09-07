@@ -21,6 +21,25 @@ npm install @timelogic/direct-api@__VERSION__
 
 The package supports Node.js and browser environments with a standard `fetch` implementation. It ships CommonJS, ES modules, and TypeScript declarations.
 
+## Browser support
+
+The direct API gateway enables cross-origin resource sharing (CORS), so browser applications can call the API directly with this package — no proxy layer or backend required:
+
+```ts
+import { TimeApi, createConfiguration } from '@timelogic/direct-api';
+
+const configuration = createConfiguration({
+  apiKey: 'your-api-key',
+});
+
+const api = new TimeApi(configuration);
+const currentTime = await api.getCurrentTime({ tz: 'America/New_York' });
+
+console.log(currentTime);
+```
+
+Signature headers (`X-TimeLogic-*`) and quota headers are exposed to browser clients, so signed responses can still be verified client-side. Keep API keys out of client-side bundles; prefer short-lived or scoped credentials for browser use.
+
 ## Quick start
 
 ```ts
