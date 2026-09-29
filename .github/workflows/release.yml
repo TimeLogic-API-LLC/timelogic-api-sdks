@@ -179,9 +179,9 @@ jobs:
           name: generated-sdks
           path: packages/
       - uses: dtolnay/rust-toolchain@stable
-      - run: cargo publish --dry-run
+      - run: cargo publish --dry-run --allow-dirty
         working-directory: packages/rust
-      - run: cargo publish
+      - run: cargo publish --allow-dirty
         working-directory: packages/rust
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
@@ -341,7 +341,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: release
     permissions:
-      contents: write
+      contents: read
       id-token: write
     steps:
       - uses: actions/checkout@v4
@@ -358,9 +358,20 @@ jobs:
           working-directory: packages/ruby
       - run: bundle exec rspec
         working-directory: packages/ruby
-      - uses: rubygems/release-gem@v1
-        with:
-          working-directory: packages/ruby
+      - uses: rubygems/configure-rubygems-credentials@dc5a8d8553e6ee01fc26761a49e99e733d17954a # v2.1.0
+      - name: Build generated gem
+        working-directory: packages/ruby
+        env:
+          SDK_VERSION: ${{ needs.verify.outputs.version }}
+        run: |
+          mkdir -p pkg
+          gem build timelogic-api.gemspec --output "pkg/timelogic-api-${SDK_VERSION}.gem"
+          ruby -e 'require "rubygems/package"; abort "gem version mismatch" unless Gem::Package.new(ARGV.fetch(0)).spec.version.to_s == ENV.fetch("SDK_VERSION")' "pkg/timelogic-api-${SDK_VERSION}.gem"
+      - name: Publish generated gem
+        working-directory: packages/ruby
+        env:
+          SDK_VERSION: ${{ needs.verify.outputs.version }}
+        run: gem push "pkg/timelogic-api-${SDK_VERSION}.gem"
 
   maven:
     needs: verify
