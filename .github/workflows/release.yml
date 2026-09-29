@@ -20,6 +20,10 @@ on:
           - kotlin
           - ruby
           - php
+      version:
+        description: Package version to publish (required for manual runs from a branch)
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -28,7 +32,29 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.release-version.outputs.value }}
     steps:
+      - id: release-version
+        name: Resolve package version
+        shell: bash
+        env:
+          VERSION_INPUT: ${{ inputs.version }}
+          TARGET_INPUT: ${{ inputs.target }}
+        run: |
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" && "${TARGET_INPUT}" == "all" && "${GITHUB_REF_TYPE}" != "tag" ]]; then
+            echo "The all target must be dispatched from its vMAJOR.MINOR.PATCH release tag."
+            exit 1
+          fi
+          version="${VERSION_INPUT}"
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            version="${GITHUB_REF_NAME#v}"
+          fi
+          if [[ ! "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Set a semantic version input or run this workflow from a vMAJOR.MINOR.PATCH tag."
+            exit 1
+          fi
+          echo "value=${version}" >> "${GITHUB_OUTPUT}"
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
@@ -37,9 +63,45 @@ jobs:
       - run: npm ci
       - run: npm run validate
       - run: npm run generate
+        env:
+          SDK_VERSION: ${{ steps.release-version.outputs.value }}
       - run: npm run verify-generated
       - run: npm run test:contract
-      - run: git diff --exit-code -- openapi packages config Package.swift Package.resolved composer.json phpunit.xml.dist
+      - run: git diff --exit-code -- openapi config Package.swift Package.resolved composer.json phpunit.xml.dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: generated-sdks
+          path: packages/
+          if-no-files-found: error
+
+  update-release-docs:
+    needs: [verify, github-release]
+    if: ${{ startsWith(github.ref, 'refs/tags/v') && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.target == 'all')) }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Update documentation versions
+        run: node scripts/update-release-docs.mjs
+        env:
+          SDK_VERSION: ${{ needs.verify.outputs.version }}
+      - name: Commit updated release documentation
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- .sdk-version ':(glob)**/*.md'
+          if git diff --cached --quiet; then
+            echo 'Release documentation already uses this version.'
+            exit 0
+          fi
+          git commit -m "docs: update SDK documentation for v${SDK_VERSION}"
+          git push origin HEAD:main
+        env:
+          SDK_VERSION: ${{ needs.verify.outputs.version }}
 
   npm:
     needs: verify
@@ -48,6 +110,10 @@ jobs:
     environment: npm
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: generated-sdks
+          path: packages/
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -87,6 +153,10 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: generated-sdks
+          path: packages/
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
@@ -104,6 +174,10 @@ jobs:
     if: ${{ vars.PUBLISH_CRATES == 'true' && (github.event_name != 'workflow_dispatch' || inputs.target == 'all' || inputs.target == 'crates') }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: generated-sdks
+          path: packages/
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo publish --dry-run
         working-directory: packages/rust
@@ -122,6 +196,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: generated-sdks
+          path: packages/
       - uses: actions/setup-go@v5
         with:
           go-version: '1.22.x'
@@ -146,7 +224,10 @@ jobs:
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git tag -a "${tag}" -m "Release Go SDK v${version_tag}"
+          git add packages/go
+          tree=$(git write-tree)
+          release_commit=$(git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit-tree "${tree}" -p "${GITHUB_SHA}" -m "Prepare Go SDK v${version_tag}")
+          git tag -a "${tag}" "${release_commit}" -m "Release Go SDK v${version_tag}"
           git push origin "${tag}"
 
   nuget:
@@ -159,6 +240,10 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: generated-sdks
+          path: packages/
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
@@ -199,6 +284,10 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: generated-sdks
+          path: packages/
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -213,7 +302,7 @@ jobs:
 
   swift:
     needs: verify
-    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
+    if: ${{ startsWith(github.ref, 'refs/tags/v') && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.target == 'all')) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -221,6 +310,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: generated-sdks
+          path: packages/
       - name: Publish Swift source tag
         shell: bash
         run: |
@@ -236,7 +329,10 @@ jobs:
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git tag -a "${tag}" -m "Release Swift SDK v${version_tag}"
+          git add packages/swift
+          tree=$(git write-tree)
+          release_commit=$(git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit-tree "${tree}" -p "${GITHUB_SHA}" -m "Prepare Swift SDK v${version_tag}")
+          git tag -a "${tag}" "${release_commit}" -m "Release Swift SDK v${version_tag}"
           git push origin "${tag}"
 
   ruby:
@@ -251,6 +347,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: generated-sdks
+          path: packages/
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
@@ -271,6 +371,10 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: generated-sdks
+          path: packages/
       - uses: actions/setup-java@v4
         with:
           java-version: '17'
@@ -304,6 +408,10 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: generated-sdks
+          path: packages/
       - uses: actions/setup-java@v4
         with:
           java-version: '17'

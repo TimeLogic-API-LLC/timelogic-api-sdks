@@ -4,8 +4,8 @@ Pod::Spec.new do |s|
   s.osx.deployment_target = '10.13'
   s.tvos.deployment_target = '11.0'
   s.watchos.deployment_target = '4.0'
-  s.version = '1.0.1'
-  s.source = { :git => 'https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git', :tag => 'packages/swift/v1.0.1' }
+  s.version = '1.0.2'
+  s.source = { :git => 'https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git', :tag => 'packages/swift/v1.0.2' }
   s.authors = 'TimeLogic API LLC'
   s.license = { :type => 'Unlicense', :text => 'This software is released into the public domain under the Unlicense.' }
   s.homepage = 'https://api.timelogicapi.com'

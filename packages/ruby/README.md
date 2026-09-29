@@ -15,16 +15,16 @@ gem build timelogic-api.gemspec
 Then either install the gem locally:
 
 ```shell
-gem install ./timelogic-api-1.0.1.gem
+gem install ./timelogic-api-1.0.2.gem
 ```
 
-(for development, run `gem install --dev ./timelogic-api-1.0.1.gem` to install the development dependencies)
+(for development, run `gem install --dev ./timelogic-api-1.0.2.gem` to install the development dependencies)
 
 or publish the gem to a gem hosting service, e.g. [RubyGems](https://rubygems.org/).
 
 Finally add this to the Gemfile:
 
-    gem 'timelogic-api', '~> 1.0.1'
+    gem 'timelogic-api', '~> 1.0.2'
 
 ### Install from Git
 

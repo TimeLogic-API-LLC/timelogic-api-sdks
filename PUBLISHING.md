@@ -13,7 +13,7 @@ This repository has ten generated SDKs. A release tag publishes the registry-bac
 | Java | Maven Central | `com.timelogicapi:timelogic-api` | Yes | Requires the protected `maven-central` environment's signing secrets |
 | C# | NuGet.org | `TimeLogic.Api` | Yes | Requires NuGet trusted publishing and the `NUGET_USER` repository variable |
 | PHP | Packagist | `timelogic-api/php-sdk` | Tag-indexed | Root Composer manifest added; requires Packagist registration and a public repository |
-| Ruby | RubyGems.org | `timelogic-api` | Yes | Release target v1.0.1; metadata uses `dev@timelogicapi.com` |
+| Ruby | RubyGems.org | `timelogic-api` | Yes | Release target v1.0.2; metadata uses `dev@timelogicapi.com` |
 | Kotlin | Maven Central | `com.timelogicapi:timelogic-api-kotlin` | Yes | Ready for its first publication through the protected `maven-central` environment |
 | Swift | Swift Package Manager / CocoaPods source | Root Git package (`TimeLogicAPI`) | Source tag | Requires a public repository; the release job also creates `packages/swift/vMAJOR.MINOR.PATCH` for the podspec |
 
@@ -23,10 +23,8 @@ The existing release workflow is [`.github/workflows/release.yml`](.github/workf
 
 Use this sequence for every production release. Do not publish a version that is already present in a registry: registry releases are immutable.
 
-1. Choose the next semantic version, for example `1.0.1`. Use the same version for all registry-backed SDKs unless there is a deliberate per-language release policy.
-2. Update the version inputs **before regeneration**:
-   - Update the shared release version in [`scripts/generate-all.mjs`](scripts/generate-all.mjs) and `scripts/normalize-generated.mjs`.
-   - For PHP, add intentional registry/package metadata as described below. Swift now has an intentional root package identity; it still needs a public repository and a Swift-specific release tag.
+1. Choose the next semantic version and create a matching `vMAJOR.MINOR.PATCH` tag. Use the same version for all registry-backed SDKs unless there is a deliberate per-language release policy.
+2. The release workflow reads the version from the tag, passes it to the generator as `SDK_VERSION`, and shares the generated packages with the publish jobs. Dispatch target `all` from the matching release tag; individual registry targets can be dispatched from a branch by supplying the version input. No per-release edits to generator version fields are needed. Swift still needs a public repository and a Swift-specific source tag.
 3. Regenerate and review the complete generated diff:
 
    ```powershell
@@ -209,7 +207,7 @@ dotnet pack src/TimeLogic.Api/TimeLogic.Api.csproj -c Release -o ./artifacts
 Pop-Location
 ```
 
-For the first independent NuGet release, manually dispatch `Release SDKs` with target `nuget`. This skips the other registries and publishes `TimeLogic.Api` through the trusted-publishing policy. The workflow waits for the public NuGet catalog to expose the version before reporting success; NuGet may need several minutes to index a newly accepted upload. The version in the `.csproj` is regenerated from `scripts/generate-all.mjs`, so update the generator script rather than only editing the project file.
+For the first independent NuGet release, manually dispatch `Release SDKs` with target `nuget`. This skips the other registries and publishes `TimeLogic.Api` through the trusted-publishing policy. The workflow waits for the public NuGet catalog to expose the version before reporting success; NuGet may need several minutes to index a newly accepted upload. The `.csproj` version comes from the release workflow's `SDK_VERSION`; tagged releases also update the repository's Markdown version references automatically.
 
 ### PHP / Packagist
 
@@ -257,7 +255,7 @@ The Kotlin package is configured as a distinct Maven Central artifact:
 
 - group ID: `com.timelogicapi`;
 - artifact ID: `timelogic-api-kotlin`;
-- version: `1.0.1` for this release;
+- version: `1.0.2` for this release;
 - sources and documentation artifacts: supplied by the Vanniktech Maven Publish plugin;
 - GPG signing and Central Portal upload: supplied by the protected `maven-central` environment.
 
@@ -272,11 +270,11 @@ Push-Location packages/kotlin
 Pop-Location
 ```
 
-After verifying the local repository contains `com/timelogicapi/timelogic-api-kotlin/1.0.1`, use **Actions → Release SDKs → Run workflow → target `kotlin`**. The Kotlin job is independent of Java and the other registries after shared verification. For later versions, update the shared generator version inputs, regenerate, commit, and publish a new immutable version.
+After verifying the local repository contains `com/timelogicapi/timelogic-api-kotlin/1.0.2`, use **Actions → Release SDKs → Run workflow → target `kotlin`**. The Kotlin job is independent of Java and the other registries after shared verification. For later versions, publish from a matching tag; the workflow supplies that version to generation and publishing.
 
 ### Swift / Swift Package Manager (and CocoaPods)
 
-The Swift package uses the public identity `TimeLogicAPI` and the summary `TimeLogic API | A World Time API`. The repository-root `Package.swift` exposes that library while generated sources remain under `packages/swift`. The podspec uses the repository HTTPS URL, the Unlicense, and the immutable tag `packages/swift/v1.0.1`.
+The Swift package uses the public identity `TimeLogicAPI` and the summary `TimeLogic API | A World Time API`. The repository-root `Package.swift` exposes that library while generated sources remain under `packages/swift`. The podspec uses the repository HTTPS URL, the Unlicense, and the immutable tag `packages/swift/v1.0.2`.
 
 The repository is currently private, so public SPM/CocoaPods consumers still need the repository made public (or granted Git access). The existing root `v1.0.0` tag predates this manifest; use a new semver tag (for example `v1.0.1`). The release workflow creates the matching `packages/swift/v1.0.1` source tag used by the podspec.
 

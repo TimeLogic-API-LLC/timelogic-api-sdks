@@ -3,7 +3,8 @@ import { join } from 'node:path';
 
 const repoUrl = 'https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git';
 const moduleName = 'github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go';
-const releaseVersion = '1.0.1';
+const currentVersion = readFileSync('.sdk-version', 'utf8').trim();
+const releaseVersion = process.env.SDK_VERSION ?? currentVersion;
 
 function filesUnder(directory) {
   const result = [];

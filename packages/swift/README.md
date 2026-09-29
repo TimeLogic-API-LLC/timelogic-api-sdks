@@ -4,7 +4,7 @@ Official Swift SDK for TimeLogic API, a world time API.
 
 ## Overview
 - API version: 1.0.0
-- Package version: 1.0.1
+- Package version: 1.0.2
 - Swift module: `TimeLogicAPI`
 - License: Unlicense
 
