@@ -273,8 +273,8 @@ jobs:
             echo "NuGet catalog is still indexing ${package_id} ${package_version} (attempt ${attempt}/20)."
             sleep 15
           done
-          echo "NuGet accepted the upload but did not expose ${package_id} ${package_version} in the public catalog within five minutes."
-          exit 1
+          echo "::warning::NuGet accepted the upload but did not expose ${package_id} ${package_version} in the public catalog within five minutes. Check the package index again later."
+          exit 0
 
   php:
     needs: verify
