@@ -13,7 +13,7 @@ This repository has ten generated SDKs. A release tag publishes the registry-bac
 | Java | Maven Central | `com.timelogicapi:timelogic-api` | Yes | Requires the protected `maven-central` environment's signing secrets |
 | C# | NuGet.org | `TimeLogic.Api` | Yes | Requires NuGet trusted publishing and the `NUGET_USER` repository variable |
 | PHP | Packagist | `timelogic-api/php-sdk` | Tag-indexed | Root Composer manifest added; requires Packagist registration and a public repository |
-| Ruby | RubyGems.org | `timelogic-api` | Yes | Release target v1.0.2; metadata uses `dev@timelogicapi.com` |
+| Ruby | RubyGems.org | `timelogic-api` | Yes | Release target v1.0.3; metadata uses `dev@timelogicapi.com` |
 | Kotlin | Maven Central | `com.timelogicapi:timelogic-api-kotlin` | Yes | Ready for its first publication through the protected `maven-central` environment |
 | Swift | Swift Package Manager / CocoaPods source | Root Git package (`TimeLogicAPI`) | Source tag | Requires a public repository; the release job also creates `packages/swift/vMAJOR.MINOR.PATCH` for the podspec |
 
@@ -255,7 +255,7 @@ The Kotlin package is configured as a distinct Maven Central artifact:
 
 - group ID: `com.timelogicapi`;
 - artifact ID: `timelogic-api-kotlin`;
-- version: `1.0.2` for this release;
+- version: `1.0.3` for this release;
 - sources and documentation artifacts: supplied by the Vanniktech Maven Publish plugin;
 - GPG signing and Central Portal upload: supplied by the protected `maven-central` environment.
 
@@ -270,11 +270,11 @@ Push-Location packages/kotlin
 Pop-Location
 ```
 
-After verifying the local repository contains `com/timelogicapi/timelogic-api-kotlin/1.0.2`, use **Actions → Release SDKs → Run workflow → target `kotlin`**. The Kotlin job is independent of Java and the other registries after shared verification. For later versions, publish from a matching tag; the workflow supplies that version to generation and publishing.
+After verifying the local repository contains `com/timelogicapi/timelogic-api-kotlin/1.0.3`, use **Actions → Release SDKs → Run workflow → target `kotlin`**. The Kotlin job is independent of Java and the other registries after shared verification. For later versions, publish from a matching tag; the workflow supplies that version to generation and publishing.
 
 ### Swift / Swift Package Manager (and CocoaPods)
 
-The Swift package uses the public identity `TimeLogicAPI` and the summary `TimeLogic API | A World Time API`. The repository-root `Package.swift` exposes that library while generated sources remain under `packages/swift`. The podspec uses the repository HTTPS URL, the Unlicense, and the immutable tag `packages/swift/v1.0.2`.
+The Swift package uses the public identity `TimeLogicAPI` and the summary `TimeLogic API | A World Time API`. The repository-root `Package.swift` exposes that library while generated sources remain under `packages/swift`. The podspec uses the repository HTTPS URL, the Unlicense, and the immutable tag `packages/swift/v1.0.3`.
 
 The repository is currently private, so public SPM/CocoaPods consumers still need the repository made public (or granted Git access). The existing root `v1.0.0` tag predates this manifest; use a new semver tag (for example `v1.0.1`). The release workflow creates the matching `packages/swift/v1.0.1` source tag used by the podspec.
 

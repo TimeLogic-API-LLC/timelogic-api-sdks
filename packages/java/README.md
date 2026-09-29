@@ -56,7 +56,7 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>com.timelogicapi</groupId>
   <artifactId>timelogic-api</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <scope>compile</scope>
 </dependency>
 ```
@@ -72,7 +72,7 @@ Add this dependency to your project's build file:
   }
 
   dependencies {
-     implementation "com.timelogicapi:timelogic-api:1.0.2"
+     implementation "com.timelogicapi:timelogic-api:1.0.3"
   }
 ```
 
@@ -86,7 +86,7 @@ mvn clean package
 
 Then manually install the following JARs:
 
-* `target/timelogic-api-1.0.2.jar`
+* `target/timelogic-api-1.0.3.jar`
 * `target/lib/*.jar`
 
 ## Getting Started

@@ -5,7 +5,7 @@ Official .NET SDK for TimeLogic API.
 ## Install
 
 ```bash
-dotnet add package TimeLogic.Api --version 1.0.2
+dotnet add package TimeLogic.Api --version 1.0.3
 ```
 
 ## Quick start
