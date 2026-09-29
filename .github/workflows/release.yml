@@ -84,6 +84,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
+      - name: Replace tracked SDKs with verified release output
+        run: git rm -r --quiet packages
+      - uses: actions/download-artifact@v4
+        with:
+          name: generated-sdks
+          path: packages/
       - name: Update documentation versions
         run: node scripts/update-release-docs.mjs
         env:
@@ -93,12 +99,12 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- .sdk-version ':(glob)**/*.md'
+          git add -- .sdk-version ':(glob)**/*.md' packages/
           if git diff --cached --quiet; then
-            echo 'Release documentation already uses this version.'
+            echo 'Release documentation and generated SDKs already use this version.'
             exit 0
           fi
-          git commit -m "docs: update SDK documentation for v${SDK_VERSION}"
+          git commit -m "chore: update SDK files for v${SDK_VERSION}"
           git push origin HEAD:main
         env:
           SDK_VERSION: ${{ needs.verify.outputs.version }}

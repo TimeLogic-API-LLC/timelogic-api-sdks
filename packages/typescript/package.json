@@ -1,6 +1,6 @@
 {
   "name": "@timelogic/direct-api",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Official TypeScript SDK for TimeLogic API, a world time API.",
   "author": "TimeLogic API LLC <dev@timelogicapi.com>",
   "repository": {
