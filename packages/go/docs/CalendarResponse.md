@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 **IsoLocal** | **NullableString** |  |
 **Rfc2822** | **string** |  |
 **Human** | **string** |  |
-**DayNumber** | **int32** |  |
+**DayNumber** | **int32** | Day of the week counted from Sunday (1 &#x3D; Sunday, 2 &#x3D; Monday ... 7 &#x3D; Saturday). |
 **DayShort** | **string** |  |
 **DayFull** | **string** |  |
 **Timezone** | **NullableString** |  |
@@ -19,7 +19,7 @@ Name | Type | Description | Notes
 **Month** | **int32** |  |
 **MonthName** | **string** |  |
 **Day** | **int32** |  |
-**WeekNumber** | Pointer to **int32** |  | [optional]
+**WeekNumber** | Pointer to **int32** | ISO 8601 week number (present with &#x60;week&#x3D;true&#x60;). It belongs to the ISO week-year, which is not returned and can differ from &#x60;year&#x60; near January 1 (2027-01-01 is week 53 of 2026). | [optional]
 
 ## Methods
 

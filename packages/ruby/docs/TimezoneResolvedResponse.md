@@ -10,7 +10,7 @@
 | **iso_local** | **String** |  |  |
 | **rfc2822** | **String** |  |  |
 | **human** | **String** |  |  |
-| **day_number** | **Integer** |  |  |
+| **day_number** | **Integer** | Day of the week counted from Sunday (1 &#x3D; Sunday, 2 &#x3D; Monday ... 7 &#x3D; Saturday). |  |
 | **day_short** | **String** |  |  |
 | **day_full** | **String** |  |  |
 | **timezone** | **String** |  |  |

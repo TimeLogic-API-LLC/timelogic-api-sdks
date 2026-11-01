@@ -10,7 +10,7 @@
 | **isoLocal** | **kotlin.String** |  |  |
 | **rfc2822** | **kotlin.String** |  |  |
 | **human** | **kotlin.String** |  |  |
-| **dayNumber** | **kotlin.Int** |  |  |
+| **dayNumber** | **kotlin.Int** | Day of the week counted from Sunday (1 &#x3D; Sunday, 2 &#x3D; Monday ... 7 &#x3D; Saturday). |  |
 | **dayShort** | **kotlin.String** |  |  |
 | **dayFull** | **kotlin.String** |  |  |
 | **timezone** | **kotlin.String** |  |  |

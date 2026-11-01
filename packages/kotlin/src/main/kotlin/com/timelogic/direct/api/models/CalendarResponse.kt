@@ -28,7 +28,7 @@ import com.squareup.moshi.JsonClass
  * @param isoLocal
  * @param rfc2822
  * @param human
- * @param dayNumber
+ * @param dayNumber Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday).
  * @param dayShort
  * @param dayFull
  * @param timezone
@@ -37,7 +37,7 @@ import com.squareup.moshi.JsonClass
  * @param monthName
  * @param day
  * @param formatted
- * @param weekNumber
+ * @param weekNumber ISO 8601 week number (present with `week=true`). It belongs to the ISO week-year, which is not returned and can differ from `year` near January 1 (2027-01-01 is week 53 of 2026).
  */
 
 
@@ -61,6 +61,7 @@ data class CalendarResponse (
     @Json(name = "human")
     val human: kotlin.String,
 
+    /* Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday). */
     @Json(name = "day_number")
     val dayNumber: kotlin.Int,
 
@@ -88,6 +89,7 @@ data class CalendarResponse (
     @Json(name = "formatted")
     val formatted: kotlin.String? = null,
 
+    /* ISO 8601 week number (present with `week=true`). It belongs to the ISO week-year, which is not returned and can differ from `year` near January 1 (2027-01-01 is week 53 of 2026). */
     @Json(name = "week_number")
     val weekNumber: kotlin.Int? = null
 

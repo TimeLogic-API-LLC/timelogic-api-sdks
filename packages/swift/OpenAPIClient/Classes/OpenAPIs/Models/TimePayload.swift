@@ -20,6 +20,7 @@ public struct TimePayload: Codable, JSONEncodable, Hashable {
     public var isoLocal: String?
     public var rfc2822: String
     public var human: String
+    /** Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday). */
     public var dayNumber: Int
     public var dayShort: String
     public var dayFull: String

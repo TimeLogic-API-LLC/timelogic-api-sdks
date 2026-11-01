@@ -21,7 +21,7 @@ public struct ElapsedResponse: Codable, JSONEncodable, Hashable {
     public var hours: Int
     public var days: Int
     public var human: String
-    /** `left` means the target instant is still in the future. `passed` means the target instant is already in the past. */
+    /** `left` means the reference instant is after the compared instant (now, or `compare_*`). `passed` means it is before it, or equal to it. */
     public var direction: Direction
     public var formatted: String?
     public var businessDays: Int?

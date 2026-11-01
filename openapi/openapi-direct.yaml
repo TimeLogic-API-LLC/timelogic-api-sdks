@@ -2,12 +2,8 @@ openapi: 3.0.3
 info:
   title: TimeLogic API — Direct Customer Access
   version: 1.0.0
-  description: 'Public direct-access contract for the TimeLogic gateway.
-
-
-    This public spec excludes `/healthz` and the shared clock asset routes. It keeps
-    `/.well-known/time-api-public-key`, `/v1/time/clock`, and signed JSON response
-    controls because public consumers may need them.
+  description: 'Direct API contract for client integrations. It documents authentication,
+    endpoint parameters, response shapes, public signing keys, and signed JSON controls.
 
 
     Authentication:
@@ -174,6 +170,16 @@ paths:
           headers:
             X-Request-Id:
               $ref: '#/components/headers/XRequestId'
+            X-Auth-Mode:
+              $ref: '#/components/headers/XAuthMode'
+            X-TimeLogic-Customer-ID:
+              $ref: '#/components/headers/XTimeLogicCustomerId'
+            X-TimeLogic-Plan:
+              $ref: '#/components/headers/XTimeLogicPlan'
+            X-TimeLogic-Quota-Limit:
+              $ref: '#/components/headers/XTimeLogicQuotaLimit'
+            X-TimeLogic-Quota-State:
+              $ref: '#/components/headers/XTimeLogicQuotaState'
             X-TimeLogic-Signature:
               $ref: '#/components/headers/XTimeLogicSignature'
             X-TimeLogic-Key-Id:
@@ -205,6 +211,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/SubscriptionInactive'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '429':
           $ref: '#/components/responses/QuotaExceeded'
         '405':
@@ -275,6 +283,16 @@ paths:
           headers:
             X-Request-Id:
               $ref: '#/components/headers/XRequestId'
+            X-Auth-Mode:
+              $ref: '#/components/headers/XAuthMode'
+            X-TimeLogic-Customer-ID:
+              $ref: '#/components/headers/XTimeLogicCustomerId'
+            X-TimeLogic-Plan:
+              $ref: '#/components/headers/XTimeLogicPlan'
+            X-TimeLogic-Quota-Limit:
+              $ref: '#/components/headers/XTimeLogicQuotaLimit'
+            X-TimeLogic-Quota-State:
+              $ref: '#/components/headers/XTimeLogicQuotaState'
             X-TimeLogic-Signature:
               $ref: '#/components/headers/XTimeLogicSignature'
             X-TimeLogic-Key-Id:
@@ -306,6 +324,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/SubscriptionInactive'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '429':
           $ref: '#/components/responses/QuotaExceeded'
         '405':
@@ -351,13 +371,22 @@ paths:
         - `tz=...`, `ip=...`, and `offset=...` inside `from` or `to` mean the current request-time instant resolved through that selector
         - those selector forms do not represent an arbitrary local wall-clock time
         - returned duration magnitudes are absolute; use `direction` to see whether `to` is after, before, or the same instant as `from`
+        - because "now" is the same instant in every zone, `tz=`, `ip=` and `offset=` specifiers never change `seconds` or `direction`; their zone only picks the calendar date for business days
+        - coordinates are not a specifier (`from=lat=...` returns "Unsupported time specifier."); use `from_lat`/`from_lon` as a hint for a local `iso`
+        - `seconds`, `minutes`, `hours`, `days` and the `format` placeholders are totals in each unit, not remainders; `human` is always written in hours, minutes and seconds
 
         Business-day rules:
         - `holiday_country` and `holiday_subdivision` require `business_days=true`
         - `holiday_subdivision` also requires `holiday_country`
+        - days are counted by calendar date, start included and end excluded, unsigned
+        - each side's date is taken in its zone when known (a `from_*`/`to_*` hint, or a `tz=`/`ip=`/`offset=` specifier), otherwise in UTC
+        - example: `from=iso=2026-01-02T00:00:00Z&to=iso=2026-04-30T00:00:00Z&business_days=true&holiday_country=FR` returns `business_days: 83`
+        - weekends follow the holiday calendar's country (Friday/Saturday for `SA`); a subdivision uses its country's weekend
+        - example with a subdivision: `from=iso=2026-01-02T00:00:00Z&to=iso=2026-04-30T00:00:00Z&business_days=true&holiday_country=CH&holiday_subdivision=ZH` returns `business_days: 82` (`holiday_country=CH-ZH` is the same calendar)
+        - example with a Friday/Saturday weekend: the same range with `holiday_country=SA` returns `business_days: 79`
 
         Examples:
-        - Selector-current instant: `/v1/time/diff?from=unix=1711300000&to=tz=America/New_York`
+        - Selector-current instant: `/v1/time/diff?from=unix=1711300000&to=now`
         - Wall-clock pairing: `/v1/time/diff?from=iso=2026-04-16T09:00:00&from_tz=America/New_York&to=iso=2026-04-16T09:00:00&to_tz=Europe/London`
         - Wall-clock via selector: `/v1/time/diff?from=iso=2026-01-01T12:00:00&from_ip=8.8.8.8&to=iso=2026-01-01T12:00:00&to_offset=-05:00`
       operationId: diffTime
@@ -385,6 +414,16 @@ paths:
           headers:
             X-Request-Id:
               $ref: '#/components/headers/XRequestId'
+            X-Auth-Mode:
+              $ref: '#/components/headers/XAuthMode'
+            X-TimeLogic-Customer-ID:
+              $ref: '#/components/headers/XTimeLogicCustomerId'
+            X-TimeLogic-Plan:
+              $ref: '#/components/headers/XTimeLogicPlan'
+            X-TimeLogic-Quota-Limit:
+              $ref: '#/components/headers/XTimeLogicQuotaLimit'
+            X-TimeLogic-Quota-State:
+              $ref: '#/components/headers/XTimeLogicQuotaState'
             X-TimeLogic-Signature:
               $ref: '#/components/headers/XTimeLogicSignature'
             X-TimeLogic-Key-Id:
@@ -410,6 +449,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/SubscriptionInactive'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '429':
           $ref: '#/components/responses/QuotaExceeded'
         '405':
@@ -491,6 +532,16 @@ paths:
           headers:
             X-Request-Id:
               $ref: '#/components/headers/XRequestId'
+            X-Auth-Mode:
+              $ref: '#/components/headers/XAuthMode'
+            X-TimeLogic-Customer-ID:
+              $ref: '#/components/headers/XTimeLogicCustomerId'
+            X-TimeLogic-Plan:
+              $ref: '#/components/headers/XTimeLogicPlan'
+            X-TimeLogic-Quota-Limit:
+              $ref: '#/components/headers/XTimeLogicQuotaLimit'
+            X-TimeLogic-Quota-State:
+              $ref: '#/components/headers/XTimeLogicQuotaState'
             X-TimeLogic-Signature:
               $ref: '#/components/headers/XTimeLogicSignature'
             X-TimeLogic-Key-Id:
@@ -516,6 +567,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/SubscriptionInactive'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '429':
           $ref: '#/components/responses/QuotaExceeded'
         '405':
@@ -556,6 +609,16 @@ paths:
           headers:
             X-Request-Id:
               $ref: '#/components/headers/XRequestId'
+            X-Auth-Mode:
+              $ref: '#/components/headers/XAuthMode'
+            X-TimeLogic-Customer-ID:
+              $ref: '#/components/headers/XTimeLogicCustomerId'
+            X-TimeLogic-Plan:
+              $ref: '#/components/headers/XTimeLogicPlan'
+            X-TimeLogic-Quota-Limit:
+              $ref: '#/components/headers/XTimeLogicQuotaLimit'
+            X-TimeLogic-Quota-State:
+              $ref: '#/components/headers/XTimeLogicQuotaState'
             X-TimeLogic-Signature:
               $ref: '#/components/headers/XTimeLogicSignature'
             X-TimeLogic-Key-Id:
@@ -581,6 +644,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/SubscriptionInactive'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '429':
           $ref: '#/components/responses/QuotaExceeded'
         '405':
@@ -646,6 +711,16 @@ paths:
           headers:
             X-Request-Id:
               $ref: '#/components/headers/XRequestId'
+            X-Auth-Mode:
+              $ref: '#/components/headers/XAuthMode'
+            X-TimeLogic-Customer-ID:
+              $ref: '#/components/headers/XTimeLogicCustomerId'
+            X-TimeLogic-Plan:
+              $ref: '#/components/headers/XTimeLogicPlan'
+            X-TimeLogic-Quota-Limit:
+              $ref: '#/components/headers/XTimeLogicQuotaLimit'
+            X-TimeLogic-Quota-State:
+              $ref: '#/components/headers/XTimeLogicQuotaState'
             X-TimeLogic-Signature:
               $ref: '#/components/headers/XTimeLogicSignature'
             X-TimeLogic-Key-Id:
@@ -671,6 +746,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/SubscriptionInactive'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '429':
           $ref: '#/components/responses/QuotaExceeded'
         '405':
@@ -786,6 +863,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/SubscriptionInactive'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '429':
           $ref: '#/components/responses/QuotaExceeded'
         '405':
@@ -837,10 +916,16 @@ paths:
         - local-ISO companion selectors are valid only with `iso=...` that has no explicit offset
         - compare local-ISO companion selectors are valid only with `compare_iso=...` that has no explicit offset
         - if no compare input is provided, the comparison defaults to the request time
+        - compare selectors (`tz`, `ip`, `lat`/`lon`, `offset`, `auto_tz`) all mean the current request time, which is the same instant in every zone, so they do not change the result
+        - equal instants return `seconds: 0` with `direction: passed` (diff returns `same`)
 
         Business-day rules:
         - `holiday_country` and `holiday_subdivision` require `business_days=true`
         - `holiday_subdivision` also requires `holiday_country`
+        - same counting rules as diff; the reference date uses its `source_*` zone and the compare date its `compare_source_*` zone when given, otherwise UTC
+        - weekends follow the holiday calendar's country (Friday/Saturday for `SA`); a subdivision uses its country's weekend
+        - example with a subdivision: `iso=2026-01-02T00:00:00Z&compare_iso=2026-04-30T00:00:00Z&business_days=true&holiday_country=IN-MH` returns `business_days: 76`
+        - example with a Friday/Saturday weekend: the same range with `holiday_country=SA` returns `business_days: 79`
 
         Examples:
         - Timestamp-to-timestamp: `/v1/time/elapsed?iso=2026-04-16T09:00:00&source_tz=America/New_York&compare_iso=2026-04-16T09:00:00&compare_source_tz=Europe/London`
@@ -880,6 +965,16 @@ paths:
           headers:
             X-Request-Id:
               $ref: '#/components/headers/XRequestId'
+            X-Auth-Mode:
+              $ref: '#/components/headers/XAuthMode'
+            X-TimeLogic-Customer-ID:
+              $ref: '#/components/headers/XTimeLogicCustomerId'
+            X-TimeLogic-Plan:
+              $ref: '#/components/headers/XTimeLogicPlan'
+            X-TimeLogic-Quota-Limit:
+              $ref: '#/components/headers/XTimeLogicQuotaLimit'
+            X-TimeLogic-Quota-State:
+              $ref: '#/components/headers/XTimeLogicQuotaState'
             X-TimeLogic-Signature:
               $ref: '#/components/headers/XTimeLogicSignature'
             X-TimeLogic-Key-Id:
@@ -905,6 +1000,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/SubscriptionInactive'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '429':
           $ref: '#/components/responses/QuotaExceeded'
         '405':
@@ -930,8 +1027,15 @@ paths:
 
         - Bulk is not supported on this route.
 
-        - `offset` queries return a specialized payload that includes `matching_zones`
-        for the request-time offset match.
+        - With no selector the route returns 400 MISSING_TARGET.
+
+        - `offset` queries return a specialized payload with `timezone=null` and `matching_zones`
+        for the request-time offset match. Only geographic zones are listed; `UTC` and `Etc/*`
+        are intentionally excluded (use `tz=UTC` for UTC).
+
+        - `tz` names resolve to their canonical zone (`Europe/Stockholm` returns `Europe/Berlin`).
+
+        - An `ip` with no timezone mapping returns 404 NOT_FOUND.
 
 
         Examples:
@@ -954,6 +1058,16 @@ paths:
           headers:
             X-Request-Id:
               $ref: '#/components/headers/XRequestId'
+            X-Auth-Mode:
+              $ref: '#/components/headers/XAuthMode'
+            X-TimeLogic-Customer-ID:
+              $ref: '#/components/headers/XTimeLogicCustomerId'
+            X-TimeLogic-Plan:
+              $ref: '#/components/headers/XTimeLogicPlan'
+            X-TimeLogic-Quota-Limit:
+              $ref: '#/components/headers/XTimeLogicQuotaLimit'
+            X-TimeLogic-Quota-State:
+              $ref: '#/components/headers/XTimeLogicQuotaState'
             X-TimeLogic-Signature:
               $ref: '#/components/headers/XTimeLogicSignature'
             X-TimeLogic-Key-Id:
@@ -983,6 +1097,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/SubscriptionInactive'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '429':
           $ref: '#/components/responses/QuotaExceeded'
         '405':
@@ -1022,7 +1138,8 @@ components:
         type: string
       example: vbk1uI/2SaHwARiXyoZye4CG4OM4MG0NNqFfwZ4WzAQFdAYupZ0S6JT0KUzdc7/1PD5vtLLgQJFbM1+vUvD4CQ==
     XTimeLogicKeyId:
-      description: Signing key identifier used for `X-TimeLogic-Signature`.
+      description: On signed responses, the signing key `kid` used for `X-TimeLogic-Signature`.
+        On unsigned authenticated responses, the ID of the API key that made the request.
       schema:
         type: string
       example: ed25519-2026-07-19
@@ -1043,6 +1160,11 @@ components:
       description: Base64URL-encoded exact UTF-8 v1 signing input. Decode this value and verify X-TimeLogic-Signature over the decoded bytes; it includes the signed path and query, including sign=true, and deliberately excludes scheme, host, and Content-Type.
       schema:
         type: string
+    XAuthMode:
+      description: How the request was authenticated (`api_key`).
+      schema:
+        type: string
+      example: api_key
     XTimeLogicCustomerId:
       description: Authenticated customer identifier.
       schema:
@@ -1052,7 +1174,8 @@ components:
       schema:
         type: string
     XTimeLogicQuotaLimit:
-      description: Monthly quota limit, or unlimited.
+      description: Requests included per month, or `unlimited`. There is no remaining-requests
+        or reset header; the quota period is the UTC calendar month.
       schema:
         type: string
     XTimeLogicQuotaState:
@@ -1070,7 +1193,7 @@ components:
     SignFlag:
       name: sign
       in: query
-      description: Set to exactly `true` to ask the gateway to sign the final JSON response.
+      description: Set to `true`, `1` or `yes` (case-insensitive) to ask the gateway to sign the final JSON response. Any other value, a bare `sign`, or repeated `sign` values leave the response unsigned.
         Every authenticated JSON response, including errors, then includes signing headers.
         Not supported on `/v1/time/clock`.
       required: false
@@ -1081,7 +1204,12 @@ components:
       name: format
       in: query
       description: 'Custom date/time format template using supported `strftime`-style
-        directives such as `%Y-%m-%d %H:%M:%S`. Reference: [strftime](https://strftime.net/).'
+        directives such as `%Y-%m-%d %H:%M:%S`. Supported directives: `%a %A %b %B
+        %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x
+        %X %y %Y %z %:z %Z %%`, with the `-`, `_` and `0` padding flags on numeric directives.
+        `%Z` prints the IANA zone name (or `UTC+HH:MM` for an offset target, `UTC`
+        with no target), not an abbreviation. Any other directive (for example `%U`,
+        `%f`, `%Q`) or a trailing `%` returns 400 INVALID_PARAMETER naming the directive.'
       required: false
       schema:
         type: string
@@ -1090,7 +1218,8 @@ components:
       name: format
       in: query
       description: Custom duration format template using `%days`, `%hours`, `%minutes`,
-        and `%seconds`.
+        and `%seconds`. Each placeholder is the total duration in that unit, not a remainder
+        (118 days renders `%days days %hours hours` as `118 days 2832 hours`).
       required: false
       schema:
         type: string
@@ -1098,8 +1227,12 @@ components:
     TzSelector:
       name: tz
       in: query
-      description: IANA timezone name. On bulk-capable routes, a comma-separated list
-        enables bulk mode with at most 10 values; request URLs are limited to 8192 characters.
+      description: IANA timezone name, matched case-insensitively. Links and aliases resolve
+        to their canonical zone, so the returned `timezone` can differ (`Europe/Stockholm`
+        returns `Europe/Berlin`, `UTC` returns `Etc/UTC`). `Etc/GMT+5` is UTC-05:00 (POSIX
+        sign). On bulk-capable routes, a comma-separated list enables bulk mode with at most
+        10 values (any comma, even a trailing one, returns an array); request URLs are limited
+        to 8192 characters. On single-target routes a list is rejected as an invalid timezone.
       required: false
       schema:
         type: string
@@ -1139,7 +1272,9 @@ components:
     OffsetSelector:
       name: offset
       in: query
-      description: Fixed UTC offset in `+HH:MM` or `-HH:MM` format. On bulk-capable
+      description: Fixed UTC offset in `+HH:MM` or `-HH:MM` format only (`+0530` and
+        `+5` are rejected); URL-encode `+` as `%2B`, since an unencoded `+` is read as a space.
+        An offset target returns `timezone=null`. On bulk-capable
         routes, a comma-separated list enables bulk mode with at most 10 values; request URLs are limited to 8192 characters.
       required: false
       schema:
@@ -1149,7 +1284,9 @@ components:
     AutoTzSelector:
       name: auto_tz
       in: query
-      description: Set to `true` to resolve using the caller IP from Cloudflare headers.
+      description: Set to `true` to resolve using the caller IP from Cloudflare headers. Counts
+        as a selector family, so it cannot be combined with `tz`, `ip`, `lat`/`lon` or `offset`.
+        Not supported on `/v1/time/clock`. Enabled by `true`, `1` or `yes` (case-insensitive); any other value leaves it off without an error.
       required: false
       schema:
         type: boolean
@@ -1157,7 +1294,9 @@ components:
     UtcFlag:
       name: utc
       in: query
-      description: Set to `true` to force UTC on routes that support it.
+      description: Set to `true` to force UTC on routes that support it. Counts as a target and
+        cannot be combined with other selectors (the AMBIGUOUS_TARGET message lists only the
+        selector families). The response then has `iso_local=null` and `timezone=null`. Enabled by `true`, `1` or `yes` (case-insensitive); any other value leaves it off without an error.
       required: false
       schema:
         type: boolean
@@ -1165,6 +1304,7 @@ components:
     Unix:
       name: unix
       in: query
+      description: Whole Unix seconds (fractions are rejected; negative values are allowed). Valid range is -62135596800 to 253402300799 (0001-01-01T00:00:00Z to 9999-12-31T23:59:59Z); values outside it return 400 INVALID_TIMESTAMP.
       required: false
       schema:
         type: integer
@@ -1173,6 +1313,8 @@ components:
     UnixMs:
       name: unix_ms
       in: query
+      description: Whole Unix milliseconds. Valid range -62135596800000 to 253402300799999
+        (0001-01-01T00:00:00Z to 9999-12-31T23:59:59.999Z); values outside it return 400 INVALID_TIMESTAMP.
       required: false
       schema:
         type: integer
@@ -1183,7 +1325,15 @@ components:
       in: query
       description: ISO-8601 timestamp. To supply a local wall-clock time without an
         explicit offset, pair it with one of `source_tz=Area/City`, `source_ip=...`,
-        `source_lat=...&source_lon=...`, or `source_offset=±HH:MM`.
+        `source_lat=...&source_lon=...`, or `source_offset=±HH:MM`; without a hint a local
+        value is read as UTC. Accepted shapes are extended format with `Z`, `±HH:MM` or `±HH:MM:SS`
+        (for example `1900-06-01T12:09:21+00:09:21`, as `iso_local` prints old local-mean-time offsets),
+        optional fractional seconds, a space instead of `T`, a local time, or a date alone
+        (read as 00:00). Basic format and offsets without a colon are rejected. The date must
+        exist (`2027-02-29` returns 400 INVALID_TIMESTAMP rather than rolling over), and the
+        instant must fall between 0001-01-01T00:00:00Z and 9999-12-31T23:59:59Z. A local
+        time inside a spring-forward gap returns 400 INVALID_TIMESTAMP; an ambiguous
+        fall-back time resolves to its first occurrence.
       required: false
       schema:
         type: string
@@ -1448,7 +1598,10 @@ components:
     BusinessDays:
       name: business_days
       in: query
-      description: Set to `true` to enable weekday/business-day counting.
+      description: Set to `true` to add a `business_days` count. Days are counted by calendar
+        date, start included and end excluded, unsigned; weekends follow the holiday calendar's country (Saturday/Sunday in 221 countries, Friday/Saturday in 18 such as SA, Sunday only in 8, Friday only in IR, Friday/Sunday in BN; Saturday/Sunday when no `holiday_country` is given) and holidays of the chosen calendar are skipped. Each endpoint's date is taken in its
+        own zone when one is known (diff - from_*/to_* hints or a tz=/ip=/offset= specifier; elapsed -
+        source_*/compare_source_*), otherwise in UTC. Enabled by `true`, `1` or `yes` (case-insensitive); any other value leaves it off without an error.
       required: false
       schema:
         type: boolean
@@ -1456,20 +1609,32 @@ components:
     HolidayCountry:
       name: holiday_country
       in: query
-      description: ISO 3166-1 alpha-2 holiday calendar country code. Requires `business_days=true`.
+      description: 'Holiday calendar: one of the 249 countries with holiday calendars (862 calendars
+        including subdivisions, years 1900-2100), as an ISO 3166-1 alpha-2 code in any letter case, or a
+        combined ISO 3166-2 style code such as `CH-ZH`, `US-CA` or `FR-6AE`. Requires `business_days=true`.
+        The full list is at https://timelogicapi.com/docs#holiday-calendars and, as JSON, at
+        https://timelogicapi.com/content/holiday-calendars.json. Any other country (for example `LK`)
+        returns 400 INVALID_PARAMETER "Unsupported holiday calendar."; a malformed value returns "Invalid
+        holiday_country parameter."; a business-day range outside 1900-2100 returns "Holiday calendar
+        coverage is only available for years 1900-2100."'
       required: false
       schema:
         type: string
-        pattern: ^[A-Z]{2}$
+        pattern: ^[A-Za-z]{2}(-[A-Za-z0-9]+)?$
       example: US
     HolidaySubdivision:
       name: holiday_subdivision
       in: query
-      description: Holiday calendar subdivision code from the upstream `python-holidays`
-        calendar, for example `CA` or `ENG`. Requires `holiday_country` and `business_days=true`.
+      description: 'Holiday calendar subdivision code for the country (the ISO 3166-2 suffix, 1-3
+        letters or digits, any letter case), for example `ENG` (GB), `ZH` (CH), `MH` (IN), `01` (FI)
+        or `6AE` (FR); digits and leading zeros are part of the code. Subdivisions exist for 35 countries.
+        Requires `holiday_country` and `business_days=true`. An unknown code returns 400 INVALID_PARAMETER
+        "Unknown holiday_subdivision ''XX'' for country DE." (also for `FI` + `1`, which must be `01`);
+        a value that conflicts with a combined `holiday_country` such as `US-CA` returns 400 INVALID_PARAMETER.'
       required: false
       schema:
         type: string
+        pattern: ^[A-Za-z0-9]+$
       example: CA
     SecondsModifier:
       name: seconds
@@ -1495,6 +1660,9 @@ components:
     DaysModifier:
       name: days
       in: query
+      description: Days to add, each exactly 24 hours (86,400 seconds), so the local wall-clock
+        time shifts across a DST change. There are no weeks/months/years modifiers; unknown
+        parameters are ignored.
       required: false
       schema:
         type: integer
@@ -1502,6 +1670,7 @@ components:
     WeekFlag:
       name: week
       in: query
+      description: Set to `true` to add the ISO 8601 `week_number`. Enabled by `true`, `1` or `yes` (case-insensitive); any other value leaves it off without an error.
       required: false
       schema:
         type: boolean
@@ -1509,6 +1678,7 @@ components:
     NextFlag:
       name: next
       in: query
+      description: Set to `true` to add `next_transition` (the next UTC offset change, or null). Enabled by `true`, `1` or `yes` (case-insensitive); any other value leaves it off without an error.
       required: false
       schema:
         type: boolean
@@ -1768,10 +1938,10 @@ components:
         next_transition: '2026-11-01T02:00:00-04:00'
     ClockDigitalHtmlExample:
       summary: Abbreviated digital clock HTML fragment
-      value: '<div class="timelogic-clock-host" data-timelogic-clock></div><script type="application/json">{"version":"v1","style":"digital-dashboard","unix_ms":1776274247883,"timezone_label":"America/New_York","refresh":{"path":"/v1/time/current","selector":{"kind":"tz","tz":"America/New_York"}}}</script><link rel="stylesheet" href="/v1/time/clock/assets/v1/clock.css"><script src="/v1/time/clock/assets/v1/clock.js"></script>'
+      value: '<div class="timelogic-clock-host" data-timelogic-clock></div><script type="application/json">{"version":"v1","style":"digital-dashboard","unix_ms":1776274247883,"timezone_label":"America/New_York","refresh":{"path":"https://api.timelogicapi.com/v1/time/current","selector":{"kind":"tz","tz":"America/New_York"}}}</script><link rel="stylesheet" href="https://api.timelogicapi.com/v1/time/clock/assets/v1/clock.css"><script src="https://api.timelogicapi.com/v1/time/clock/assets/v1/clock.js"></script>'
     ClockAnalogHtmlExample:
       summary: Abbreviated analog clock HTML fragment
-      value: '<div class="timelogic-clock-host" data-timelogic-clock></div><script type="application/json">{"version":"v1","style":"analog-station","unix_ms":1776274247883,"timezone_label":"UTC","refresh":{"path":"/v1/time/current","selector":{"kind":"none"}}}</script><link rel="stylesheet" href="/v1/time/clock/assets/v1/clock.css"><script src="/v1/time/clock/assets/v1/clock.js"></script>'
+      value: '<div class="timelogic-clock-host" data-timelogic-clock></div><script type="application/json">{"version":"v1","style":"analog-station","unix_ms":1776274247883,"timezone_label":"UTC","refresh":{"path":"https://api.timelogicapi.com/v1/time/current","selector":{"kind":"none"}}}</script><link rel="stylesheet" href="https://api.timelogicapi.com/v1/time/clock/assets/v1/clock.css"><script src="https://api.timelogicapi.com/v1/time/clock/assets/v1/clock.js"></script>'
     ElapsedExample:
       summary: Remaining duration with business-day count
       value:
@@ -1895,6 +2065,17 @@ components:
             cause: upstream failure
         request_id: 0f8fad5b-d9cb-469f-a165-70867728950e
   responses:
+    NotFound:
+      description: 'Unknown route (including a trailing slash), or an `ip` selector with no
+        timezone mapping (private, reserved and loopback addresses never resolve) - "No timezone
+        mapping found for the supplied IP address."'
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/XRequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
     Unauthorized:
       description: Missing or invalid authentication.
       content:
@@ -1919,7 +2100,7 @@ components:
             ambiguousTarget:
               $ref: '#/components/examples/AmbiguousTargetExample'
     MethodNotAllowed:
-      description: Only `GET` is supported.
+      description: 'Only `GET` and `HEAD` are supported ("Only GET and HEAD are supported."), with `Allow: GET, HEAD`. `HEAD` is answered like `GET` without a body. The CORS preflight allows GET, HEAD and OPTIONS.'
       headers:
         X-Request-Id:
           $ref: '#/components/headers/XRequestId'
@@ -1973,7 +2154,9 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
     QuotaExceeded:
-      description: The cached monthly quota state is exceeded.
+      description: The plan's monthly quota is used up (`QUOTA_EXCEEDED`, "Monthly quota
+        exceeded."). The quota period is the UTC calendar month and resets at 00:00 UTC on
+        the 1st; no `Retry-After` header is sent. There is no published per-second limit.
       headers:
         X-Request-Id:
           $ref: '#/components/headers/XRequestId'
@@ -2024,8 +2207,9 @@ components:
         timestamp:
           type: string
           format: date-time
-          description: Intentionally omitted from public API error responses to avoid
-            exposing request timing; use request_id for support correlation.
+          description: Intentionally omitted from public API error responses, including
+            per-item errors inside bulk arrays, to avoid exposing request timing; use request_id
+            for support correlation.
     BulkError:
       description: Per-item error wrapper used inside bulk arrays returned by bulk-capable
         routes.
@@ -2073,6 +2257,7 @@ components:
           type: integer
           minimum: 1
           maximum: 7
+          description: Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday).
         day_short:
           type: string
         day_full:
@@ -2163,6 +2348,9 @@ components:
             type: integer
           week_number:
             type: integer
+            description: ISO 8601 week number (present with `week=true`). It belongs to the
+              ISO week-year, which is not returned and can differ from `year` near January 1
+              (2027-01-01 is week 53 of 2026).
     DstResponse:
       allOf:
       - $ref: '#/components/schemas/TimePayload'
@@ -2176,6 +2364,10 @@ components:
             type: string
             format: date-time
             nullable: true
+            description: Present only with `next=true`. The instant of the next UTC offset change,
+              written in the offset in force before it (e.g. `2026-11-01T02:00:00-04:00`); the new
+              offset is not returned. `null` when no change is scheduled, for offset targets and
+              with no selector. Tracks offset changes only, so `dst_active` can change without one.
     ElapsedResponse:
       type: object
       required:
@@ -2197,8 +2389,8 @@ components:
         human:
           type: string
         direction:
-          description: '`left` means the target instant is still in the future. `passed`
-            means the target instant is already in the past.'
+          description: '`left` means the reference instant is after the compared instant (now,
+            or `compare_*`). `passed` means it is before it, or equal to it.'
           type: string
           enum:
           - left
@@ -2251,6 +2443,9 @@ components:
             nullable: true
           matching_zones:
             type: array
+            description: For `offset=` lookups, the geographic zones whose current offset equals
+              the requested one. `UTC` and `Etc/*` zones are intentionally excluded; use `tz=UTC`
+              for UTC.
             items:
               $ref: '#/components/schemas/TimezoneMatch'
     JwkKey:

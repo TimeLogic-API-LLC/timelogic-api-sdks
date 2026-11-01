@@ -209,6 +209,7 @@ open class ApiClient(val baseUrl: String, val client: Call.Factory = defaultClie
                 Serializer.moshi.adapter<T>().fromJson(bodyContent)
             }
             mediaType == OctetMediaType -> body.bytes() as? T
+            mediaType.startsWith("text/") -> body.string() as? T
             else ->  throw UnsupportedOperationException("responseBody currently only supports JSON body.")
         }
     }

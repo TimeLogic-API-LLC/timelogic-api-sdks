@@ -19,6 +19,7 @@ public struct CalendarResponse: Codable, JSONEncodable, Hashable {
     public var isoLocal: String?
     public var rfc2822: String
     public var human: String
+    /** Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday). */
     public var dayNumber: Int
     public var dayShort: String
     public var dayFull: String
@@ -28,6 +29,7 @@ public struct CalendarResponse: Codable, JSONEncodable, Hashable {
     public var month: Int
     public var monthName: String
     public var day: Int
+    /** ISO 8601 week number (present with `week=true`). It belongs to the ISO week-year, which is not returned and can differ from `year` near January 1 (2027-01-01 is week 53 of 2026). */
     public var weekNumber: Int?
 
     public init(unix: Int64, unixMs: Int64, utc: Date, isoLocal: String?, rfc2822: String, human: String, dayNumber: Int, dayShort: String, dayFull: String, timezone: String?, formatted: String? = nil, year: Int, month: Int, monthName: String, day: Int, weekNumber: Int? = nil) {

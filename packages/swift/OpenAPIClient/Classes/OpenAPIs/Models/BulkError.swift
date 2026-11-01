@@ -15,7 +15,7 @@ public struct BulkError: Codable, JSONEncodable, Hashable {
 
     public var error: ApiError
     public var requestId: String
-    /** Intentionally omitted from public API error responses to avoid exposing request timing; use request_id for support correlation. */
+    /** Intentionally omitted from public API error responses, including per-item errors inside bulk arrays, to avoid exposing request timing; use request_id for support correlation. */
     public var timestamp: Date?
     public var item: String
 

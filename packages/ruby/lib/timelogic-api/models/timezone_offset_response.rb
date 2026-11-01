@@ -1,7 +1,7 @@
 =begin
 #TimeLogic API | A World Time API
 
-# Official public API contract for TimeLogic API.
+#Direct API contract for client integrations. It documents authentication, endpoint parameters, response shapes, public signing keys, and signed JSON controls.  Authentication: - the API supports `Authorization: Bearer <token>`, `X-API-Key`, and `api_key` query credentials - RapidAPI access uses `X-RapidAPI-Key` and `X-RapidAPI-Host`; the SDKs expose this as a `rapidApi` transport option that accepts only the RapidAPI key  Behavioral notes: - all documented operations are `GET` - only one selector family may be used at a time - current and convert support bulk only through one comma-separated `tz`, `ip`, or `offset` selector - bulk selectors accept at most 10 values, and every request URL is limited to 8192 characters - add, diff, calendar, dst, elapsed, timezone, and clock are single-target routes - credentials are extracted in Authorization, X-API-Key, then api_key query order; conflicting values are rejected - the first server is the default API host. The second server is the RapidAPI gateway and can be selected or overridden by SDK configuration - `sign` is available on supported JSON routes and is not supported on `/v1/time/clock`
 
 The version of the OpenAPI document: 1.0.0
 
@@ -28,6 +28,7 @@ module TimeLogic::Api
 
     attr_accessor :human
 
+    # Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday).
     attr_accessor :day_number
 
     attr_accessor :day_short
@@ -42,6 +43,7 @@ module TimeLogic::Api
 
     attr_accessor :dst
 
+    # For `offset=` lookups, the geographic zones whose current offset equals the requested one. `UTC` and `Etc/*` zones are intentionally excluded; use `tz=UTC` for UTC.
     attr_accessor :matching_zones
 
     # Attribute mapping from ruby-style variable name to JSON key.

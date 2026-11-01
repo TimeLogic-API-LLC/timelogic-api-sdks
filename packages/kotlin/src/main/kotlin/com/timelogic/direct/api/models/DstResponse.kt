@@ -28,13 +28,13 @@ import com.squareup.moshi.JsonClass
  * @param isoLocal
  * @param rfc2822
  * @param human
- * @param dayNumber
+ * @param dayNumber Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday).
  * @param dayShort
  * @param dayFull
  * @param timezone
  * @param dstActive
  * @param formatted
- * @param nextTransition
+ * @param nextTransition Present only with `next=true`. The instant of the next UTC offset change, written in the offset in force before it (e.g. `2026-11-01T02:00:00-04:00`); the new offset is not returned. `null` when no change is scheduled, for offset targets and with no selector. Tracks offset changes only, so `dst_active` can change without one.
  */
 
 
@@ -58,6 +58,7 @@ data class DstResponse (
     @Json(name = "human")
     val human: kotlin.String,
 
+    /* Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday). */
     @Json(name = "day_number")
     val dayNumber: kotlin.Int,
 
@@ -76,6 +77,7 @@ data class DstResponse (
     @Json(name = "formatted")
     val formatted: kotlin.String? = null,
 
+    /* Present only with `next=true`. The instant of the next UTC offset change, written in the offset in force before it (e.g. `2026-11-01T02:00:00-04:00`); the new offset is not returned. `null` when no change is scheduled, for offset targets and with no selector. Tracks offset changes only, so `dst_active` can change without one. */
     @Json(name = "next_transition")
     val nextTransition: java.time.OffsetDateTime? = null
 

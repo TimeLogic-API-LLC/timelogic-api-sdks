@@ -38,7 +38,7 @@ class ErrorResponseTest : ShouldSpec() {
             //modelInstance.requestId shouldBe ("TODO")
         }
 
-        // to test the property `timestamp` - Intentionally omitted from public API error responses to avoid exposing request timing; use request_id for support correlation.
+        // to test the property `timestamp` - Intentionally omitted from public API error responses, including per-item errors inside bulk arrays, to avoid exposing request timing; use request_id for support correlation.
         should("test timestamp") {
             // uncomment below to test the property
             //modelInstance.timestamp shouldBe ("TODO")

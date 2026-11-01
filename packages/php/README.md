@@ -1,176 +1,376 @@
-# TimeLogic API PHP SDK | A World Time API
+# TimeLogic API SDK for PHP
 
-Official PHP SDK for TimeLogic API, a world time API.
+Official PHP client for [TimeLogic API](https://api.timelogicapi.com): current time, time zone lookups, conversions, date arithmetic, business-day counts, DST status, calendars, embeddable clocks and signed responses. The package contains two clients:
 
-## Installation & Usage
+- the `/v1` client, generated from the [TimeLogic API contract](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/openapi/openapi.yaml), with direct and RapidAPI transports;
+- a [WorldTimeAPI-compatible client](#worldtimeapi-compatible-client) for the `/api/timezone` and `/api/ip` routes, which use worldtimeapi.org's paths, fields and plain-text format.
 
-Install the package after its Packagist release:
+Package: [`timelogic-api/php-sdk`](https://packagist.org/packages/timelogic-api/php-sdk), version 1.0.3. Changes are listed in the [changelog](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/CHANGELOG.md).
+
+## Install
 
 ```bash
-composer require timelogic-api/php-sdk:^1.0
+composer require timelogic-api/php-sdk:1.0.3
 ```
 
-## Getting Started
+Requires PHP 7.4+ with `ext-curl`, `ext-json` and `ext-mbstring`, and Guzzle 7.16.1+ or 8.3.1+. The examples use named arguments (PHP 8.0+); on PHP 7.4 pass the parameters positionally.
 
-Please follow the [installation procedure](#installation--usage) and then run the following:
+## Quick start
+
+Get an API key, export it as `TIMELOGIC_API_KEY`, and run:
 
 ```php
 <?php
-require_once(__DIR__ . '/vendor/autoload.php');
+require __DIR__ . '/vendor/autoload.php';
 
+use TimeLogic\Api\Api\TimeApi;
+use TimeLogic\Api\TransportConfiguration;
 
+$config = TransportConfiguration::create(getenv('TIMELOGIC_API_KEY'));
+$time = new TimeApi(new GuzzleHttp\Client(), $config);
 
-// Configure API key authorization: apiKeyHeader
-$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-API-Key', 'YOUR_API_KEY');
-// Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-API-Key', 'Bearer');
+$now = $time->getCurrentTime(tz: 'America/New_York');
+echo $now->getIsoLocal(), ' ', $now->getTimezone(), PHP_EOL;
+```
 
-// Configure Bearer (TimeLogic API key) authorization: bearerAuth
-$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
+## Configuration
 
-// Configure API key authorization: apiKeyQuery
-$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('api_key', 'YOUR_API_KEY');
-// Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('api_key', 'Bearer');
+The transport helper sets the host and credentials for the `/v1` client. Pass a TimeLogic key for the direct API, or a RapidAPI key with the RapidAPI option; the SDK then sends `X-RapidAPI-Key` and `X-RapidAPI-Host` (default host `timelogic-api-world-time-timezones-time-calculations.p.rapidapi.com`, overridable). Keep keys in environment variables or a secret store, not in source control.
 
-// Configure API key authorization: rapidApiKey
-$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Key', 'YOUR_API_KEY');
-// Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Key', 'Bearer');
+```php
+<?php
+require __DIR__ . '/vendor/autoload.php';
 
-// Configure API key authorization: rapidApiHost
-$config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKey('X-RapidAPI-Host', 'YOUR_API_KEY');
-// Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = TimeLogic\Api\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-RapidAPI-Host', 'Bearer');
+use TimeLogic\Api\Api\TimeApi;
+use TimeLogic\Api\TransportConfiguration;
 
+// Direct API (default host https://api.timelogicapi.com, sends Authorization: Bearer <key>)
+$direct = TransportConfiguration::create(getenv('TIMELOGIC_API_KEY'));
 
-$apiInstance = new TimeLogic\Api\Api\TimeApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client(),
-    $config
-);
-$unix = 1711300000; // int
-$unixMs = 1711300000000; // int
-$iso = '2024-03-24T15:00:00'; // string | ISO-8601 timestamp. To supply a local wall-clock time without an explicit offset, pair it with one of `source_tz=Area/City`, `source_ip=...`, `source_lat=...&source_lon=...`, or `source_offset=±HH:MM`.
-$sourceTz = 'America/New_York'; // string | Used only with `iso=...` when the ISO value has no explicit offset.
-$sourceIp = '8.8.8.8'; // string | Used only with `iso=...` when the ISO value has no explicit offset. Resolves that local wall-clock time through the timezone mapped from this IP address.
-$sourceLat = 40.7128; // float | Used only with `iso=...` when the ISO value has no explicit offset. Provide together with `source_lon` to resolve that local wall-clock time through the timezone mapped from these coordinates.
-$sourceLon = -74.006; // float | Used only with `iso=...` when the ISO value has no explicit offset. Provide together with `source_lat`.
-$sourceOffset = '-05:00'; // string | Used only with `iso=...` when the ISO value has no explicit offset. Interprets that local wall-clock time at this fixed UTC offset.
-$seconds = 30; // int
-$minutes = 15; // int
-$hours = 2; // int
-$days = 7; // int
-$tz = 'America/New_York'; // string | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode.
-$ip = '8.8.8.8'; // string | IP address. On bulk-capable routes, a comma-separated list enables bulk mode.
-$lat = 40.7128; // float | Latitude. Must be provided together with `lon`.
-$lon = -74.006; // float | Longitude. Must be provided together with `lat`.
-$offset = '-04:00'; // string | Fixed UTC offset in `+HH:MM` or `-HH:MM` format. On bulk-capable routes, a comma-separated list enables bulk mode.
-$autoTz = true; // bool | Set to `true` to resolve using the caller IP from Cloudflare headers.
-$utc = true; // bool | Set to `true` to force UTC on routes that support it.
-$format = '%Y-%m-%d %H:%M:%S'; // string | Custom date/time format template using supported `strftime`-style directives such as `%Y-%m-%d %H:%M:%S`. Reference: [strftime](https://strftime.net/).
-$sign = true; // bool | Set to exactly `true` to ask the gateway to sign the final JSON response. Every authenticated JSON response, including errors, then includes signing headers. Not supported on `/v1/time/clock`.
+// RapidAPI: pass only your RapidAPI key; the SDK sets X-RapidAPI-Key and X-RapidAPI-Host
+$rapid = TransportConfiguration::create(getenv('RAPIDAPI_KEY'), true);
+
+// A different host (for example a compatible gateway or a test server)
+$custom = TransportConfiguration::create(getenv('TIMELOGIC_API_KEY'), false, 'https://your-compatible-gateway.example');
+
+// Timeouts belong to the Guzzle client you pass in (Guzzle's default is no timeout). The SDK does not retry.
+$time = new TimeApi(new GuzzleHttp\Client(['timeout' => 10, 'connect_timeout' => 3]), $direct);
+```
+
+## Operations
+
+| Operation | Endpoint | Method |
+| --- | --- | --- |
+| Current time | `GET /v1/time/current` | `TimeApi::getCurrentTime()` |
+| Convert | `GET /v1/time/convert` | `TimeApi::convertTime()` |
+| Add | `GET /v1/time/add` | `TimeApi::addTime()` |
+| Difference | `GET /v1/time/diff` | `TimeApi::diffTime()` |
+| Elapsed | `GET /v1/time/elapsed` | `TimeApi::getElapsed()` |
+| Timezone | `GET /v1/timezone` | `TimeApi::getTimezone()` |
+| Daylight saving | `GET /v1/time/dst` | `TimeApi::getDst()` |
+| Calendar | `GET /v1/time/calendar` | `TimeApi::getCalendar()` |
+| Clock | `GET /v1/time/clock` | `TimeApi::getClock()` |
+| Signing keys | `GET /.well-known/time-api-public-key` | `UtilityApi::getPublicSigningKey()` |
+
+Operations take the query parameters in the order the endpoint defines them (named arguments on PHP 8). Each operation also has `…WithHttpInfo` (data, status code, headers), `…Async` (a Guzzle promise) and `…Request` (the prepared PSR-7 request) variants. Parameters, response fields and errors for every operation: [How the API works](#how-the-api-works). Generated reference: [TimeApi](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/packages/php/docs/Api/TimeApi.md), [UtilityApi](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/packages/php/docs/Api/UtilityApi.md) and the models in the same folder.
+
+### Examples
+
+```php
+<?php
+require __DIR__ . '/vendor/autoload.php';
+
+use TimeLogic\Api\Api\TimeApi;
+use TimeLogic\Api\Api\UtilityApi;
+use TimeLogic\Api\TransportConfiguration;
+
+$config = TransportConfiguration::create(getenv('TIMELOGIC_API_KEY'));
+$http = new GuzzleHttp\Client();
+$time = new TimeApi($http, $config);
+
+// Convert a New York wall-clock time to Tokyo
+$tokyo = $time->convertTime(iso: '2026-03-01T09:00:00', sourceTz: 'America/New_York', tz: 'Asia/Tokyo');
+
+// Add 1 day and 2 hours, shown in New York time
+$later = $time->addTime(iso: '2026-03-07T12:00:00Z', days: 1, hours: 2, tz: 'America/New_York');
+
+// Duration and business days between two instants (Zurich holiday calendar)
+$diff = $time->diffTime('iso=2026-01-02T00:00:00Z', 'iso=2026-04-30T00:00:00Z', businessDays: true, holidayCountry: 'CH-ZH');
+echo $diff->getDays(), ' ', $diff->getDirection(), ' ', $diff->getBusinessDays(), PHP_EOL; // 118 forward 82
+
+// Time left until a deadline
+$left = $time->getElapsed(iso: '2027-01-01T00:00:00Z');
+
+// Zone details, DST status with the next transition, ISO week number
+$berlin = $time->getTimezone(tz: 'Europe/Berlin');
+$dst = $time->getDst(tz: 'America/New_York', next: true);
+$calendar = $time->getCalendar(tz: 'Europe/London', week: true);
+
+// Embeddable HTML clock
+$html = $time->getClock('digital-dashboard', tz: 'Europe/London');
+
+// Public signing keys (no API key needed)
+$keys = (new UtilityApi($http, $config))->getPublicSigningKey();
+```
+
+## Errors, headers and signed responses
+
+```php
+<?php
+require __DIR__ . '/vendor/autoload.php';
+
+use TimeLogic\Api\Api\TimeApi;
+use TimeLogic\Api\ApiException;
+use TimeLogic\Api\TransportConfiguration;
+
+$time = new TimeApi(new GuzzleHttp\Client(), TransportConfiguration::create(getenv('TIMELOGIC_API_KEY')));
 
 try {
-    $result = $apiInstance->addTime($unix, $unixMs, $iso, $sourceTz, $sourceIp, $sourceLat, $sourceLon, $sourceOffset, $seconds, $minutes, $hours, $days, $tz, $ip, $lat, $lon, $offset, $autoTz, $utc, $format, $sign);
-    print_r($result);
-} catch (Exception $e) {
-    echo 'Exception when calling TimeApi->addTime: ', $e->getMessage(), PHP_EOL;
+    $time->getCurrentTime(tz: 'Bad/Zone');
+} catch (ApiException $e) {
+    echo $e->getCode(), ' ', $e->getResponseBody(), PHP_EOL;
+    // 400 {"error":{"code":"INVALID_PARAMETER","message":"Invalid timezone.",...},"request_id":"..."}
+    $error = $e->getResponseObject(); // TimeLogic\Api\Model\ErrorResponse
 }
 
+// *WithHttpInfo returns [data, status code, headers]
+[$dst, $status, $headers] = $time->getDstWithHttpInfo(tz: 'Asia/Kolkata', sign: true);
+echo $status, ' ', $headers['x-timelogic-quota-limit'][0], ' ', $headers['X-TimeLogic-Signature'][0], PHP_EOL;
 ```
 
-## API Endpoints
+The SDK does not retry. A `429 QUOTA_EXCEEDED` carries no `Retry-After` header; quotas reset at 00:00 UTC on the 1st of each month. Status codes and error codes: [Errors](#errors).
 
-All URIs are relative to *https://api.timelogicapi.com*
+## WorldTimeAPI-compatible client
 
-Class | Method | HTTP request | Description
------------- | ------------- | ------------- | -------------
-*TimeApi* | [**addTime**](docs/Api/TimeApi.md#addtime) | **GET** /v1/time/add | Add modifiers to a timestamp
-*TimeApi* | [**convertTime**](docs/Api/TimeApi.md#converttime) | **GET** /v1/time/convert | Convert a timestamp into a target timezone or offset
-*TimeApi* | [**diffTime**](docs/Api/TimeApi.md#difftime) | **GET** /v1/time/diff | Difference between two instants
-*TimeApi* | [**getCalendar**](docs/Api/TimeApi.md#getcalendar) | **GET** /v1/time/calendar | Calendar projection for a target instant
-*TimeApi* | [**getClock**](docs/Api/TimeApi.md#getclock) | **GET** /v1/time/clock | Render a live HTML clock
-*TimeApi* | [**getCurrentTime**](docs/Api/TimeApi.md#getcurrenttime) | **GET** /v1/time/current | Get the current time for a target
-*TimeApi* | [**getDst**](docs/Api/TimeApi.md#getdst) | **GET** /v1/time/dst | Daylight-saving status for a target
-*TimeApi* | [**getElapsed**](docs/Api/TimeApi.md#getelapsed) | **GET** /v1/time/elapsed | Time elapsed since or remaining until a reference instant
-*TimeApi* | [**getTimezone**](docs/Api/TimeApi.md#gettimezone) | **GET** /v1/timezone | Resolve timezone information for a target
-*UtilityApi* | [**getPublicSigningKey**](docs/Api/UtilityApi.md#getpublicsigningkey) | **GET** /.well-known/time-api-public-key | Public signing key set
+A separate client for the WorldTimeAPI-compatible routes. Code written for worldtimeapi.org needs only the new host and an API key: paths, field names, types and the `.txt` format are the same. The client sends the key as `X-API-Key`, has a 30-second timeout, does not retry, and does not use or change the `/v1` configuration.
 
-## Models
+```php
+<?php
+require __DIR__ . '/vendor/autoload.php';
 
-- [ApiError](docs/Model/ApiError.md)
-- [BulkError](docs/Model/BulkError.md)
-- [CalendarResponse](docs/Model/CalendarResponse.md)
-- [DiffEndpointRef](docs/Model/DiffEndpointRef.md)
-- [DiffResponse](docs/Model/DiffResponse.md)
-- [DstResponse](docs/Model/DstResponse.md)
-- [ElapsedResponse](docs/Model/ElapsedResponse.md)
-- [ErrorResponse](docs/Model/ErrorResponse.md)
-- [GetCurrentTime200Response](docs/Model/GetCurrentTime200Response.md)
-- [GetTimezone200Response](docs/Model/GetTimezone200Response.md)
-- [JwkKey](docs/Model/JwkKey.md)
-- [JwksResponse](docs/Model/JwksResponse.md)
-- [TimePayload](docs/Model/TimePayload.md)
-- [TimePayloadBulkItem](docs/Model/TimePayloadBulkItem.md)
-- [TimePayloadBulkResponse](docs/Model/TimePayloadBulkResponse.md)
-- [TimezoneMatch](docs/Model/TimezoneMatch.md)
-- [TimezoneOffsetResponse](docs/Model/TimezoneOffsetResponse.md)
-- [TimezoneResolvedResponse](docs/Model/TimezoneResolvedResponse.md)
+use TimeLogic\Api\WorldTimeApi\WorldTimeApiClient;
+use TimeLogic\Api\WorldTimeApi\WorldTimeApiException;
+use TimeLogic\Api\WorldTimeApi\WorldTimeApiUnknownLocationException;
 
-## Authorization
+$wta = new WorldTimeApiClient(getenv('TIMELOGIC_API_KEY')); // 30-second timeout
 
-Authentication schemes defined for the API:
-### bearerAuth
+$zones = $wta->listTimezones();                 // ['Africa/Abidjan', ...]
+$europe = $wta->listTimezonesInArea('Europe');  // ['Europe/Amsterdam', ...]
+$london = $wta->getTimezone('Europe/London');
+echo $london->datetime, ' ', $london->utc_offset, PHP_EOL; // worldtimeapi.org field names
+$text = $wta->getTimezoneText('Europe/London'); // "abbreviation: GMT\nclient_ip: ..."
+$mine = $wta->getIp();                          // the caller's address
+$google = $wta->getIp('8.8.8.8');
 
-- **Type**: Bearer authentication (TimeLogic API key)
+try {
+    $wta->getTimezone('Nope/Zone');
+} catch (WorldTimeApiUnknownLocationException $e) {
+    echo 'unknown location', PHP_EOL; // 404 {"error":"unknown location"}
+} catch (WorldTimeApiException $e) {
+    echo $e->getStatus(), ' ', $e->getError(), PHP_EOL;
+}
 
-### apiKeyHeader
-
-- **Type**: API key
-- **API key parameter name**: X-API-Key
-- **Location**: HTTP header
-
-
-### apiKeyQuery
-
-- **Type**: API key
-- **API key parameter name**: api_key
-- **Location**: URL query string
-
-
-### rapidApiKey
-
-- **Type**: API key
-- **API key parameter name**: X-RapidAPI-Key
-- **Location**: HTTP header
-
-
-### rapidApiHost
-
-- **Type**: API key
-- **API key parameter name**: X-RapidAPI-Host
-- **Location**: HTTP header
-
-
-## Tests
-
-To run the tests, use:
-
-```bash
-composer install
-vendor/bin/phpunit
+// Signed responses: read the headers through requestRaw
+$signed = new WorldTimeApiClient(getenv('TIMELOGIC_API_KEY'), WorldTimeApiClient::DEFAULT_BASE_URL, true);
+$raw = $signed->requestRaw('/api/timezone/Europe/London');
+echo $raw->status, ' ', $raw->headers['x-timelogic-signature'], ' ', $raw->body, PHP_EOL; // lower-case header names
 ```
 
-## Author
+Routes, fields and errors: [WorldTimeAPI-compatible routes](#worldtimeapi-compatible-routes).
 
+## Known issues
 
+Checked against the live API for this release. All other operations, including single-target `current`, `convert` and `timezone` calls, decode normally.
 
-## About this package
+- Bulk `getCurrentTime` / `convertTime` calls (comma-separated selectors) return a model without the items. Send the prepared request and decode the JSON:
 
-This PHP package is automatically generated by the [TimeLogic API](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks) project:
+```php
+<?php
+require __DIR__ . '/vendor/autoload.php';
 
-- API version: `1.0.0`
-    - Generator version: `7.10.0`
-- Build package: `org.openapitools.codegen.languages.PhpClientCodegen`
+use TimeLogic\Api\Api\TimeApi;
+use TimeLogic\Api\TransportConfiguration;
+
+$http = new GuzzleHttp\Client();
+$time = new TimeApi($http, TransportConfiguration::create(getenv('TIMELOGIC_API_KEY')));
+
+// Bulk current/convert: send the prepared request and read the JSON
+$response = $http->send($time->getCurrentTimeRequest(tz: 'Europe/London,Asia/Tokyo'));
+$items = json_decode((string) $response->getBody(), true);
+echo $items[1]['timezone'], PHP_EOL; // Asia/Tokyo
+```
+
+## How the API works
+
+### Base URLs
+
+| Transport | Base URL | Credentials the SDK sends |
+| --- | --- | --- |
+| Direct API (default) | `https://api.timelogicapi.com` | `Authorization: Bearer <your TimeLogic API key>` |
+| RapidAPI | `https://timelogic-api-world-time-timezones-time-calculations.p.rapidapi.com` | `X-RapidAPI-Key: <your RapidAPI key>` and `X-RapidAPI-Host: <RapidAPI host>` |
+
+The gateway accepts a direct key in three places, checked in this order: `Authorization: Bearer <key>`, the `X-API-Key` header, and the `api_key` query parameter. The `/v1` clients in this package send the bearer header; the WorldTimeAPI-compatible client sends `X-API-Key`. Sending two different keys in one request is rejected with `401 UNAUTHORIZED` ("Conflicting API key credentials."). All operations are `GET` requests (`HEAD` is answered like `GET` without a body).
+
+### Choosing a target (selector rules)
+
+Most time operations take one *target*, chosen with exactly one selector family:
+
+| Selector | Example | Notes |
+| --- | --- | --- |
+| `tz` | `America/New_York` | IANA zone, matched case-insensitively. Links and aliases resolve to their canonical zone (`Europe/Stockholm` returns `Europe/Berlin`, `UTC` returns `Etc/UTC`). `Etc/GMT+5` is UTC-05:00 (POSIX sign). |
+| `ip` | `8.8.8.8` | IPv4 or IPv6. Private, reserved and loopback addresses have no zone and return `404 NOT_FOUND`. |
+| `lat` + `lon` | `40.7128`, `-74.006` | Both are required together. |
+| `offset` | `-04:00` | Fixed offset, `+HH:MM` or `-HH:MM` only (`+0530` and `+5` are rejected). The response has `timezone: null`. |
+| `auto_tz` | `true` | Uses the caller's IP address as seen by the gateway. Not available on the clock route. |
+| `utc` | `true` | Forces UTC (convert and add only). The response has `iso_local: null` and `timezone: null`. |
+
+Combining two selector families returns `400 AMBIGUOUS_TARGET`. Where a target is optional and none is given, the response is in UTC with `timezone: null` and `iso_local: null`; `/v1/timezone` requires a target and returns `400 MISSING_TARGET` without one.
+
+**Bulk requests.** `current` and `convert` accept a comma-separated list in one `tz`, `ip` or `offset` selector (at most 10 values; any comma, even a trailing one, switches to bulk). The response is then an array in request order; each item is either a normal time payload or an item error `{ "item", "error": { "code", "message", "details" }, "request_id" }`, so one bad value does not fail the whole request. Every request URL is limited to 8192 characters.
+
+**Input timestamps.** `convert`, `add`, `calendar`, `elapsed` and `clock` take one input instant: `unix` (whole seconds, -62135596800 to 253402300799), `unix_ms` (whole milliseconds) or `iso` (ISO-8601). An `iso` value without an offset is a local wall-clock time; pair it with one hint (`source_tz`, `source_ip`, `source_lat` + `source_lon`, or `source_offset`), otherwise it is read as UTC. Dates must exist (`2027-02-29` returns `400 INVALID_TIMESTAMP`), a local time inside a spring-forward gap returns `400 INVALID_TIMESTAMP`, and an ambiguous fall-back time resolves to its first occurrence.
+
+**Custom formatting.** Every JSON time route accepts `format`, a `strftime`-style template that adds a `formatted` field. Supported directives: `%a %A %b %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x %X %y %Y %z %:z %Z %%`, with the `-`, `_` and `0` padding flags on numeric directives. `%Z` prints the IANA zone name (or `UTC+HH:MM` for an offset target), not an abbreviation. Any other directive returns `400 INVALID_PARAMETER`. On `diff` and `elapsed`, `format` is a duration template instead, using `%days`, `%hours`, `%minutes` and `%seconds` (each a total in that unit, so 118 days renders `%days days %hours hours` as `118 days 2832 hours`).
+
+### Operations
+
+| Operation | Endpoint | What it returns |
+| --- | --- | --- |
+| Current time | `GET /v1/time/current` | The current time for one target, or an array for a bulk selector. |
+| Convert | `GET /v1/time/convert` | One input instant (`unix`, `unix_ms` or `iso`) expressed in a target zone or offset; bulk targets supported. |
+| Add | `GET /v1/time/add` | A base instant (default: now) plus `seconds`, `minutes`, `hours` and `days`, in a target zone. `days` are exact 24-hour days, so the wall-clock time shifts across a DST change. |
+| Difference | `GET /v1/time/diff` | The duration between `from` and `to`, with `direction` and optional business days. |
+| Elapsed | `GET /v1/time/elapsed` | Time elapsed since, or remaining until, a reference instant (compared with now or a `compare_*` instant), with optional business days. |
+| Timezone | `GET /v1/timezone` | Zone metadata for a target: current time plus `offset` (minutes) and `dst`. An `offset` lookup adds `matching_zones`. |
+| Daylight saving | `GET /v1/time/dst` | Whether DST is active for a target; `next=true` adds `next_transition`. |
+| Calendar | `GET /v1/time/calendar` | Calendar fields (`year`, `month`, `month_name`, `day`) for an instant and target; `week=true` adds the ISO `week_number`. |
+| Clock | `GET /v1/time/clock` | An embeddable HTML clock fragment (`text/html`). `style` is required (30 styles, for example `digital-dashboard` or `analog-station`); `auto_tz` and `sign` are not supported here. |
+| Signing keys | `GET /.well-known/time-api-public-key` | The public Ed25519 keys (JWKS) used to verify signed responses. No API key needed; `kid` filters to one key. |
+
+#### Time payload fields
+
+`current`, `convert`, `add`, `timezone`, `dst` and `calendar` all return these fields:
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `unix` | integer | Unix seconds. |
+| `unix_ms` | integer | Unix milliseconds. |
+| `utc` | string | UTC timestamp, for example `2026-11-01T13:16:03Z`. |
+| `iso_local` | string or null | Local ISO-8601 time with offset; `null` for UTC-only responses. |
+| `rfc2822` | string | RFC 2822 local time. |
+| `human` | string | Readable local time, for example `November 1, 2026, 8:16 AM America/New_York`. |
+| `day_number` | integer | Day of the week counted from Sunday (1 = Sunday ... 7 = Saturday). |
+| `day_short`, `day_full` | string | `Sun` / `Sunday`. |
+| `timezone` | string or null | Canonical IANA zone; `null` for offset and UTC targets. |
+| `formatted` | string | Present only when `format` was sent. |
+
+Extra fields per operation:
+
+- `/v1/timezone`: `offset` (minutes east of UTC) and `dst` (boolean); with an `offset` selector also `matching_zones`, the geographic zones currently at that offset (`UTC` and `Etc/*` excluded).
+- `/v1/time/dst`: `dst_active` and, with `next=true`, `next_transition` (the next UTC-offset change, or `null` if the zone has none).
+- `/v1/time/calendar`: `year`, `month`, `month_name`, `day`, and with `week=true` `week_number` (ISO 8601 week).
+- `/v1/time/diff`: `seconds`, `minutes`, `hours`, `days` (each a total, not a remainder), `direction` (`forward`, `backward` or `same`), `human` (always in hours, minutes and seconds), `from.unix_ms`, `to.unix_ms`, and `business_days` when requested.
+- `/v1/time/elapsed`: `seconds`, `minutes`, `hours`, `days`, `human`, `direction` (`left` while the reference is still ahead, `passed` once it is behind), and `business_days` when requested.
+
+#### Difference and elapsed
+
+`diff` takes two *time specifiers*, `from` and `to`: `now`, `unix=<seconds>`, `unix_ms=<milliseconds>`, `iso=<ISO-8601>`, `offset=±HH:MM`, `tz=<IANA zone>` or `ip=<address>`. The `tz=`, `ip=` and `offset=` forms mean "now" (they only choose the calendar date used for business days). A local `iso` can be placed with `from_tz`/`from_ip`/`from_lat`+`from_lon`/`from_offset` and the matching `to_*` hints.
+
+`elapsed` takes one reference instant (`unix`, `unix_ms` or `iso` with `source_*` hints) and compares it with now, with a `compare_unix`/`compare_unix_ms`/`compare_iso` instant (with `compare_source_*` hints), or with the current time at a target selector.
+
+**Business days.** Set `business_days=true` to add `business_days`. Days are counted by calendar date, start included and end excluded. Add `holiday_country` (ISO 3166-1 alpha-2, any letter case, optionally with a subdivision such as `US-CA` or `CH-ZH`) to skip that calendar's public holidays; `holiday_subdivision` (for example `ZH`, `ENG`, `01`) selects a region and requires `holiday_country`. Weekends follow the calendar's country (Friday/Saturday for `SA`, Saturday/Sunday when no calendar is given). Holiday coverage is 1900 to 2100. Example: from `2026-01-02T00:00:00Z` to `2026-04-30T00:00:00Z` gives `business_days: 83` with `holiday_country=FR`, `82` with `CH-ZH`, and `79` with `SA`.
+
+### Errors
+
+Every error has the same JSON body:
+
+```json
+{ "error": { "code": "INVALID_PARAMETER", "message": "Invalid timezone.", "details": { "tz": "Bad/Zone" } }, "request_id": "547f27d2-1acc-46e6-a9a6-686ec2ca99d9" }
+```
+
+| Status | Codes | When |
+| --- | --- | --- |
+| 400 | `INVALID_PARAMETER`, `INVALID_TIMESTAMP`, `AMBIGUOUS_TARGET`, `MISSING_TARGET` | A parameter is malformed or out of range, two selector families were combined, or a required target is missing. |
+| 401 | `UNAUTHORIZED` | Missing, invalid or conflicting API key credentials. |
+| 403 | `SUBSCRIPTION_INACTIVE` | The key or the customer subscription is not active. |
+| 404 | `NOT_FOUND` | Unknown route (including a trailing slash), or an `ip` with no timezone mapping. |
+| 405 | `METHOD_NOT_ALLOWED` | A method other than `GET`/`HEAD`; the response carries `Allow: GET, HEAD`. |
+| 429 | `QUOTA_EXCEEDED` | The plan's monthly quota is used up. |
+| 500 | `INTERNAL_ERROR` | Internal failure, including signing failures. |
+| 501 | `DEPENDENCY_NOT_READY` | A required resolver or dependency is not ready. |
+| 502 | `INTERNAL_ERROR` | The gateway could not reach the core service. |
+
+Quote `request_id` (also sent as the `X-Request-Id` header) when you contact support.
+
+### Response headers, quotas and limits
+
+| Header | Meaning |
+| --- | --- |
+| `X-Request-Id` | Request identifier, on every response. |
+| `X-Auth-Mode` | How the request was authenticated (`api_key`). |
+| `X-TimeLogic-Customer-ID` | Your customer identifier. |
+| `X-TimeLogic-Plan` | Your plan, for example `free`. |
+| `X-TimeLogic-Quota-Limit` | Requests included per month, or `unlimited`. |
+| `X-TimeLogic-Quota-State` | Cached quota state, for example `active`. |
+| `X-TimeLogic-Key-Id` | On unsigned responses, the ID of the API key that made the request; on signed responses, the signing key `kid`. |
+
+Header names are case-insensitive in HTTP. Some SDKs return headers as a plain map keyed by the name as received (most arrive in lower case, the signature headers as `X-TimeLogic-Signature…`), so compare names case-insensitively.
+
+Quotas are counted per UTC calendar month and reset at 00:00 UTC on the 1st. There is no remaining-requests or reset header, no `Retry-After` on `429`, and no published per-second limit. Bulk selectors take at most 10 values and every request URL is limited to 8192 characters.
+
+### Signed responses
+
+Pass `sign` (`true`) on any JSON route except the clock to receive a detached Ed25519 signature over the exact response body, in these headers: `X-TimeLogic-Signature` (Base64), `X-TimeLogic-Key-Id`, `X-TimeLogic-Signature-Alg` (`Ed25519`), `X-TimeLogic-Signature-Timestamp`, `X-TimeLogic-Content-SHA256` and `X-TimeLogic-Signature-Input`. To verify: decode `X-TimeLogic-Signature-Input` (Base64URL), check that its `content-sha256` line matches the SHA-256 of the body bytes, then verify the signature over the decoded input with the key whose `kid` matches, from `GET /.well-known/time-api-public-key`. The body is unchanged by signing. The headers are exposed to browsers through CORS.
+
+## WorldTimeAPI-compatible routes
+
+### Routes
+
+The client covers all 12 routes of the WorldTimeAPI-compatible contract ([`openapi/openapi-worldtimeapi.yaml`](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/openapi/openapi-worldtimeapi.yaml)). Each JSON route has a plain-text twin ending in `.txt`.
+
+| Route | Returns |
+| --- | --- |
+| `GET /api/timezone`, `/api/timezone.txt` | Every zone name. |
+| `GET /api/timezone/{area}`, `.txt` | The zone names in an area such as `Europe`, or the time object for a one-word zone such as `UTC`. |
+| `GET /api/timezone/{area}/{location}`, `.txt` | The time object for a zone such as `Europe/London`. |
+| `GET /api/timezone/{area}/{location}/{region}`, `.txt` | The time object for a three-part zone such as `America/Argentina/Salta`. |
+| `GET /api/ip`, `/api/ip.txt` | The time object for the caller's IP address. |
+| `GET /api/ip/{ip}`, `.txt` | The time object for an IPv4 or IPv6 address. |
+
+Zone names match in any letter case. Query parameters other than `api_key` and `sign` are ignored.
+
+### Time object fields
+
+| Field | Example | Meaning |
+| --- | --- | --- |
+| `abbreviation` | `GMT` | Zone abbreviation. |
+| `client_ip` | `203.0.113.7` | The caller's IP address. |
+| `datetime` | `2026-11-01T13:18:00.721000+00:00` | Local time with six fractional digits (millisecond resolution, so the last three are `000`). |
+| `day_of_week` | `0` | 0 = Sunday ... 6 = Saturday. |
+| `day_of_year` | `305` | 1-366. |
+| `dst` | `false` | Whether DST is in effect. |
+| `dst_from` | `null` | Start of the current DST period, or `null`. |
+| `dst_offset` | `0` | DST offset in seconds. |
+| `dst_until` | `null` | End of the current DST period, or `null`. |
+| `raw_offset` | `0` | Standard offset in seconds. |
+| `timezone` | `Europe/London` | Zone name. |
+| `unixtime` | `1793539080` | Unix seconds. |
+| `utc_datetime` | `2026-11-01T13:18:00.721000+00:00` | UTC time. |
+| `utc_offset` | `+00:00` | Current total offset. |
+| `week_number` | `44` | ISO 8601 week number. |
+
+The `.txt` variants return the same fields as `key: value` lines in alphabetical order.
+
+### Errors and authentication
+
+Unknown zones and malformed addresses return `404` with worldtimeapi.org's bodies: `{"error":"unknown location"}`, `{"error":"malformed ip"}` or `{"error":"not found"}` (on `.txt` routes, a line starting with `Error:`). Authentication and quota errors (`401`, `403`, `429`) use the TimeLogic error body shown in [Errors](#errors). Every route requires a TimeLogic API key, which the client sends as the `X-API-Key` header, and successful calls count toward the monthly quota like `/v1` calls. The client connects to the direct API (`https://api.timelogicapi.com` by default); it does not use the RapidAPI transport.
+
+With signing enabled, the client adds `sign=true` and responses carry the same detached signature headers as `/v1` ([Signed responses](#signed-responses)); the body is byte-identical to the unsigned body. Use the raw request method to read those headers.
+
+## Support
+
+Questions and problem reports: [issue tracker](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/issues). Security issues: see [SECURITY.md](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/SECURITY.md). Service status: [status.timelogicapi.com](https://status.timelogicapi.com).
+
+## License
+
+[Unlicense](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/LICENSE).

@@ -14,7 +14,7 @@ Standard single-target timezone resolution payload.
 |**isoLocal** | **String** |  |  |
 |**rfc2822** | **String** |  |  |
 |**human** | **String** |  |  |
-|**dayNumber** | **Integer** |  |  |
+|**dayNumber** | **Integer** | Day of the week counted from Sunday (1 &#x3D; Sunday, 2 &#x3D; Monday ... 7 &#x3D; Saturday). |  |
 |**dayShort** | **String** |  |  |
 |**dayFull** | **String** |  |  |
 |**timezone** | **String** |  |  |

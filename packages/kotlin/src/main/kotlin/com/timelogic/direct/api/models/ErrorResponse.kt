@@ -25,7 +25,7 @@ import com.squareup.moshi.JsonClass
  *
  * @param error
  * @param requestId
- * @param timestamp Intentionally omitted from public API error responses to avoid exposing request timing; use request_id for support correlation.
+ * @param timestamp Intentionally omitted from public API error responses, including per-item errors inside bulk arrays, to avoid exposing request timing; use request_id for support correlation.
  */
 
 
@@ -37,7 +37,7 @@ data class ErrorResponse (
     @Json(name = "request_id")
     val requestId: kotlin.String,
 
-    /* Intentionally omitted from public API error responses to avoid exposing request timing; use request_id for support correlation. */
+    /* Intentionally omitted from public API error responses, including per-item errors inside bulk arrays, to avoid exposing request timing; use request_id for support correlation. */
     @Json(name = "timestamp")
     val timestamp: java.time.OffsetDateTime? = null
 

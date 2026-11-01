@@ -27,7 +27,7 @@ import com.squareup.moshi.JsonClass
  * @param hours
  * @param days
  * @param human
- * @param direction `left` means the target instant is still in the future. `passed` means the target instant is already in the past.
+ * @param direction `left` means the reference instant is after the compared instant (now, or `compare_*`). `passed` means it is before it, or equal to it.
  * @param formatted
  * @param businessDays
  */
@@ -50,7 +50,7 @@ data class ElapsedResponse (
     @Json(name = "human")
     val human: kotlin.String,
 
-    /* `left` means the target instant is still in the future. `passed` means the target instant is already in the past. */
+    /* `left` means the reference instant is after the compared instant (now, or `compare_*`). `passed` means it is before it, or equal to it. */
     @Json(name = "direction")
     val direction: ElapsedResponse.Direction,
 
@@ -63,7 +63,7 @@ data class ElapsedResponse (
 ) {
 
     /**
-     * `left` means the target instant is still in the future. `passed` means the target instant is already in the past.
+     * `left` means the reference instant is after the compared instant (now, or `compare_*`). `passed` means it is before it, or equal to it.
      *
      * Values: left,passed
      */

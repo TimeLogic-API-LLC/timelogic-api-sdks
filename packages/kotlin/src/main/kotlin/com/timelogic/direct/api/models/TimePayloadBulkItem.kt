@@ -31,7 +31,7 @@ import com.squareup.moshi.JsonClass
  * @param isoLocal
  * @param rfc2822
  * @param human
- * @param dayNumber
+ * @param dayNumber Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday).
  * @param dayShort
  * @param dayFull
  * @param timezone
@@ -39,7 +39,7 @@ import com.squareup.moshi.JsonClass
  * @param requestId
  * @param item
  * @param formatted
- * @param timestamp Intentionally omitted from public API error responses to avoid exposing request timing; use request_id for support correlation.
+ * @param timestamp Intentionally omitted from public API error responses, including per-item errors inside bulk arrays, to avoid exposing request timing; use request_id for support correlation.
  */
 
 
@@ -63,6 +63,7 @@ data class TimePayloadBulkItem (
     @Json(name = "human")
     val human: kotlin.String,
 
+    /* Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday). */
     @Json(name = "day_number")
     val dayNumber: kotlin.Int,
 
@@ -87,7 +88,7 @@ data class TimePayloadBulkItem (
     @Json(name = "formatted")
     val formatted: kotlin.String? = null,
 
-    /* Intentionally omitted from public API error responses to avoid exposing request timing; use request_id for support correlation. */
+    /* Intentionally omitted from public API error responses, including per-item errors inside bulk arrays, to avoid exposing request timing; use request_id for support correlation. */
     @Json(name = "timestamp")
     val timestamp: java.time.OffsetDateTime? = null
 

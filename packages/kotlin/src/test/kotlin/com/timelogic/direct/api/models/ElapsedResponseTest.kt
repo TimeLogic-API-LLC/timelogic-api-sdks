@@ -55,7 +55,7 @@ class ElapsedResponseTest : ShouldSpec() {
             //modelInstance.human shouldBe ("TODO")
         }
 
-        // to test the property `direction` - `left` means the target instant is still in the future. `passed` means the target instant is already in the past.
+        // to test the property `direction` - `left` means the reference instant is after the compared instant (now, or `compare_*`). `passed` means it is before it, or equal to it.
         should("test direction") {
             // uncomment below to test the property
             //modelInstance.direction shouldBe ("TODO")

@@ -61,7 +61,7 @@ class CalendarResponseTest : ShouldSpec() {
             //modelInstance.human shouldBe ("TODO")
         }
 
-        // to test the property `dayNumber`
+        // to test the property `dayNumber` - Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday).
         should("test dayNumber") {
             // uncomment below to test the property
             //modelInstance.dayNumber shouldBe ("TODO")
@@ -115,7 +115,7 @@ class CalendarResponseTest : ShouldSpec() {
             //modelInstance.formatted shouldBe ("TODO")
         }
 
-        // to test the property `weekNumber`
+        // to test the property `weekNumber` - ISO 8601 week number (present with `week=true`). It belongs to the ISO week-year, which is not returned and can differ from `year` near January 1 (2027-01-01 is week 53 of 2026).
         should("test weekNumber") {
             // uncomment below to test the property
             //modelInstance.weekNumber shouldBe ("TODO")

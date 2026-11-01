@@ -63,7 +63,7 @@ class GetCurrentTime200ResponseTest : ShouldSpec() {
             //modelInstance.human shouldBe ("TODO")
         }
 
-        // to test the property `dayNumber`
+        // to test the property `dayNumber` - Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday).
         should("test dayNumber") {
             // uncomment below to test the property
             //modelInstance.dayNumber shouldBe ("TODO")
