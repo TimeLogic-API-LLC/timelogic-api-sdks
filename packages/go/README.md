@@ -5,12 +5,12 @@ Official Go client for [TimeLogic API](https://api.timelogicapi.com): current ti
 - the `/v1` client, generated from the [TimeLogic API contract](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/openapi/openapi.yaml), with direct and RapidAPI transports;
 - a [WorldTimeAPI-compatible client](#worldtimeapi-compatible-client) for the `/api/timezone` and `/api/ip` routes, which use worldtimeapi.org's paths, fields and plain-text format.
 
-Package: [`github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2`](https://pkg.go.dev/github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2), version 1.1.0. Changes are listed in the [changelog](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/CHANGELOG.md).
+Package: [`github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2`](https://pkg.go.dev/github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2), version 2.0.0. Changes are listed in the [changelog](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/CHANGELOG.md).
 
 ## Install
 
 ```bash
-go get github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2@v1.1.0
+go get github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2@v2.0.0
 ```
 
 Requires Go 1.18+. The package name is `timelogicapi`.
