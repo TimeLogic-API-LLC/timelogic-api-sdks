@@ -1,5 +1,5 @@
 group 'com.timelogicapi'
-version '1.0.3'
+version '1.1.0'
 
 wrapper {
     gradleVersion = '8.7'

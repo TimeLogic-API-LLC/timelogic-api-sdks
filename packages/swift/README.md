@@ -5,7 +5,7 @@ Official Swift client for [TimeLogic API](https://api.timelogicapi.com): current
 - the `/v1` client, generated from the [TimeLogic API contract](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/openapi/openapi.yaml), with direct and RapidAPI transports;
 - a [WorldTimeAPI-compatible client](#worldtimeapi-compatible-client) for the `/api/timezone` and `/api/ip` routes, which use worldtimeapi.org's paths, fields and plain-text format.
 
-Package: `TimeLogicAPI` (Swift Package Manager, this repository), version 1.0.3. Changes are listed in the [changelog](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/CHANGELOG.md).
+Package: `TimeLogicAPI` (Swift Package Manager, this repository), version 1.1.0. Changes are listed in the [changelog](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/CHANGELOG.md).
 
 ## Install
 
@@ -13,7 +13,7 @@ Swift Package Manager:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git", from: "1.0.3")
+    .package(url: "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git", from: "1.1.0")
 ]
 ```
 

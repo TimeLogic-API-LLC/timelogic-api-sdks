@@ -14,7 +14,7 @@
 """  # noqa: E501
 
 
-__version__ = "1.0.3"
+__version__ = "1.1.0"
 
 # import apis into sdk package
 from timelogic_direct_api.api.time_api import TimeApi

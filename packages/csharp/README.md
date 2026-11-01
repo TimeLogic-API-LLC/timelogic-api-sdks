@@ -5,12 +5,12 @@ Official .NET client for [TimeLogic API](https://api.timelogicapi.com): current 
 - the `/v1` client, generated from the [TimeLogic API contract](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/openapi/openapi.yaml), with direct and RapidAPI transports;
 - a [WorldTimeAPI-compatible client](#worldtimeapi-compatible-client) for the `/api/timezone` and `/api/ip` routes, which use worldtimeapi.org's paths, fields and plain-text format.
 
-Package: [`TimeLogic.Api`](https://www.nuget.org/packages/TimeLogic.Api), version 1.0.3. Changes are listed in the [changelog](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/CHANGELOG.md).
+Package: [`TimeLogic.Api`](https://www.nuget.org/packages/TimeLogic.Api), version 1.1.0. Changes are listed in the [changelog](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/CHANGELOG.md).
 
 ## Install
 
 ```bash
-dotnet add package TimeLogic.Api --version 1.0.3
+dotnet add package TimeLogic.Api --version 1.1.0
 ```
 
 Targets .NET 8.

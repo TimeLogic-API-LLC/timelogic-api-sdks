@@ -5,12 +5,12 @@ Official TypeScript / JavaScript client for [TimeLogic API](https://api.timelogi
 - the `/v1` client, generated from the [TimeLogic API contract](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/openapi/openapi.yaml), with direct and RapidAPI transports;
 - a [WorldTimeAPI-compatible client](#worldtimeapi-compatible-client) for the `/api/timezone` and `/api/ip` routes, which use worldtimeapi.org's paths, fields and plain-text format.
 
-Package: [`@timelogic/direct-api`](https://www.npmjs.com/package/@timelogic/direct-api), version 1.0.3. Changes are listed in the [changelog](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/CHANGELOG.md).
+Package: [`@timelogic/direct-api`](https://www.npmjs.com/package/@timelogic/direct-api), version 1.1.0. Changes are listed in the [changelog](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/CHANGELOG.md).
 
 ## Install
 
 ```bash
-npm install @timelogic/direct-api@1.0.3
+npm install @timelogic/direct-api@1.1.0
 ```
 
 Runs on Node.js 18+ and in browsers; requests use the global `fetch`. The package ships ES module and CommonJS builds with type definitions.
