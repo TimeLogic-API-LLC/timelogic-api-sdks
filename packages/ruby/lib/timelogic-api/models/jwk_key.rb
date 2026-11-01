@@ -27,6 +27,12 @@ module TimeLogic::Api
 
     attr_accessor :x
 
+    # Permitted key operations; published keys allow only `verify`.
+    attr_accessor :key_ops
+
+    # JWK extractable flag as exported by the signing worker; always `true`.
+    attr_accessor :ext
+
     class EnumAttributeValidator
       attr_reader :datatype
       attr_reader :allowable_values
@@ -57,7 +63,9 @@ module TimeLogic::Api
         :'alg' => :'alg',
         :'use' => :'use',
         :'kid' => :'kid',
-        :'x' => :'x'
+        :'x' => :'x',
+        :'key_ops' => :'key_ops',
+        :'ext' => :'ext'
       }
     end
 
@@ -74,7 +82,9 @@ module TimeLogic::Api
         :'alg' => :'String',
         :'use' => :'String',
         :'kid' => :'String',
-        :'x' => :'String'
+        :'x' => :'String',
+        :'key_ops' => :'Array<String>',
+        :'ext' => :'Boolean'
       }
     end
 
@@ -133,6 +143,16 @@ module TimeLogic::Api
         self.x = attributes[:'x']
       else
         self.x = nil
+      end
+
+      if attributes.key?(:'key_ops')
+        if (value = attributes[:'key_ops']).is_a?(Array)
+          self.key_ops = value
+        end
+      end
+
+      if attributes.key?(:'ext')
+        self.ext = attributes[:'ext']
       end
     end
 
@@ -239,7 +259,9 @@ module TimeLogic::Api
           alg == o.alg &&
           use == o.use &&
           kid == o.kid &&
-          x == o.x
+          x == o.x &&
+          key_ops == o.key_ops &&
+          ext == o.ext
     end
 
     # @see the `==` method
@@ -251,7 +273,7 @@ module TimeLogic::Api
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [kty, crv, alg, use, kid, x].hash
+      [kty, crv, alg, use, kid, x, key_ops, ext].hash
     end
 
     # Builds the object from hash

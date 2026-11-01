@@ -25,6 +25,12 @@ pub struct JwkKey {
     pub kid: String,
     #[serde(rename = "x")]
     pub x: String,
+    /// Permitted key operations; published keys allow only `verify`.
+    #[serde(rename = "key_ops", skip_serializing_if = "Option::is_none")]
+    pub key_ops: Option<Vec<KeyOps>>,
+    /// JWK extractable flag as exported by the signing worker; always `true`.
+    #[serde(rename = "ext", skip_serializing_if = "Option::is_none")]
+    pub ext: Option<bool>,
 }
 
 impl JwkKey {
@@ -36,6 +42,8 @@ impl JwkKey {
             r#use,
             kid,
             x,
+            key_ops: None,
+            ext: None,
         }
     }
 }
@@ -85,6 +93,18 @@ pub enum Use {
 impl Default for Use {
     fn default() -> Use {
         Self::Sig
+    }
+}
+/// Permitted key operations; published keys allow only `verify`.
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
+pub enum KeyOps {
+    #[serde(rename = "verify")]
+    Verify,
+}
+
+impl Default for KeyOps {
+    fn default() -> KeyOps {
+        Self::Verify
     }
 }
 

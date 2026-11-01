@@ -4,19 +4,9 @@
 ## Properties
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
-| **unix** | **kotlin.Long** |  |  |
-| **unixMs** | **kotlin.Long** |  |  |
-| **utc** | [**java.time.OffsetDateTime**](java.time.OffsetDateTime.md) |  |  |
-| **isoLocal** | **kotlin.String** |  |  |
-| **rfc2822** | **kotlin.String** |  |  |
-| **human** | **kotlin.String** |  |  |
-| **dayNumber** | **kotlin.Int** | Day of the week counted from Sunday (1 &#x3D; Sunday, 2 &#x3D; Monday ... 7 &#x3D; Saturday). |  |
-| **dayShort** | **kotlin.String** |  |  |
-| **dayFull** | **kotlin.String** |  |  |
-| **timezone** | **kotlin.String** |  |  |
-| **offset** | **kotlin.Int** |  |  |
-| **dst** | **kotlin.Boolean** |  |  |
-| **formatted** | **kotlin.String** |  |  [optional] |
+| **timezone** | **kotlin.String** | IANA timezone name. |  |
+| **offset** | **kotlin.Int** | Current UTC offset of the zone in minutes. |  |
+| **dst** | **kotlin.Boolean** | Whether daylight saving time is currently in effect in the zone. |  |
 
 
 

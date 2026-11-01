@@ -20,7 +20,9 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -280,6 +282,66 @@ public class JwkKey {
   @javax.annotation.Nonnull
   private String x;
 
+  /**
+   * Gets or Sets keyOps
+   */
+  @JsonAdapter(KeyOpsEnum.Adapter.class)
+  public enum KeyOpsEnum {
+    VERIFY("verify");
+
+    private String value;
+
+    KeyOpsEnum(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    public static KeyOpsEnum fromValue(String value) {
+      for (KeyOpsEnum b : KeyOpsEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+
+    public static class Adapter extends TypeAdapter<KeyOpsEnum> {
+      @Override
+      public void write(final JsonWriter jsonWriter, final KeyOpsEnum enumeration) throws IOException {
+        jsonWriter.value(enumeration.getValue());
+      }
+
+      @Override
+      public KeyOpsEnum read(final JsonReader jsonReader) throws IOException {
+        String value =  jsonReader.nextString();
+        return KeyOpsEnum.fromValue(value);
+      }
+    }
+
+    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+      String value = jsonElement.getAsString();
+      KeyOpsEnum.fromValue(value);
+    }
+  }
+
+  public static final String SERIALIZED_NAME_KEY_OPS = "key_ops";
+  @SerializedName(SERIALIZED_NAME_KEY_OPS)
+  @javax.annotation.Nullable
+  private List<KeyOpsEnum> keyOps = new ArrayList<>();
+
+  public static final String SERIALIZED_NAME_EXT = "ext";
+  @SerializedName(SERIALIZED_NAME_EXT)
+  @javax.annotation.Nullable
+  private Boolean ext;
+
   public JwkKey() {
   }
 
@@ -397,6 +459,52 @@ public class JwkKey {
   }
 
 
+  public JwkKey keyOps(@javax.annotation.Nullable List<KeyOpsEnum> keyOps) {
+    this.keyOps = keyOps;
+    return this;
+  }
+
+  public JwkKey addKeyOpsItem(KeyOpsEnum keyOpsItem) {
+    if (this.keyOps == null) {
+      this.keyOps = new ArrayList<>();
+    }
+    this.keyOps.add(keyOpsItem);
+    return this;
+  }
+
+  /**
+   * Permitted key operations; published keys allow only &#x60;verify&#x60;.
+   * @return keyOps
+   */
+  @javax.annotation.Nullable
+  public List<KeyOpsEnum> getKeyOps() {
+    return keyOps;
+  }
+
+  public void setKeyOps(@javax.annotation.Nullable List<KeyOpsEnum> keyOps) {
+    this.keyOps = keyOps;
+  }
+
+
+  public JwkKey ext(@javax.annotation.Nullable Boolean ext) {
+    this.ext = ext;
+    return this;
+  }
+
+  /**
+   * JWK extractable flag as exported by the signing worker; always &#x60;true&#x60;.
+   * @return ext
+   */
+  @javax.annotation.Nullable
+  public Boolean getExt() {
+    return ext;
+  }
+
+  public void setExt(@javax.annotation.Nullable Boolean ext) {
+    this.ext = ext;
+  }
+
+
 
   @Override
   public boolean equals(Object o) {
@@ -412,12 +520,14 @@ public class JwkKey {
         Objects.equals(this.alg, jwkKey.alg) &&
         Objects.equals(this.use, jwkKey.use) &&
         Objects.equals(this.kid, jwkKey.kid) &&
-        Objects.equals(this.x, jwkKey.x);
+        Objects.equals(this.x, jwkKey.x) &&
+        Objects.equals(this.keyOps, jwkKey.keyOps) &&
+        Objects.equals(this.ext, jwkKey.ext);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(kty, crv, alg, use, kid, x);
+    return Objects.hash(kty, crv, alg, use, kid, x, keyOps, ext);
   }
 
   @Override
@@ -430,6 +540,8 @@ public class JwkKey {
     sb.append("    use: ").append(toIndentedString(use)).append("\n");
     sb.append("    kid: ").append(toIndentedString(kid)).append("\n");
     sb.append("    x: ").append(toIndentedString(x)).append("\n");
+    sb.append("    keyOps: ").append(toIndentedString(keyOps)).append("\n");
+    sb.append("    ext: ").append(toIndentedString(ext)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -458,6 +570,8 @@ public class JwkKey {
     openapiFields.add("use");
     openapiFields.add("kid");
     openapiFields.add("x");
+    openapiFields.add("key_ops");
+    openapiFields.add("ext");
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>();
@@ -516,6 +630,10 @@ public class JwkKey {
       }
       if (!jsonObj.get("x").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format("Expected the field `x` to be a primitive type in the JSON string but got `%s`", jsonObj.get("x").toString()));
+      }
+      // ensure the optional json data is an array if present
+      if (jsonObj.get("key_ops") != null && !jsonObj.get("key_ops").isJsonNull() && !jsonObj.get("key_ops").isJsonArray()) {
+        throw new IllegalArgumentException(String.format("Expected the field `key_ops` to be an array in the JSON string but got `%s`", jsonObj.get("key_ops").toString()));
       }
   }
 

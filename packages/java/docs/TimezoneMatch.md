@@ -2,24 +2,15 @@
 
 # TimezoneMatch
 
+One geographic zone whose current offset equals the requested offset.
 
 ## Properties
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**unix** | **Long** |  |  |
-|**unixMs** | **Long** |  |  |
-|**utc** | **OffsetDateTime** |  |  |
-|**isoLocal** | **String** |  |  |
-|**rfc2822** | **String** |  |  |
-|**human** | **String** |  |  |
-|**dayNumber** | **Integer** | Day of the week counted from Sunday (1 &#x3D; Sunday, 2 &#x3D; Monday ... 7 &#x3D; Saturday). |  |
-|**dayShort** | **String** |  |  |
-|**dayFull** | **String** |  |  |
-|**timezone** | **String** |  |  |
-|**formatted** | **String** |  |  [optional] |
-|**offset** | **Integer** |  |  |
-|**dst** | **Boolean** |  |  |
+|**timezone** | **String** | IANA timezone name. |  |
+|**offset** | **Integer** | Current UTC offset of the zone in minutes. |  |
+|**dst** | **Boolean** | Whether daylight saving time is currently in effect in the zone. |  |
 
 
 

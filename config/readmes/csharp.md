@@ -90,7 +90,7 @@ Console.WriteLine($"{diff.Days} {diff.Direction} {diff.BusinessDays}"); // 118 F
 var left = await time.GetElapsedAsync(iso: "2027-01-01T00:00:00Z"); // every operation also has an *Async form
 
 // Zone details, DST status with the next transition, ISO week number
-var berlin = time.GetTimezone(tz: "Europe/Berlin").GetTimezoneResolvedResponse();
+var berlin = time.GetTimezone(tz: "Europe/Berlin");
 var dst = time.GetDst(tz: "America/New_York", next: true);
 var calendar = time.GetCalendar(tz: "Europe/London", week: true);
 
@@ -164,26 +164,46 @@ Console.WriteLine($"{raw.Status} {raw.Headers["x-timelogic-signature"]} {raw.Bod
 
 Routes, fields and errors: [WorldTimeAPI-compatible routes](#worldtimeapi-compatible-routes).
 
-## Known issues
+## Migrating from 1.x to 2.0
 
-Checked against the live API for this release. All other operations, including single-target `current`, `convert` and `timezone` calls, decode normally.
+2.0 changes the `/v1` response types so that every response decodes into a typed model. The API itself is unchanged. What changed in the contract, for every language:
 
-- Bulk `GetCurrentTime` / `ConvertTime` calls (comma-separated selectors) and `offset` lookups with `GetTimezone` throw `InvalidDataException` while decoding. Call those endpoints with `HttpClient`:
+- `timezone` returns one model, `TimezoneResponse`: the time payload plus `offset`, `dst`, and `matching_zones` (present only for `offset` lookups). The `oneOf` wrapper `GetTimezone200Response` and its members `TimezoneResolvedResponse` and `TimezoneOffsetResponse` are removed.
+- `TimezoneMatch` (the `matching_zones` item) is `timezone`, `offset` and `dst`, as the API returns it. It previously described a full time payload.
+- `timezone` takes the `format` parameter, after `sign`.
+- `JwkKey` lists the optional `key_ops` and `ext` members.
+- `current` and `convert` no longer reject a comma-separated `tz` list longer than 64 characters or an `offset` list before sending it; an invalid value in a list comes back as a `BulkError` item.
+
+In this package:
+
+- `TimePayloadBulkResponse` is a `List<TimePayloadBulkItem>`; bulk `GetCurrentTime` / `ConvertTime` calls decode, and each item holds a `TimePayload` or a `BulkError`. 1.x threw `InvalidDataException`.
+- Date-like strings in `oneOf` results (`IsoLocal`) keep the API's offset; they are no longer re-written in the machine's local offset.
+- `GetTimezone` returns `TimezoneResponse` and takes `format`. 1.x returned `GetTimezone200Response`.
+
+Before (1.x):
 
 ```csharp
-using System.Net.Http.Headers;
-using System.Text.Json;
-
-// Bulk current/convert and offset timezone lookups: call the endpoint directly and read the JSON
-using var http = new HttpClient { BaseAddress = new Uri("https://api.timelogicapi.com") };
-http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Environment.GetEnvironmentVariable("TIMELOGIC_API_KEY"));
-
-using var bulk = JsonDocument.Parse(await http.GetStringAsync("/v1/time/current?tz=Europe/London,Asia/Tokyo"));
-Console.WriteLine(bulk.RootElement[1].GetProperty("timezone"));          // Asia/Tokyo
-
-using var offset = JsonDocument.Parse(await http.GetStringAsync("/v1/timezone?offset=%2B05:30"));
-Console.WriteLine(offset.RootElement.GetProperty("matching_zones")[0].GetProperty("timezone")); // Asia/Colombo
+var berlin = time.GetTimezone(tz: "Europe/Berlin");
 ```
+
+After (2.0):
+
+```csharp
+var berlin = time.GetTimezone(tz: "Europe/Berlin"); // TimezoneResponse
+var ist = time.GetTimezone(offset: "+05:30");
+foreach (var zone in ist.MatchingZones) Console.WriteLine($"{zone.Timezone} {zone.Offset}");
+
+var many = time.GetCurrentTime(tz: "Europe/London,Nope/Zone").GetTimePayloadBulkResponse();
+foreach (var item in many)
+{
+    if (item.ActualInstance is BulkError error) Console.WriteLine($"{error.Item}: {error.Error.Code}");
+    else Console.WriteLine(item.GetTimePayload().IsoLocal);
+}
+```
+
+## Known issues
+
+Checked against the live API for this release: every `/v1` operation, including bulk `current` / `convert` calls and `offset` lookups with `timezone`, decodes into the typed models. There are no known issues.
 
 <!-- include: shared/v1-api.md -->
 

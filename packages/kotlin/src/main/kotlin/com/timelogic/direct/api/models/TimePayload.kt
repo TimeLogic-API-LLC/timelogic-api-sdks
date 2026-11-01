@@ -72,7 +72,7 @@ data class TimePayload (
     @Json(name = "formatted")
     val formatted: kotlin.String? = null
 
-) {
+) : GetCurrentTime200Response, TimePayloadBulkItem {
 
 
 }

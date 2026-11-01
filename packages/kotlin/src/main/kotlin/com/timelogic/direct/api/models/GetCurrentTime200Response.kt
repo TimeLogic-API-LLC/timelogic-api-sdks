@@ -15,67 +15,8 @@
 
 package com.timelogic.direct.api.models
 
-import com.timelogic.direct.api.models.TimePayload
-import com.timelogic.direct.api.models.TimePayloadBulkResponse
-
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
-
 /**
- *
- *
- * @param unix
- * @param unixMs
- * @param utc
- * @param isoLocal
- * @param rfc2822
- * @param human
- * @param dayNumber Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday).
- * @param dayShort
- * @param dayFull
- * @param timezone
- * @param formatted
+ * The `/v1/time/current` and `/v1/time/convert` result: a [TimePayload] for one
+ * target, or a [TimePayloadBulkResponse] for a comma-separated selector list.
  */
-
-
-data class GetCurrentTime200Response (
-
-    @Json(name = "unix")
-    val unix: kotlin.Long,
-
-    @Json(name = "unix_ms")
-    val unixMs: kotlin.Long,
-
-    @Json(name = "utc")
-    val utc: java.time.OffsetDateTime,
-
-    @Json(name = "iso_local")
-    val isoLocal: kotlin.String?,
-
-    @Json(name = "rfc2822")
-    val rfc2822: kotlin.String,
-
-    @Json(name = "human")
-    val human: kotlin.String,
-
-    /* Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday). */
-    @Json(name = "day_number")
-    val dayNumber: kotlin.Int,
-
-    @Json(name = "day_short")
-    val dayShort: kotlin.String,
-
-    @Json(name = "day_full")
-    val dayFull: kotlin.String,
-
-    @Json(name = "timezone")
-    val timezone: kotlin.String?,
-
-    @Json(name = "formatted")
-    val formatted: kotlin.String? = null
-
-) {
-
-
-}
-
+sealed interface GetCurrentTime200Response

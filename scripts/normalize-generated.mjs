@@ -2,7 +2,8 @@ import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'n
 import { join } from 'node:path';
 
 const repoUrl = 'https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git';
-const moduleName = 'github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go';
+// Go semantic import versioning: from v2 on, the module path ends in the major version.
+const moduleName = 'github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2';
 const currentVersion = readFileSync('.sdk-version', 'utf8').trim();
 const releaseVersion = process.env.SDK_VERSION ?? currentVersion;
 

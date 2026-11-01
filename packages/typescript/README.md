@@ -26,9 +26,8 @@ const api = new TimeApi(createConfiguration({ apiKey: process.env.TIMELOGIC_API_
 
 const now = await api.getCurrentTime({ tz: 'America/New_York' });
 console.log(now);
-// { unix: 1793538963, unix_ms: 1793538963266, utc: '2026-11-01T13:16:03Z',
-//   iso_local: '2026-11-01T08:16:03-05:00', timezone: 'America/New_York', ... }
-// getCurrentTime and convertTime return the API's field names; see "Known issues".
+// { unix: 1793538963, unixMs: 1793538963266, utc: 2026-11-01T13:16:03.000Z,
+//   isoLocal: '2026-11-01T08:16:03-05:00', timezone: 'America/New_York', ... }
 ```
 
 ## Configuration
@@ -178,21 +177,51 @@ console.log(res.status, res.headers['x-timelogic-signature'], res.body);
 
 Routes, fields and errors: [WorldTimeAPI-compatible routes](#worldtimeapi-compatible-routes).
 
-## Known issues
+## Migrating from 1.x to 2.0
 
-Checked against the live API for this release. All other operations, including single-target `current`, `convert` and `timezone` calls, decode normally.
+2.0 changes the `/v1` response types so that every response decodes into a typed model. The API itself is unchanged. What changed in the contract, for every language:
 
-- `getCurrentTime` and `convertTime` (single and bulk) resolve to the response JSON exactly as the API sends it, with snake_case keys (`iso_local`, `unix_ms`, `day_number`), although the declared return type is the camelCase `TimePayload`. All other operations return camelCase models. Read those two results as the API's field names:
+- `timezone` returns one model, `TimezoneResponse`: the time payload plus `offset`, `dst`, and `matching_zones` (present only for `offset` lookups). The `oneOf` wrapper `GetTimezone200Response` and its members `TimezoneResolvedResponse` and `TimezoneOffsetResponse` are removed.
+- `TimezoneMatch` (the `matching_zones` item) is `timezone`, `offset` and `dst`, as the API returns it. It previously described a full time payload.
+- `timezone` takes the `format` parameter, after `sign`.
+- `JwkKey` lists the optional `key_ops` and `ext` members.
+- `current` and `convert` no longer reject a comma-separated `tz` list longer than 64 characters or an `offset` list before sending it; an invalid value in a list comes back as a `BulkError` item.
+
+In this package:
+
+- `getCurrentTime` and `convertTime` resolve to camelCase models: a `TimePayload` for one target, or a `TimePayloadBulkResponse` (an array of `TimePayload` and `BulkError` items) for a bulk selector. In 1.x they resolved to the raw snake_case JSON. `isTimePayloadBulkResponse()` and `isBulkError()` tell the shapes apart.
+- `getTimezone` resolves to `TimezoneResponse`; `matchingZones` items are `TimezoneMatch` (`timezone`, `offset`, `dst`).
+
+Before (1.x):
 
 ```ts
-import { TimeApi, createConfiguration } from '@timelogic/direct-api';
-
-const time = new TimeApi(createConfiguration({ apiKey: process.env.TIMELOGIC_API_KEY! }));
-
-// getCurrentTime and convertTime resolve to the API's JSON (snake_case keys)
-const now = (await time.getCurrentTime({ tz: 'Europe/London' })) as unknown as { iso_local: string; timezone: string };
-console.log(now.iso_local, now.timezone);
+const now = (await time.getCurrentTime({ tz: 'Europe/London' })) as unknown as { iso_local: string };
+console.log(now.iso_local);
+const ist = (await time.getTimezone({ offset: '+05:30' })) as TimezoneOffsetResponse;
 ```
+
+After (2.0):
+
+```ts
+import { TimePayload, isBulkError, isTimePayloadBulkResponse } from '@timelogic/direct-api';
+
+const now = (await time.getCurrentTime({ tz: 'Europe/London' })) as TimePayload;
+console.log(now.isoLocal);
+
+const many = await time.getCurrentTime({ tz: 'Europe/London,Asia/Tokyo,Nope/Zone' });
+if (isTimePayloadBulkResponse(many)) {
+  for (const item of many) {
+    console.log(isBulkError(item) ? `${item.item}: ${item.error.code}` : item.isoLocal);
+  }
+}
+
+const ist = await time.getTimezone({ offset: '+05:30' }); // TimezoneResponse
+console.log(ist.matchingZones?.map((zone) => zone.timezone)); // ['Asia/Colombo', 'Asia/Kolkata']
+```
+
+## Known issues
+
+Checked against the live API for this release: every `/v1` operation, including bulk `current` / `convert` calls and `offset` lookups with `timezone`, decodes into the typed models. There are no known issues.
 
 ## How the API works
 

@@ -45,7 +45,7 @@ data class BulkError (
     @Json(name = "timestamp")
     val timestamp: java.time.OffsetDateTime? = null
 
-) {
+) : TimePayloadBulkItem {
 
 
 }

@@ -26,7 +26,7 @@ using OpenAPIDateConverter = TimeLogic.Api.Client.OpenAPIDateConverter;
 namespace TimeLogic.Api.Model
 {
     /// <summary>
-    /// TimezoneMatch
+    /// One geographic zone whose current offset equals the requested offset.
     /// </summary>
     [DataContract(Name = "TimezoneMatch")]
     public partial class TimezoneMatch : IValidatableObject
@@ -39,55 +39,11 @@ namespace TimeLogic.Api.Model
         /// <summary>
         /// Initializes a new instance of the <see cref="TimezoneMatch" /> class.
         /// </summary>
-        /// <param name="unix">unix (required).</param>
-        /// <param name="unixMs">unixMs (required).</param>
-        /// <param name="utc">utc (required).</param>
-        /// <param name="isoLocal">isoLocal (required).</param>
-        /// <param name="rfc2822">rfc2822 (required).</param>
-        /// <param name="human">human (required).</param>
-        /// <param name="dayNumber">Day of the week counted from Sunday (1 &#x3D; Sunday, 2 &#x3D; Monday ... 7 &#x3D; Saturday). (required).</param>
-        /// <param name="dayShort">dayShort (required).</param>
-        /// <param name="dayFull">dayFull (required).</param>
-        /// <param name="timezone">timezone (required).</param>
-        /// <param name="formatted">formatted.</param>
-        /// <param name="offset">offset (required).</param>
-        /// <param name="dst">dst (required).</param>
-        public TimezoneMatch(long unix = default(long), long unixMs = default(long), DateTime utc = default(DateTime), string isoLocal = default(string), string rfc2822 = default(string), string human = default(string), int dayNumber = default(int), string dayShort = default(string), string dayFull = default(string), string timezone = default(string), string formatted = default(string), int offset = default(int), bool dst = default(bool))
+        /// <param name="timezone">IANA timezone name. (required).</param>
+        /// <param name="offset">Current UTC offset of the zone in minutes. (required).</param>
+        /// <param name="dst">Whether daylight saving time is currently in effect in the zone. (required).</param>
+        public TimezoneMatch(string timezone = default(string), int offset = default(int), bool dst = default(bool))
         {
-            this.Unix = unix;
-            this.UnixMs = unixMs;
-            this.Utc = utc;
-            // to ensure "isoLocal" is required (not null)
-            if (isoLocal == null)
-            {
-                throw new ArgumentNullException("isoLocal is a required property for TimezoneMatch and cannot be null");
-            }
-            this.IsoLocal = isoLocal;
-            // to ensure "rfc2822" is required (not null)
-            if (rfc2822 == null)
-            {
-                throw new ArgumentNullException("rfc2822 is a required property for TimezoneMatch and cannot be null");
-            }
-            this.Rfc2822 = rfc2822;
-            // to ensure "human" is required (not null)
-            if (human == null)
-            {
-                throw new ArgumentNullException("human is a required property for TimezoneMatch and cannot be null");
-            }
-            this.Human = human;
-            this.DayNumber = dayNumber;
-            // to ensure "dayShort" is required (not null)
-            if (dayShort == null)
-            {
-                throw new ArgumentNullException("dayShort is a required property for TimezoneMatch and cannot be null");
-            }
-            this.DayShort = dayShort;
-            // to ensure "dayFull" is required (not null)
-            if (dayFull == null)
-            {
-                throw new ArgumentNullException("dayFull is a required property for TimezoneMatch and cannot be null");
-            }
-            this.DayFull = dayFull;
             // to ensure "timezone" is required (not null)
             if (timezone == null)
             {
@@ -96,85 +52,26 @@ namespace TimeLogic.Api.Model
             this.Timezone = timezone;
             this.Offset = offset;
             this.Dst = dst;
-            this.Formatted = formatted;
         }
 
         /// <summary>
-        /// Gets or Sets Unix
+        /// IANA timezone name.
         /// </summary>
-        [DataMember(Name = "unix", IsRequired = true, EmitDefaultValue = true)]
-        public long Unix { get; set; }
-
-        /// <summary>
-        /// Gets or Sets UnixMs
-        /// </summary>
-        [DataMember(Name = "unix_ms", IsRequired = true, EmitDefaultValue = true)]
-        public long UnixMs { get; set; }
-
-        /// <summary>
-        /// Gets or Sets Utc
-        /// </summary>
-        [DataMember(Name = "utc", IsRequired = true, EmitDefaultValue = true)]
-        public DateTime Utc { get; set; }
-
-        /// <summary>
-        /// Gets or Sets IsoLocal
-        /// </summary>
-        [DataMember(Name = "iso_local", IsRequired = true, EmitDefaultValue = true)]
-        public string IsoLocal { get; set; }
-
-        /// <summary>
-        /// Gets or Sets Rfc2822
-        /// </summary>
-        [DataMember(Name = "rfc2822", IsRequired = true, EmitDefaultValue = true)]
-        public string Rfc2822 { get; set; }
-
-        /// <summary>
-        /// Gets or Sets Human
-        /// </summary>
-        [DataMember(Name = "human", IsRequired = true, EmitDefaultValue = true)]
-        public string Human { get; set; }
-
-        /// <summary>
-        /// Day of the week counted from Sunday (1 &#x3D; Sunday, 2 &#x3D; Monday ... 7 &#x3D; Saturday).
-        /// </summary>
-        /// <value>Day of the week counted from Sunday (1 &#x3D; Sunday, 2 &#x3D; Monday ... 7 &#x3D; Saturday).</value>
-        [DataMember(Name = "day_number", IsRequired = true, EmitDefaultValue = true)]
-        public int DayNumber { get; set; }
-
-        /// <summary>
-        /// Gets or Sets DayShort
-        /// </summary>
-        [DataMember(Name = "day_short", IsRequired = true, EmitDefaultValue = true)]
-        public string DayShort { get; set; }
-
-        /// <summary>
-        /// Gets or Sets DayFull
-        /// </summary>
-        [DataMember(Name = "day_full", IsRequired = true, EmitDefaultValue = true)]
-        public string DayFull { get; set; }
-
-        /// <summary>
-        /// Gets or Sets Timezone
-        /// </summary>
+        /// <value>IANA timezone name.</value>
         [DataMember(Name = "timezone", IsRequired = true, EmitDefaultValue = true)]
         public string Timezone { get; set; }
 
         /// <summary>
-        /// Gets or Sets Formatted
+        /// Current UTC offset of the zone in minutes.
         /// </summary>
-        [DataMember(Name = "formatted", EmitDefaultValue = false)]
-        public string Formatted { get; set; }
-
-        /// <summary>
-        /// Gets or Sets Offset
-        /// </summary>
+        /// <value>Current UTC offset of the zone in minutes.</value>
         [DataMember(Name = "offset", IsRequired = true, EmitDefaultValue = true)]
         public int Offset { get; set; }
 
         /// <summary>
-        /// Gets or Sets Dst
+        /// Whether daylight saving time is currently in effect in the zone.
         /// </summary>
+        /// <value>Whether daylight saving time is currently in effect in the zone.</value>
         [DataMember(Name = "dst", IsRequired = true, EmitDefaultValue = true)]
         public bool Dst { get; set; }
 
@@ -186,17 +83,7 @@ namespace TimeLogic.Api.Model
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("class TimezoneMatch {\n");
-            sb.Append("  Unix: ").Append(Unix).Append("\n");
-            sb.Append("  UnixMs: ").Append(UnixMs).Append("\n");
-            sb.Append("  Utc: ").Append(Utc).Append("\n");
-            sb.Append("  IsoLocal: ").Append(IsoLocal).Append("\n");
-            sb.Append("  Rfc2822: ").Append(Rfc2822).Append("\n");
-            sb.Append("  Human: ").Append(Human).Append("\n");
-            sb.Append("  DayNumber: ").Append(DayNumber).Append("\n");
-            sb.Append("  DayShort: ").Append(DayShort).Append("\n");
-            sb.Append("  DayFull: ").Append(DayFull).Append("\n");
             sb.Append("  Timezone: ").Append(Timezone).Append("\n");
-            sb.Append("  Formatted: ").Append(Formatted).Append("\n");
             sb.Append("  Offset: ").Append(Offset).Append("\n");
             sb.Append("  Dst: ").Append(Dst).Append("\n");
             sb.Append("}\n");
@@ -219,18 +106,6 @@ namespace TimeLogic.Api.Model
         /// <returns>Validation Result</returns>
         IEnumerable<ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
         {
-            // DayNumber (int) maximum
-            if (this.DayNumber > (int)7)
-            {
-                yield return new ValidationResult("Invalid value for DayNumber, must be a value less than or equal to 7.", new [] { "DayNumber" });
-            }
-
-            // DayNumber (int) minimum
-            if (this.DayNumber < (int)1)
-            {
-                yield return new ValidationResult("Invalid value for DayNumber, must be a value greater than or equal to 1.", new [] { "DayNumber" });
-            }
-
             yield break;
         }
     }

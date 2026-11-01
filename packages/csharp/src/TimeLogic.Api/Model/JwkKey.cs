@@ -108,6 +108,19 @@ namespace TimeLogic.Api.Model
         [DataMember(Name = "use", IsRequired = true, EmitDefaultValue = true)]
         public UseEnum Use { get; set; }
         /// <summary>
+        /// Defines KeyOps
+        /// </summary>
+        [JsonConverter(typeof(StringEnumConverter))]
+        public enum KeyOpsEnum
+        {
+            /// <summary>
+            /// Enum Verify for value: verify
+            /// </summary>
+            [EnumMember(Value = "verify")]
+            Verify = 1
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="JwkKey" /> class.
         /// </summary>
         [JsonConstructorAttribute]
@@ -121,7 +134,9 @@ namespace TimeLogic.Api.Model
         /// <param name="use">use (required).</param>
         /// <param name="kid">kid (required).</param>
         /// <param name="x">x (required).</param>
-        public JwkKey(KtyEnum kty = default(KtyEnum), CrvEnum crv = default(CrvEnum), AlgEnum alg = default(AlgEnum), UseEnum use = default(UseEnum), string kid = default(string), string x = default(string))
+        /// <param name="keyOps">Permitted key operations; published keys allow only &#x60;verify&#x60;..</param>
+        /// <param name="ext">JWK extractable flag as exported by the signing worker; always &#x60;true&#x60;..</param>
+        public JwkKey(KtyEnum kty = default(KtyEnum), CrvEnum crv = default(CrvEnum), AlgEnum alg = default(AlgEnum), UseEnum use = default(UseEnum), string kid = default(string), string x = default(string), List<KeyOpsEnum> keyOps = default(List<KeyOpsEnum>), bool ext = default(bool))
         {
             this.Kty = kty;
             this.Crv = crv;
@@ -139,6 +154,8 @@ namespace TimeLogic.Api.Model
                 throw new ArgumentNullException("x is a required property for JwkKey and cannot be null");
             }
             this.X = x;
+            this.KeyOps = keyOps;
+            this.Ext = ext;
         }
 
         /// <summary>
@@ -157,6 +174,20 @@ namespace TimeLogic.Api.Model
         public string X { get; set; }
 
         /// <summary>
+        /// Permitted key operations; published keys allow only &#x60;verify&#x60;.
+        /// </summary>
+        /// <value>Permitted key operations; published keys allow only &#x60;verify&#x60;.</value>
+        [DataMember(Name = "key_ops", EmitDefaultValue = false)]
+        public List<JwkKey.KeyOpsEnum> KeyOps { get; set; }
+
+        /// <summary>
+        /// JWK extractable flag as exported by the signing worker; always &#x60;true&#x60;.
+        /// </summary>
+        /// <value>JWK extractable flag as exported by the signing worker; always &#x60;true&#x60;.</value>
+        [DataMember(Name = "ext", EmitDefaultValue = true)]
+        public bool Ext { get; set; }
+
+        /// <summary>
         /// Returns the string presentation of the object
         /// </summary>
         /// <returns>String presentation of the object</returns>
@@ -170,6 +201,8 @@ namespace TimeLogic.Api.Model
             sb.Append("  Use: ").Append(Use).Append("\n");
             sb.Append("  Kid: ").Append(Kid).Append("\n");
             sb.Append("  X: ").Append(X).Append("\n");
+            sb.Append("  KeyOps: ").Append(KeyOps).Append("\n");
+            sb.Append("  Ext: ").Append(Ext).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }

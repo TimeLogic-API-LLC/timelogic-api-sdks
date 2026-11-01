@@ -35,31 +35,12 @@ class TestTimezoneMatch(unittest.TestCase):
         model = TimezoneMatch()
         if include_optional:
             return TimezoneMatch(
-                unix = 56,
-                unix_ms = 56,
-                utc = datetime.datetime.strptime('2013-10-20 19:20:30.00', '%Y-%m-%d %H:%M:%S.%f'),
-                iso_local = '',
-                rfc2822 = '',
-                human = '',
-                day_number = 1,
-                day_short = '',
-                day_full = '',
                 timezone = '',
-                formatted = '',
                 offset = 56,
                 dst = True
             )
         else:
             return TimezoneMatch(
-                unix = 56,
-                unix_ms = 56,
-                utc = datetime.datetime.strptime('2013-10-20 19:20:30.00', '%Y-%m-%d %H:%M:%S.%f'),
-                iso_local = '',
-                rfc2822 = '',
-                human = '',
-                day_number = 1,
-                day_short = '',
-                day_full = '',
                 timezone = '',
                 offset = 56,
                 dst = True,

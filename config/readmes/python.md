@@ -67,7 +67,7 @@ custom = create_configuration(os.environ["TIMELOGIC_API_KEY"], base_url="https:/
 | Clock | `GET /v1/time/clock` | `TimeApi.get_clock()` |
 | Signing keys | `GET /.well-known/time-api-public-key` | `UtilityApi.get_public_signing_key()` |
 
-Operations take keyword arguments named after the query parameters in snake_case. `from` is a Python keyword, so `diff_time` takes it as `var_from`. `current`, `convert` and `timezone` return a wrapper whose `.actual_instance` is the decoded model. Every operation has `…_with_http_info` (status, headers and data) and `…_without_preload_content` (the raw `urllib3` response) variants. Parameters, response fields and errors for every operation: [How the API works](#how-the-api-works). Generated reference: [TimeApi](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/packages/python/docs/TimeApi.md), [UtilityApi](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/packages/python/docs/UtilityApi.md) and the models in the same folder.
+Operations take keyword arguments named after the query parameters in snake_case. `from` is a Python keyword, so `diff_time` takes it as `var_from`. `current` and `convert` return a wrapper whose `.actual_instance` is a `TimePayload`, or a `TimePayloadBulkResponse` for a bulk selector; `timezone` returns a `TimezoneResponse`. Every operation has `…_with_http_info` (status, headers and data) and `…_without_preload_content` (the raw `urllib3` response) variants. Parameters, response fields and errors for every operation: [How the API works](#how-the-api-works). Generated reference: [TimeApi](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/packages/python/docs/TimeApi.md), [UtilityApi](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/packages/python/docs/UtilityApi.md) and the models in the same folder.
 
 ### Examples
 
@@ -107,7 +107,7 @@ print(diff.days, diff.direction, diff.business_days)  # 118 forward 82
 left = time_api.get_elapsed(iso="2027-01-01T00:00:00Z")
 
 # Zone details, DST status with the next transition, ISO week number
-berlin = time_api.get_timezone(tz="Europe/Berlin").actual_instance
+berlin = time_api.get_timezone(tz="Europe/Berlin")
 dst = time_api.get_dst(tz="America/New_York", next=True)
 calendar = time_api.get_calendar(tz="Europe/London", week=True)
 
@@ -192,26 +192,43 @@ print(raw.status, raw.headers.get("x-timelogic-signature"), raw.body)
 
 Routes, fields and errors: [WorldTimeAPI-compatible routes](#worldtimeapi-compatible-routes).
 
-## Known issues
+## Migrating from 1.x to 2.0
 
-Checked against the live API for this release. All other operations, including single-target `current`, `convert` and `timezone` calls, decode normally.
+2.0 changes the `/v1` response types so that every response decodes into a typed model. The API itself is unchanged. What changed in the contract, for every language:
 
-- An `offset` lookup with `get_timezone` decodes to `TimezoneResolvedResponse` and drops `matching_zones`. Read that one from the raw response:
+- `timezone` returns one model, `TimezoneResponse`: the time payload plus `offset`, `dst`, and `matching_zones` (present only for `offset` lookups). The `oneOf` wrapper `GetTimezone200Response` and its members `TimezoneResolvedResponse` and `TimezoneOffsetResponse` are removed.
+- `TimezoneMatch` (the `matching_zones` item) is `timezone`, `offset` and `dst`, as the API returns it. It previously described a full time payload.
+- `timezone` takes the `format` parameter, after `sign`.
+- `JwkKey` lists the optional `key_ops` and `ext` members.
+- `current` and `convert` no longer reject a comma-separated `tz` list longer than 64 characters or an `offset` list before sending it; an invalid value in a list comes back as a `BulkError` item.
+
+In this package:
+
+- `get_timezone` returns `TimezoneResponse` directly; 1.x returned a `GetTimezone200Response` wrapper and dropped `matching_zones` for `offset` lookups. `matching_zones` items are `TimezoneMatch`.
+- Bulk `get_current_time` / `convert_time` results (`TimePayloadBulkResponse`) can be iterated, indexed and measured with `len()`; each item's `actual_instance` is a `TimePayload` or a `BulkError`.
+
+Before (1.x):
 
 ```python
-import json
-import os
-
-import timelogic_direct_api
-from timelogic_direct_api.transport import create_configuration
-
-time_api = timelogic_direct_api.TimeApi(timelogic_direct_api.ApiClient(create_configuration(os.environ["TIMELOGIC_API_KEY"])))
-
-# Offset lookups: read matching_zones from the raw response
-raw = time_api.get_timezone_without_preload_content(offset="+05:30")
-body = json.loads(raw.data)
-print([zone["timezone"] for zone in body["matching_zones"]])  # ['Asia/Colombo', 'Asia/Kolkata']
+berlin = time_api.get_timezone(tz="Europe/Berlin")  # TimezoneResolvedResponse
+ist = time_api.get_timezone_without_preload_content(offset="+05:30")
+zones = [zone["timezone"] for zone in json.loads(ist.data)["matching_zones"]]
 ```
+
+After (2.0):
+
+```python
+berlin = time_api.get_timezone(tz="Europe/Berlin")  # TimezoneResponse
+ist = time_api.get_timezone(offset="+05:30")
+zones = [zone.timezone for zone in ist.matching_zones]  # ['Asia/Colombo', 'Asia/Kolkata']
+
+for item in time_api.get_current_time(tz="Europe/London,Nope/Zone").actual_instance:
+    value = item.actual_instance  # TimePayload or BulkError
+```
+
+## Known issues
+
+Checked against the live API for this release: every `/v1` operation, including bulk `current` / `convert` calls and `offset` lookups with `timezone`, decodes into the typed models. There are no known issues.
 
 <!-- include: shared/v1-api.md -->
 

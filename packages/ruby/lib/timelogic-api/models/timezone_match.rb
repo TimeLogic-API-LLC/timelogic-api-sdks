@@ -14,48 +14,21 @@ require 'date'
 require 'time'
 
 module TimeLogic::Api
+  # One geographic zone whose current offset equals the requested offset.
   class TimezoneMatch
-    attr_accessor :unix
-
-    attr_accessor :unix_ms
-
-    attr_accessor :utc
-
-    attr_accessor :iso_local
-
-    attr_accessor :rfc2822
-
-    attr_accessor :human
-
-    # Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday).
-    attr_accessor :day_number
-
-    attr_accessor :day_short
-
-    attr_accessor :day_full
-
+    # IANA timezone name.
     attr_accessor :timezone
 
-    attr_accessor :formatted
-
+    # Current UTC offset of the zone in minutes.
     attr_accessor :offset
 
+    # Whether daylight saving time is currently in effect in the zone.
     attr_accessor :dst
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'unix' => :'unix',
-        :'unix_ms' => :'unix_ms',
-        :'utc' => :'utc',
-        :'iso_local' => :'iso_local',
-        :'rfc2822' => :'rfc2822',
-        :'human' => :'human',
-        :'day_number' => :'day_number',
-        :'day_short' => :'day_short',
-        :'day_full' => :'day_full',
         :'timezone' => :'timezone',
-        :'formatted' => :'formatted',
         :'offset' => :'offset',
         :'dst' => :'dst'
       }
@@ -69,17 +42,7 @@ module TimeLogic::Api
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'unix' => :'Integer',
-        :'unix_ms' => :'Integer',
-        :'utc' => :'Time',
-        :'iso_local' => :'String',
-        :'rfc2822' => :'String',
-        :'human' => :'String',
-        :'day_number' => :'Integer',
-        :'day_short' => :'String',
-        :'day_full' => :'String',
         :'timezone' => :'String',
-        :'formatted' => :'String',
         :'offset' => :'Integer',
         :'dst' => :'Boolean'
       }
@@ -88,15 +51,7 @@ module TimeLogic::Api
     # List of attributes with nullable: true
     def self.openapi_nullable
       Set.new([
-        :'iso_local',
       ])
-    end
-
-    # List of class defined in allOf (OpenAPI v3)
-    def self.openapi_all_of
-      [
-      :'TimePayload'
-      ]
     end
 
     # Initializes the object
@@ -114,68 +69,10 @@ module TimeLogic::Api
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'unix')
-        self.unix = attributes[:'unix']
-      else
-        self.unix = nil
-      end
-
-      if attributes.key?(:'unix_ms')
-        self.unix_ms = attributes[:'unix_ms']
-      else
-        self.unix_ms = nil
-      end
-
-      if attributes.key?(:'utc')
-        self.utc = attributes[:'utc']
-      else
-        self.utc = nil
-      end
-
-      if attributes.key?(:'iso_local')
-        self.iso_local = attributes[:'iso_local']
-      else
-        self.iso_local = nil
-      end
-
-      if attributes.key?(:'rfc2822')
-        self.rfc2822 = attributes[:'rfc2822']
-      else
-        self.rfc2822 = nil
-      end
-
-      if attributes.key?(:'human')
-        self.human = attributes[:'human']
-      else
-        self.human = nil
-      end
-
-      if attributes.key?(:'day_number')
-        self.day_number = attributes[:'day_number']
-      else
-        self.day_number = nil
-      end
-
-      if attributes.key?(:'day_short')
-        self.day_short = attributes[:'day_short']
-      else
-        self.day_short = nil
-      end
-
-      if attributes.key?(:'day_full')
-        self.day_full = attributes[:'day_full']
-      else
-        self.day_full = nil
-      end
-
       if attributes.key?(:'timezone')
         self.timezone = attributes[:'timezone']
       else
         self.timezone = nil
-      end
-
-      if attributes.key?(:'formatted')
-        self.formatted = attributes[:'formatted']
       end
 
       if attributes.key?(:'offset')
@@ -196,46 +93,6 @@ module TimeLogic::Api
     def list_invalid_properties
       warn '[DEPRECATED] the `list_invalid_properties` method is obsolete'
       invalid_properties = Array.new
-      if @unix.nil?
-        invalid_properties.push('invalid value for "unix", unix cannot be nil.')
-      end
-
-      if @unix_ms.nil?
-        invalid_properties.push('invalid value for "unix_ms", unix_ms cannot be nil.')
-      end
-
-      if @utc.nil?
-        invalid_properties.push('invalid value for "utc", utc cannot be nil.')
-      end
-
-      if @rfc2822.nil?
-        invalid_properties.push('invalid value for "rfc2822", rfc2822 cannot be nil.')
-      end
-
-      if @human.nil?
-        invalid_properties.push('invalid value for "human", human cannot be nil.')
-      end
-
-      if @day_number.nil?
-        invalid_properties.push('invalid value for "day_number", day_number cannot be nil.')
-      end
-
-      if @day_number > 7
-        invalid_properties.push('invalid value for "day_number", must be smaller than or equal to 7.')
-      end
-
-      if @day_number < 1
-        invalid_properties.push('invalid value for "day_number", must be greater than or equal to 1.')
-      end
-
-      if @day_short.nil?
-        invalid_properties.push('invalid value for "day_short", day_short cannot be nil.')
-      end
-
-      if @day_full.nil?
-        invalid_properties.push('invalid value for "day_full", day_full cannot be nil.')
-      end
-
       if @timezone.nil?
         invalid_properties.push('invalid value for "timezone", timezone cannot be nil.')
       end
@@ -255,38 +112,10 @@ module TimeLogic::Api
     # @return true if the model is valid
     def valid?
       warn '[DEPRECATED] the `valid?` method is obsolete'
-      return false if @unix.nil?
-      return false if @unix_ms.nil?
-      return false if @utc.nil?
-      return false if @rfc2822.nil?
-      return false if @human.nil?
-      return false if @day_number.nil?
-      return false if @day_number > 7
-      return false if @day_number < 1
-      return false if @day_short.nil?
-      return false if @day_full.nil?
       return false if @timezone.nil?
       return false if @offset.nil?
       return false if @dst.nil?
       true
-    end
-
-    # Custom attribute writer method with validation
-    # @param [Object] day_number Value to be assigned
-    def day_number=(day_number)
-      if day_number.nil?
-        fail ArgumentError, 'day_number cannot be nil'
-      end
-
-      if day_number > 7
-        fail ArgumentError, 'invalid value for "day_number", must be smaller than or equal to 7.'
-      end
-
-      if day_number < 1
-        fail ArgumentError, 'invalid value for "day_number", must be greater than or equal to 1.'
-      end
-
-      @day_number = day_number
     end
 
     # Checks equality by comparing each attribute.
@@ -294,17 +123,7 @@ module TimeLogic::Api
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          unix == o.unix &&
-          unix_ms == o.unix_ms &&
-          utc == o.utc &&
-          iso_local == o.iso_local &&
-          rfc2822 == o.rfc2822 &&
-          human == o.human &&
-          day_number == o.day_number &&
-          day_short == o.day_short &&
-          day_full == o.day_full &&
           timezone == o.timezone &&
-          formatted == o.formatted &&
           offset == o.offset &&
           dst == o.dst
     end
@@ -318,7 +137,7 @@ module TimeLogic::Api
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [unix, unix_ms, utc, iso_local, rfc2822, human, day_number, day_short, day_full, timezone, formatted, offset, dst].hash
+      [timezone, offset, dst].hash
     end
 
     # Builds the object from hash

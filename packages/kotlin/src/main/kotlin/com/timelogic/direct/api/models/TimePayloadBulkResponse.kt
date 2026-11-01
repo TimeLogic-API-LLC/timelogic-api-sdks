@@ -15,21 +15,10 @@
 
 package com.timelogic.direct.api.models
 
-import com.timelogic.direct.api.models.TimePayloadBulkItem
-
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
-
 /**
  * Bulk response array returned when `/v1/time/current` or `/v1/time/convert` receives one comma-separated `tz`, `ip`, or `offset` selector.
- *
+ * Items are in request order; each is a [TimePayload] or a [BulkError].
  */
-
-
-class TimePayloadBulkResponse (
-
-) : kotlin.collections.ArrayList<TimePayloadBulkItem>() {
-
-
-}
-
+class TimePayloadBulkResponse(
+    items: kotlin.collections.Collection<TimePayloadBulkItem> = emptyList()
+) : kotlin.collections.ArrayList<TimePayloadBulkItem>(items), GetCurrentTime200Response

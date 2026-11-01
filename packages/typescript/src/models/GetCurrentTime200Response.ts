@@ -34,6 +34,14 @@ import {
  */
 export type GetCurrentTime200Response = TimePayload | TimePayloadBulkResponse;
 
+/**
+ * True when a current/convert result is a bulk array (one comma-separated
+ * tz, ip or offset selector). Narrows the result to TimePayloadBulkResponse.
+ */
+export function isTimePayloadBulkResponse(value: GetCurrentTime200Response): value is TimePayloadBulkResponse {
+    return Array.isArray(value);
+}
+
 export function GetCurrentTime200ResponseFromJSON(json: any): GetCurrentTime200Response {
     return GetCurrentTime200ResponseFromJSONTyped(json, false);
 }
@@ -42,14 +50,10 @@ export function GetCurrentTime200ResponseFromJSONTyped(json: any, ignoreDiscrimi
     if (json == null) {
         return json;
     }
-    if (instanceOfTimePayload(json)) {
-        return TimePayloadFromJSONTyped(json, true);
-    }
-    if (instanceOfTimePayloadBulkResponse(json)) {
+    if (Array.isArray(json)) {
         return TimePayloadBulkResponseFromJSONTyped(json, true);
     }
-
-    return {} as any;
+    return TimePayloadFromJSONTyped(json, true);
 }
 
 export function GetCurrentTime200ResponseToJSON(json: any): any {
@@ -61,13 +65,9 @@ export function GetCurrentTime200ResponseToJSONTyped(value?: GetCurrentTime200Re
         return value;
     }
 
-    if (instanceOfTimePayload(value)) {
-        return TimePayloadToJSON(value as TimePayload);
-    }
-    if (instanceOfTimePayloadBulkResponse(value)) {
+    if (Array.isArray(value)) {
         return TimePayloadBulkResponseToJSON(value as TimePayloadBulkResponse);
     }
-
-    return {};
+    return TimePayloadToJSON(value as TimePayload);
 }
 

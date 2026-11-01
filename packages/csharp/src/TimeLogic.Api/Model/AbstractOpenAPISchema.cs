@@ -26,6 +26,7 @@ namespace TimeLogic.Api.Model
         {
             // OpenAPI generated types generally hide default constructors.
             ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
+            DateParseHandling = DateParseHandling.None,
             MissingMemberHandling = MissingMemberHandling.Error,
             ContractResolver = new DefaultContractResolver
             {
@@ -43,6 +44,7 @@ namespace TimeLogic.Api.Model
         {
             // OpenAPI generated types generally hide default constructors.
             ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
+            DateParseHandling = DateParseHandling.None,
             MissingMemberHandling = MissingMemberHandling.Ignore,
             ContractResolver = new DefaultContractResolver
             {

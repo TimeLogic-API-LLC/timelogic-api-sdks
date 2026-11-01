@@ -153,24 +153,45 @@ puts "#{raw.status} #{raw.headers['x-timelogic-signature']} #{raw.body}"
 
 Routes, fields and errors: [WorldTimeAPI-compatible routes](#worldtimeapi-compatible-routes).
 
-## Known issues
+## Migrating from 1.x to 2.0
 
-Checked against the live API for this release. All other operations, including single-target `current`, `convert` and `timezone` calls, decode normally.
+2.0 changes the `/v1` response types so that every response decodes into a typed model. The API itself is unchanged. What changed in the contract, for every language:
 
-- Bulk `get_current_time` / `convert_time` calls (comma-separated selectors) and `offset` lookups with `get_timezone` return `nil`. Ask for the parsed JSON instead of a model:
+- `timezone` returns one model, `TimezoneResponse`: the time payload plus `offset`, `dst`, and `matching_zones` (present only for `offset` lookups). The `oneOf` wrapper `GetTimezone200Response` and its members `TimezoneResolvedResponse` and `TimezoneOffsetResponse` are removed.
+- `TimezoneMatch` (the `matching_zones` item) is `timezone`, `offset` and `dst`, as the API returns it. It previously described a full time payload.
+- `timezone` takes the `format` parameter, after `sign`.
+- `JwkKey` lists the optional `key_ops` and `ext` members.
+- `current` and `convert` no longer reject a comma-separated `tz` list longer than 64 characters or an `offset` list before sending it; an invalid value in a list comes back as a `BulkError` item.
+
+In this package:
+
+- Bulk `get_current_time` / `convert_time` calls return `TimePayloadBulkResponse`, an `Array` of `TimePayload` and `BulkError` objects. 1.x returned `nil`.
+- `get_timezone` returns `TimezoneResponse` and accepts `format:`. `matching_zones` holds `TimezoneMatch` objects. 1.x returned `nil` for `offset` lookups.
+
+Before (1.x):
 
 ```ruby
-require 'timelogic-api'
-
-time = TimeLogic::Api::TimeApi.new(TimeLogic::Api::ApiClient.new(TimeLogic::Api::TransportConfiguration.build(api_key: ENV.fetch('TIMELOGIC_API_KEY'))))
-
-# Bulk current/convert and offset timezone lookups: ask for the parsed JSON instead of a model
 items = time.get_current_time(tz: 'Europe/London,Asia/Tokyo', debug_return_type: 'Object')
-puts items[1][:timezone] # Asia/Tokyo
-
-offset = time.get_timezone(offset: '+05:30', debug_return_type: 'Object')
-puts offset[:matching_zones].map { |zone| zone[:timezone] }.inspect # ["Asia/Colombo", "Asia/Kolkata"]
+puts items[1][:timezone]
 ```
+
+After (2.0):
+
+```ruby
+time.get_current_time(tz: 'Europe/London,Nope/Zone').each do |item|
+  if item.is_a?(TimeLogic::Api::BulkError)
+    puts "#{item.item}: #{item.error.code}"
+  else
+    puts item.iso_local
+  end
+end
+
+puts time.get_timezone(offset: '+05:30').matching_zones.map(&:timezone).inspect # ["Asia/Colombo", "Asia/Kolkata"]
+```
+
+## Known issues
+
+Checked against the live API for this release: every `/v1` operation, including bulk `current` / `convert` calls and `offset` lookups with `timezone`, decodes into the typed models. There are no known issues.
 
 ## How the API works
 

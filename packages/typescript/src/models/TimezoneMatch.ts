@@ -14,85 +14,25 @@
 
 import { mapValues } from '../runtime';
 /**
- *
+ * One geographic zone whose current offset equals the requested offset.
  * @export
  * @interface TimezoneMatch
  */
 export interface TimezoneMatch {
     /**
-     *
-     * @type {number}
-     * @memberof TimezoneMatch
-     */
-    unix: number;
-    /**
-     *
-     * @type {number}
-     * @memberof TimezoneMatch
-     */
-    unixMs: number;
-    /**
-     *
-     * @type {Date}
-     * @memberof TimezoneMatch
-     */
-    utc: Date;
-    /**
-     *
-     * @type {string}
-     * @memberof TimezoneMatch
-     */
-    isoLocal: string | null;
-    /**
-     *
-     * @type {string}
-     * @memberof TimezoneMatch
-     */
-    rfc2822: string;
-    /**
-     *
-     * @type {string}
-     * @memberof TimezoneMatch
-     */
-    human: string;
-    /**
-     * Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday).
-     * @type {number}
-     * @memberof TimezoneMatch
-     */
-    dayNumber: number;
-    /**
-     *
-     * @type {string}
-     * @memberof TimezoneMatch
-     */
-    dayShort: string;
-    /**
-     *
-     * @type {string}
-     * @memberof TimezoneMatch
-     */
-    dayFull: string;
-    /**
-     *
+     * IANA timezone name.
      * @type {string}
      * @memberof TimezoneMatch
      */
     timezone: string;
     /**
-     *
-     * @type {string}
-     * @memberof TimezoneMatch
-     */
-    formatted?: string;
-    /**
-     *
+     * Current UTC offset of the zone in minutes.
      * @type {number}
      * @memberof TimezoneMatch
      */
     offset: number;
     /**
-     *
+     * Whether daylight saving time is currently in effect in the zone.
      * @type {boolean}
      * @memberof TimezoneMatch
      */
@@ -103,15 +43,6 @@ export interface TimezoneMatch {
  * Check if a given object implements the TimezoneMatch interface.
  */
 export function instanceOfTimezoneMatch(value: object): value is TimezoneMatch {
-    if (!('unix' in value) || value['unix'] === undefined) return false;
-    if (!('unixMs' in value) || value['unixMs'] === undefined) return false;
-    if (!('utc' in value) || value['utc'] === undefined) return false;
-    if (!('isoLocal' in value) || value['isoLocal'] === undefined) return false;
-    if (!('rfc2822' in value) || value['rfc2822'] === undefined) return false;
-    if (!('human' in value) || value['human'] === undefined) return false;
-    if (!('dayNumber' in value) || value['dayNumber'] === undefined) return false;
-    if (!('dayShort' in value) || value['dayShort'] === undefined) return false;
-    if (!('dayFull' in value) || value['dayFull'] === undefined) return false;
     if (!('timezone' in value) || value['timezone'] === undefined) return false;
     if (!('offset' in value) || value['offset'] === undefined) return false;
     if (!('dst' in value) || value['dst'] === undefined) return false;
@@ -128,17 +59,7 @@ export function TimezoneMatchFromJSONTyped(json: any, ignoreDiscriminator: boole
     }
     return {
 
-        'unix': json['unix'],
-        'unixMs': json['unix_ms'],
-        'utc': (new Date(json['utc'])),
-        'isoLocal': json['iso_local'],
-        'rfc2822': json['rfc2822'],
-        'human': json['human'],
-        'dayNumber': json['day_number'],
-        'dayShort': json['day_short'],
-        'dayFull': json['day_full'],
         'timezone': json['timezone'],
-        'formatted': json['formatted'] == null ? undefined : json['formatted'],
         'offset': json['offset'],
         'dst': json['dst'],
     };
@@ -155,17 +76,7 @@ export function TimezoneMatchToJSONTyped(value?: TimezoneMatch | null, ignoreDis
 
     return {
 
-        'unix': value['unix'],
-        'unix_ms': value['unixMs'],
-        'utc': ((value['utc']).toISOString()),
-        'iso_local': value['isoLocal'],
-        'rfc2822': value['rfc2822'],
-        'human': value['human'],
-        'day_number': value['dayNumber'],
-        'day_short': value['dayShort'],
-        'day_full': value['dayFull'],
         'timezone': value['timezone'],
-        'formatted': value['formatted'],
         'offset': value['offset'],
         'dst': value['dst'],
     };

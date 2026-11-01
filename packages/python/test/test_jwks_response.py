@@ -42,7 +42,11 @@ class TestJwksResponse(unittest.TestCase):
                         alg = 'EdDSA',
                         use = 'sig',
                         kid = 'ed25519-2026-07-19',
-                        x = '', )
+                        x = '',
+                        key_ops = [
+                            'verify'
+                            ],
+                        ext = True, )
                     ]
             )
         else:
@@ -54,7 +58,11 @@ class TestJwksResponse(unittest.TestCase):
                         alg = 'EdDSA',
                         use = 'sig',
                         kid = 'ed25519-2026-07-19',
-                        x = '', )
+                        x = '',
+                        key_ops = [
+                            'verify'
+                            ],
+                        ext = True, )
                     ],
         )
         """

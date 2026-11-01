@@ -20,7 +20,7 @@ Each package README covers installation, configuration, every operation with exa
 | TypeScript / JavaScript | [`@timelogic/direct-api`](https://www.npmjs.com/package/@timelogic/direct-api) | `npm install @timelogic/direct-api` | [README](packages/typescript/README.md) |
 | Python | [`timelogic-api`](https://pypi.org/project/timelogic-api/) | `python -m pip install timelogic-api` | [README](packages/python/README.md) |
 | Rust | [`timelogic-api`](https://crates.io/crates/timelogic-api) | `cargo add timelogic-api` | [README](packages/rust/README.md) |
-| Go | [`packages/go`](https://pkg.go.dev/github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go) | `go get github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go` | [README](packages/go/README.md) |
+| Go | [`packages/go/v2`](https://pkg.go.dev/github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2) | `go get github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2` | [README](packages/go/README.md) |
 | Java | `com.timelogicapi:timelogic-api` | [Maven Central](https://central.sonatype.com/artifact/com.timelogicapi/timelogic-api) | [README](packages/java/README.md) |
 | Kotlin | `com.timelogicapi:timelogic-api-kotlin` | [Maven Central](https://central.sonatype.com/artifact/com.timelogicapi/timelogic-api-kotlin) | [README](packages/kotlin/README.md) |
 | .NET | [`TimeLogic.Api`](https://www.nuget.org/packages/TimeLogic.Api) | `dotnet add package TimeLogic.Api` | [README](packages/csharp/README.md) |
@@ -53,7 +53,7 @@ Every package also contains a client for TimeLogic's WorldTimeAPI-compatible rou
 | --- | --- | --- |
 | TypeScript | `@timelogic/direct-api` → `WorldTimeApiClient` | `await new WorldTimeApiClient({ apiKey }).getTimezone('Europe/London')` |
 | Python | `timelogic_direct_api.worldtimeapi` | `WorldTimeApiClient(api_key=key).get_timezone("Europe/London")` |
-| Go | `github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/worldtimeapi` | `worldtimeapi.NewClient(key).GetTimezone(ctx, "Europe/London")` |
+| Go | `github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2/worldtimeapi` | `worldtimeapi.NewClient(key).GetTimezone(ctx, "Europe/London")` |
 | Rust | `timelogic_api::worldtimeapi` | `Client::new(key).get_timezone("Europe/London").await?` |
 | Java | `com.timelogic.direct.worldtimeapi` | `new WorldTimeApiClient(key).getTimezone("Europe/London")` |
 | Kotlin | `com.timelogic.direct.api.worldtimeapi` | `WorldTimeApiClient(key).getTimezone("Europe/London")` |
@@ -101,24 +101,13 @@ if worldtimeapi.IsUnknownLocation(err) {
 
 Live tests for these clients run only when `TIMELOGIC_API_KEY` is set.
 
+## Upgrading from 1.x
+
+2.0 decodes every `/v1` response into typed models in all ten SDKs, including bulk `current` / `convert` calls and `offset` lookups with `timezone`, which 1.x could not decode in most languages. The API is unchanged. The `timezone` response is one `TimezoneResponse` model (the `GetTimezone200Response`, `TimezoneResolvedResponse` and `TimezoneOffsetResponse` types are removed), `matching_zones` items are `TimezoneMatch` (`timezone`, `offset`, `dst`), and the Go module path ends in `/v2`. Each package README has a "Migrating from 1.x to 2.0" section with before and after code for that language; the [changelog](CHANGELOG.md) lists every change.
+
 ## Known issues
 
-The table lists what does not decode correctly in this release, checked with live calls in every language. Each package README gives a working way to read those responses until the decoders handle them. The endpoints themselves return complete data.
-
-| SDK | Bulk `current` / `convert` | `timezone` with `offset` |
-| --- | --- | --- |
-| TypeScript | works | works |
-| Python | works | `matching_zones` dropped |
-| Go | works | decoding error |
-| Rust | decoding error | `matching_zones` dropped |
-| Java | decoding error | decoding error |
-| Kotlin | decoding error | decoding error |
-| .NET | decoding error | decoding error |
-| PHP | items missing | works |
-| Ruby | `nil` | `nil` |
-| Swift | works | `matching_zones` dropped |
-
-In TypeScript, `getCurrentTime` and `convertTime` return the API's snake_case field names (`iso_local`, `unix_ms`) instead of the camelCase names in their declared type.
+None known for `/v1` decoding: every operation was checked with live calls in every language for this release.
 
 ## Authentication
 

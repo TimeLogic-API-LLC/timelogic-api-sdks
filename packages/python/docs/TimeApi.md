@@ -1181,7 +1181,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **get_timezone**
-> GetTimezone200Response get_timezone(tz=tz, ip=ip, lat=lat, lon=lon, offset=offset, auto_tz=auto_tz, sign=sign)
+> TimezoneResponse get_timezone(tz=tz, ip=ip, lat=lat, lon=lon, offset=offset, auto_tz=auto_tz, sign=sign, format=format)
 
 Resolve timezone information for a target
 
@@ -1197,7 +1197,7 @@ Resolves timezone metadata for a single target.  Target selector rules: - Use ex
 
 ```python
 import timelogic_direct_api
-from timelogic_direct_api.models.get_timezone200_response import GetTimezone200Response
+from timelogic_direct_api.models.timezone_response import TimezoneResponse
 from timelogic_direct_api.rest import ApiException
 from pprint import pprint
 
@@ -1252,10 +1252,11 @@ with timelogic_direct_api.ApiClient(configuration) as api_client:
     offset = '-04:00' # str | Fixed UTC offset in `+HH:MM` or `-HH:MM` format only (`+0530` and `+5` are rejected); URL-encode `+` as `%2B`, since an unencoded `+` is read as a space. An offset target returns `timezone=null`. On bulk-capable routes, a comma-separated list enables bulk mode with at most 10 values; request URLs are limited to 8192 characters. (optional)
     auto_tz = true # bool | Set to `true` to resolve using the caller IP from Cloudflare headers. Counts as a selector family, so it cannot be combined with `tz`, `ip`, `lat`/`lon` or `offset`. Not supported on `/v1/time/clock`. Enabled by `true`, `1` or `yes` (case-insensitive); any other value leaves it off without an error. (optional)
     sign = true # bool | Set to `true`, `1` or `yes` (case-insensitive) to ask the gateway to sign the final JSON response. Any other value, a bare `sign`, or repeated `sign` values leave the response unsigned. Every authenticated JSON response, including errors, then includes signing headers. Not supported on `/v1/time/clock`. (optional)
+    format = '%Y-%m-%d %H:%M:%S' # str | Custom date/time format template using supported `strftime`-style directives such as `%Y-%m-%d %H:%M:%S`. Supported directives: `%a %A %b %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x %X %y %Y %z %:z %Z %%`, with the `-`, `_` and `0` padding flags on numeric directives. `%Z` prints the IANA zone name (or `UTC+HH:MM` for an offset target, `UTC` with no target), not an abbreviation. Any other directive (for example `%U`, `%f`, `%Q`) or a trailing `%` returns 400 INVALID_PARAMETER naming the directive. (optional)
 
     try:
         # Resolve timezone information for a target
-        api_response = api_instance.get_timezone(tz=tz, ip=ip, lat=lat, lon=lon, offset=offset, auto_tz=auto_tz, sign=sign)
+        api_response = api_instance.get_timezone(tz=tz, ip=ip, lat=lat, lon=lon, offset=offset, auto_tz=auto_tz, sign=sign, format=format)
         print("The response of TimeApi->get_timezone:\n")
         pprint(api_response)
     except Exception as e:
@@ -1276,10 +1277,11 @@ Name | Type | Description  | Notes
  **offset** | **str**| Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format only (&#x60;+0530&#x60; and &#x60;+5&#x60; are rejected); URL-encode &#x60;+&#x60; as &#x60;%2B&#x60;, since an unencoded &#x60;+&#x60; is read as a space. An offset target returns &#x60;timezone&#x3D;null&#x60;. On bulk-capable routes, a comma-separated list enables bulk mode with at most 10 values; request URLs are limited to 8192 characters. | [optional]
  **auto_tz** | **bool**| Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. Counts as a selector family, so it cannot be combined with &#x60;tz&#x60;, &#x60;ip&#x60;, &#x60;lat&#x60;/&#x60;lon&#x60; or &#x60;offset&#x60;. Not supported on &#x60;/v1/time/clock&#x60;. Enabled by &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive); any other value leaves it off without an error. | [optional]
  **sign** | **bool**| Set to &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive) to ask the gateway to sign the final JSON response. Any other value, a bare &#x60;sign&#x60;, or repeated &#x60;sign&#x60; values leave the response unsigned. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. | [optional]
+ **format** | **str**| Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Supported directives: &#x60;%a %A %b %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x %X %y %Y %z %:z %Z %%&#x60;, with the &#x60;-&#x60;, &#x60;_&#x60; and &#x60;0&#x60; padding flags on numeric directives. &#x60;%Z&#x60; prints the IANA zone name (or &#x60;UTC+HH:MM&#x60; for an offset target, &#x60;UTC&#x60; with no target), not an abbreviation. Any other directive (for example &#x60;%U&#x60;, &#x60;%f&#x60;, &#x60;%Q&#x60;) or a trailing &#x60;%&#x60; returns 400 INVALID_PARAMETER naming the directive. | [optional]
 
 ### Return type
 
-[**GetTimezone200Response**](GetTimezone200Response.md)
+[**TimezoneResponse**](TimezoneResponse.md)
 
 ### Authorization
 

@@ -17,31 +17,19 @@ import pprint
 import re  # noqa: F401
 import json
 
-from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
-from typing_extensions import Annotated
+from typing import Any, ClassVar, Dict, List
 from typing import Optional, Set
 from typing_extensions import Self
 
 class TimezoneMatch(BaseModel):
     """
-    TimezoneMatch
+    One geographic zone whose current offset equals the requested offset.
     """ # noqa: E501
-    unix: StrictInt
-    unix_ms: StrictInt
-    utc: datetime
-    iso_local: Optional[StrictStr]
-    rfc2822: StrictStr
-    human: StrictStr
-    day_number: Annotated[int, Field(le=7, strict=True, ge=1)] = Field(description="Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday).")
-    day_short: StrictStr
-    day_full: StrictStr
-    timezone: StrictStr
-    formatted: Optional[StrictStr] = None
-    offset: StrictInt
-    dst: StrictBool
-    __properties: ClassVar[List[str]] = ["unix", "unix_ms", "utc", "iso_local", "rfc2822", "human", "day_number", "day_short", "day_full", "timezone", "formatted", "offset", "dst"]
+    timezone: StrictStr = Field(description="IANA timezone name.")
+    offset: StrictInt = Field(description="Current UTC offset of the zone in minutes.")
+    dst: StrictBool = Field(description="Whether daylight saving time is currently in effect in the zone.")
+    __properties: ClassVar[List[str]] = ["timezone", "offset", "dst"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -82,11 +70,6 @@ class TimezoneMatch(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
-        # set to None if iso_local (nullable) is None
-        # and model_fields_set contains the field
-        if self.iso_local is None and "iso_local" in self.model_fields_set:
-            _dict['iso_local'] = None
-
         return _dict
 
     @classmethod
@@ -99,17 +82,7 @@ class TimezoneMatch(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "unix": obj.get("unix"),
-            "unix_ms": obj.get("unix_ms"),
-            "utc": obj.get("utc"),
-            "iso_local": obj.get("iso_local"),
-            "rfc2822": obj.get("rfc2822"),
-            "human": obj.get("human"),
-            "day_number": obj.get("day_number"),
-            "day_short": obj.get("day_short"),
-            "day_full": obj.get("day_full"),
             "timezone": obj.get("timezone"),
-            "formatted": obj.get("formatted"),
             "offset": obj.get("offset"),
             "dst": obj.get("dst")
         })

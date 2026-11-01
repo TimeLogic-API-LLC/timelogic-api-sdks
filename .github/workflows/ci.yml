@@ -52,6 +52,9 @@ jobs:
     name: Validate and test PHP SDK (PHP ${{ matrix.php }}, ${{ matrix.dependencies }} dependencies)
     needs: validate-generate-test
     runs-on: ubuntu-latest
+    env:
+      TIMELOGIC_SDK_TEST_BASE_URL: ${{ vars.TIMELOGIC_SDK_TEST_BASE_URL || 'https://api.timelogicapi.com' }}
+      TIMELOGIC_SDK_TEST_API_KEY: ${{ secrets.TIMELOGIC_SDK_TEST_API_KEY }}
     strategy:
       fail-fast: false
       matrix:
@@ -87,6 +90,9 @@ jobs:
     name: Build and test Java SDK
     needs: validate-generate-test
     runs-on: ubuntu-latest
+    env:
+      TIMELOGIC_SDK_TEST_BASE_URL: ${{ vars.TIMELOGIC_SDK_TEST_BASE_URL || 'https://api.timelogicapi.com' }}
+      TIMELOGIC_SDK_TEST_API_KEY: ${{ secrets.TIMELOGIC_SDK_TEST_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -102,6 +108,9 @@ jobs:
     name: Build and test Kotlin SDK
     needs: validate-generate-test
     runs-on: ubuntu-latest
+    env:
+      TIMELOGIC_SDK_TEST_BASE_URL: ${{ vars.TIMELOGIC_SDK_TEST_BASE_URL || 'https://api.timelogicapi.com' }}
+      TIMELOGIC_SDK_TEST_API_KEY: ${{ secrets.TIMELOGIC_SDK_TEST_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -118,6 +127,9 @@ jobs:
     name: Build and test Swift SDK
     needs: validate-generate-test
     runs-on: macos-15
+    env:
+      TIMELOGIC_SDK_TEST_BASE_URL: ${{ vars.TIMELOGIC_SDK_TEST_BASE_URL || 'https://api.timelogicapi.com' }}
+      TIMELOGIC_SDK_TEST_API_KEY: ${{ secrets.TIMELOGIC_SDK_TEST_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - name: Resolve Swift dependencies
@@ -181,3 +193,54 @@ jobs:
       - name: Ruby
         working-directory: packages/ruby
         run: bundle exec rspec spec/world_time_api_spec.rb
+
+  v1-typed-responses:
+    name: Typed /v1 responses (TypeScript, Python, Go, Rust, .NET, Ruby)
+    needs: validate-generate-test
+    runs-on: ubuntu-latest
+    env:
+      TIMELOGIC_SDK_TEST_BASE_URL: ${{ vars.TIMELOGIC_SDK_TEST_BASE_URL || 'https://api.timelogicapi.com' }}
+      TIMELOGIC_SDK_TEST_API_KEY: ${{ secrets.TIMELOGIC_SDK_TEST_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: TypeScript
+        working-directory: packages/typescript
+        run: |
+          npm install --no-package-lock --no-audit --no-fund
+          npm run build
+          node --test test/v1-responses.test.mjs
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Python
+        working-directory: packages/python
+        run: |
+          python -m pip install -e . pytest
+          python -m pytest -q test/test_v1_responses.py
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+      - name: Go
+        working-directory: packages/go
+        run: go test -run TestV1 .
+      - name: Rust
+        working-directory: packages/rust
+        run: cargo test --test v1_responses
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: .NET
+        working-directory: packages/csharp
+        run: dotnet test src/TimeLogic.Api.Test/TimeLogic.Api.Test.csproj --filter "FullyQualifiedName~V1Responses"
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          working-directory: packages/ruby
+          bundler-cache: true
+      - name: Ruby
+        working-directory: packages/ruby
+        run: bundle exec rspec spec/v1_responses_spec.rb

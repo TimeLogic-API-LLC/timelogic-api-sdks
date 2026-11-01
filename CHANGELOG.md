@@ -2,6 +2,36 @@
 
 All notable changes to the TimeLogic API SDKs. Versions follow [semantic versioning](https://semver.org/); every package in this repository is released with the same version.
 
+## 2.0.0 - 2026-11-01
+
+Every `/v1` response now decodes into typed models in all ten SDKs, including bulk `current` / `convert` calls and `offset` lookups with `timezone`. The API is unchanged; the contract now describes the responses it actually sends. Each package README has a "Migrating from 1.x to 2.0" section with before and after code.
+
+### Breaking changes
+
+- `timezone` returns one model, `TimezoneResponse` (the time payload plus `offset`, `dst`, and `matching_zones` for `offset` lookups). `GetTimezone200Response`, `TimezoneResolvedResponse` and `TimezoneOffsetResponse` are removed.
+- `TimezoneMatch`, the `matching_zones` item, is `timezone`, `offset` and `dst`, all required. It previously described a full time payload.
+- `timezone` takes the `format` parameter, after `sign`. Calls that pass every argument by position (Java, Rust, and PHP without named arguments) take one more argument.
+- TypeScript: `getCurrentTime` and `convertTime` resolve to camelCase `TimePayload` or `TimePayloadBulkResponse` models instead of the API's snake_case JSON. `isTimePayloadBulkResponse()` and `isBulkError()` tell the shapes apart.
+- Go: the module path is `github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2`, as Go requires for a new major version.
+- Rust: `TimePayloadBulkResponse` is `Vec<TimePayloadBulkItem>`.
+- .NET and Java: `TimePayloadBulkResponse` is a list of `TimePayloadBulkItem`.
+- Kotlin: `GetCurrentTime200Response` and `TimePayloadBulkItem` are sealed interfaces. `TimePayload` and `TimePayloadBulkResponse` implement the first; `TimePayload` and `BulkError` implement the second.
+- PHP: bulk calls return `TimePayloadBulkResponse`, a countable and iterable list of `TimePayload` and `BulkError` objects.
+- Ruby: bulk calls return `TimePayloadBulkResponse`, an `Array` of `TimePayload` and `BulkError` objects.
+
+### Changed
+
+- Bulk `current` / `convert` responses decode in Rust, Java, Kotlin, .NET, PHP and Ruby; Python bulk results can be iterated, indexed and measured with `len()`.
+- `offset` lookups with `timezone` decode with typed `matching_zones` in every language.
+- `current` and `convert` accept a comma-separated `tz` list longer than 64 characters and an `offset` list; an invalid value in a list comes back as a `BulkError` item instead of being refused by the client.
+- `JwkKey` lists the optional `key_ops` and `ext` members.
+- .NET: date-like strings in `current` / `convert` results (`IsoLocal`) keep the API's offset instead of being rewritten in the machine's local offset.
+- Live tests for every `/v1` operation run in CI for all ten SDKs when `TIMELOGIC_SDK_TEST_API_KEY` is set.
+
+### Known issues
+
+- None known for `/v1` decoding.
+
 ## 1.1.0 - 2026-11-01
 
 ### Added

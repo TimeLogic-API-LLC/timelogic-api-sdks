@@ -28,6 +28,8 @@ import com.squareup.moshi.JsonClass
  * @param use
  * @param kid
  * @param x
+ * @param keyOps Permitted key operations; published keys allow only `verify`.
+ * @param ext JWK extractable flag as exported by the signing worker; always `true`.
  */
 
 
@@ -49,7 +51,15 @@ data class JwkKey (
     val kid: kotlin.String,
 
     @Json(name = "x")
-    val x: kotlin.String
+    val x: kotlin.String,
+
+    /* Permitted key operations; published keys allow only `verify`. */
+    @Json(name = "key_ops")
+    val keyOps: kotlin.collections.List<JwkKey.KeyOps>? = null,
+
+    /* JWK extractable flag as exported by the signing worker; always `true`. */
+    @Json(name = "ext")
+    val ext: kotlin.Boolean? = null
 
 ) {
 
@@ -88,6 +98,15 @@ data class JwkKey (
     @JsonClass(generateAdapter = false)
     enum class Use(val value: kotlin.String) {
         @Json(name = "sig") sig("sig");
+    }
+    /**
+     * Permitted key operations; published keys allow only `verify`.
+     *
+     * Values: verify
+     */
+    @JsonClass(generateAdapter = false)
+    enum class KeyOps(val value: kotlin.String) {
+        @Json(name = "verify") verify("verify");
     }
 
 }

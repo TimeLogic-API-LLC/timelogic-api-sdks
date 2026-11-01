@@ -1,7 +1,8 @@
 // Response-decoding and authentication adjustments applied after
 // normalize-generated.mjs. Each change replaces an exact generated snippet and
 // stops generation if that snippet is missing, so a generator upgrade cannot
-// silently drop it.
+// silently drop it. The typed decoding of bulk arrays, bulk items and
+// timezone lookups lives in normalize-typed-responses.mjs.
 import { readFileSync, writeFileSync } from 'node:fs';
 
 function replaceOnce(file, before, after, label) {
@@ -26,60 +27,6 @@ replaceOnce(
         next if value.empty? || value == 'Bearer'
 `,
   'ruby auth'
-);
-
-// TypeScript: the generated oneOf check looks for camelCase keys in the raw
-// snake_case JSON, so getTimezone returned an empty object. Pick the model by
-// the raw key instead.
-replaceOnce(
-  'packages/typescript/src/models/GetTimezone200Response.ts',
-  `    if (instanceOfTimezoneOffsetResponse(json)) {
-        return TimezoneOffsetResponseFromJSONTyped(json, true);
-    }
-    if (instanceOfTimezoneResolvedResponse(json)) {
-        return TimezoneResolvedResponseFromJSONTyped(json, true);
-    }
-
-    return {} as any;`,
-  `    if (Array.isArray(json.matching_zones)) {
-        return TimezoneOffsetResponseFromJSONTyped(json, true);
-    }
-    return TimezoneResolvedResponseFromJSONTyped(json, true);`,
-  'typescript getTimezone'
-);
-
-// Python: decode each bulk item into TimePayload or BulkError. Without this,
-// pydantic built empty TimePayloadBulkItem wrappers.
-replaceOnce(
-  'packages/python/timelogic_direct_api/models/time_payload_bulk_response.py',
-  `class TimePayloadBulkResponse(RootModel[List[TimePayloadBulkItem]]):
-    """Bulk response array returned by current and convert operations."""
-
-    @classmethod
-    def from_json(cls, json_str: str) -> Self:
-        return cls.model_validate_json(json_str)
-`,
-  `class TimePayloadBulkResponse(RootModel[List[TimePayloadBulkItem]]):
-    """Bulk response array returned by current and convert operations."""
-
-    @model_validator(mode="before")
-    @classmethod
-    def _decode_items(cls, data: Any) -> Any:
-        if isinstance(data, list):
-            return [TimePayloadBulkItem.from_dict(item) if isinstance(item, dict) else item for item in data]
-        return data
-
-    @classmethod
-    def from_json(cls, json_str: str) -> Self:
-        return cls.model_validate(json.loads(json_str))
-`,
-  'python bulk items'
-);
-replaceOnce(
-  'packages/python/timelogic_direct_api/models/time_payload_bulk_response.py',
-  'from pydantic import RootModel\n',
-  'from pydantic import RootModel, model_validator\n',
-  'python bulk import'
 );
 
 // .NET: decode a oneOf response body only for successful responses, so API
@@ -136,16 +83,6 @@ replaceOnce(
   `      // Standard JWK members that the contract does not list (for example key_ops and ext) are ignored.
 `,
   'java jwk key'
-);
-
-// Kotlin: getTimezone decodes into one flattened class, which required
-// matching_zones. That field is present only for offset lookups, so every
-// tz, ip and lat/lon lookup failed. It is now optional.
-replaceOnce(
-  'packages/kotlin/src/main/kotlin/com/timelogic/direct/api/models/GetTimezone200Response.kt',
-  `    val matchingZones: kotlin.collections.List<TimezoneMatch>,`,
-  `    val matchingZones: kotlin.collections.List<TimezoneMatch>? = null,`,
-  'kotlin getTimezone'
 );
 
 // Kotlin: /v1/time/clock answers text/html, which the generated response

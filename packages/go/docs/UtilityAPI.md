@@ -25,7 +25,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	openapiclient "github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go"
+	openapiclient "github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2"
 )
 
 func main() {

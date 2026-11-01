@@ -25,82 +25,22 @@ class TimezoneMatchTest : ShouldSpec() {
         // uncomment below to create an instance of TimezoneMatch
         //val modelInstance = TimezoneMatch()
 
-        // to test the property `unix`
-        should("test unix") {
-            // uncomment below to test the property
-            //modelInstance.unix shouldBe ("TODO")
-        }
-
-        // to test the property `unixMs`
-        should("test unixMs") {
-            // uncomment below to test the property
-            //modelInstance.unixMs shouldBe ("TODO")
-        }
-
-        // to test the property `utc`
-        should("test utc") {
-            // uncomment below to test the property
-            //modelInstance.utc shouldBe ("TODO")
-        }
-
-        // to test the property `isoLocal`
-        should("test isoLocal") {
-            // uncomment below to test the property
-            //modelInstance.isoLocal shouldBe ("TODO")
-        }
-
-        // to test the property `rfc2822`
-        should("test rfc2822") {
-            // uncomment below to test the property
-            //modelInstance.rfc2822 shouldBe ("TODO")
-        }
-
-        // to test the property `human`
-        should("test human") {
-            // uncomment below to test the property
-            //modelInstance.human shouldBe ("TODO")
-        }
-
-        // to test the property `dayNumber` - Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday).
-        should("test dayNumber") {
-            // uncomment below to test the property
-            //modelInstance.dayNumber shouldBe ("TODO")
-        }
-
-        // to test the property `dayShort`
-        should("test dayShort") {
-            // uncomment below to test the property
-            //modelInstance.dayShort shouldBe ("TODO")
-        }
-
-        // to test the property `dayFull`
-        should("test dayFull") {
-            // uncomment below to test the property
-            //modelInstance.dayFull shouldBe ("TODO")
-        }
-
-        // to test the property `timezone`
+        // to test the property `timezone` - IANA timezone name.
         should("test timezone") {
             // uncomment below to test the property
             //modelInstance.timezone shouldBe ("TODO")
         }
 
-        // to test the property `offset`
+        // to test the property `offset` - Current UTC offset of the zone in minutes.
         should("test offset") {
             // uncomment below to test the property
             //modelInstance.offset shouldBe ("TODO")
         }
 
-        // to test the property `dst`
+        // to test the property `dst` - Whether daylight saving time is currently in effect in the zone.
         should("test dst") {
             // uncomment below to test the property
             //modelInstance.dst shouldBe ("TODO")
-        }
-
-        // to test the property `formatted`
-        should("test formatted") {
-            // uncomment below to test the property
-            //modelInstance.formatted shouldBe ("TODO")
         }
 
     }

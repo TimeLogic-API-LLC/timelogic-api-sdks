@@ -381,7 +381,7 @@ Name | Type | Description  | Required | Notes
 
 ## get_timezone
 
-> models::GetTimezone200Response get_timezone(tz, ip, lat, lon, offset, auto_tz, sign)
+> models::TimezoneResponse get_timezone(tz, ip, lat, lon, offset, auto_tz, sign, format)
 Resolve timezone information for a target
 
 Resolves timezone metadata for a single target.  Target selector rules: - Use exactly one selector family: `tz`, `ip`, `lat` + `lon`, `offset`, or `auto_tz=true`. - Bulk is not supported on this route. - With no selector the route returns 400 MISSING_TARGET. - `offset` queries return a specialized payload with `timezone=null` and `matching_zones` for the request-time offset match. Only geographic zones are listed; `UTC` and `Etc/_*` are intentionally excluded (use `tz=UTC` for UTC). - `tz` names resolve to their canonical zone (`Europe/Stockholm` returns `Europe/Berlin`). - An `ip` with no timezone mapping returns 404 NOT_FOUND.  Examples: - Single target: `/v1/timezone?tz=America/New_York` - Offset match: `/v1/timezone?offset=-04:00`
@@ -398,10 +398,11 @@ Name | Type | Description  | Required | Notes
 **offset** | Option<**String**> | Fixed UTC offset in `+HH:MM` or `-HH:MM` format only (`+0530` and `+5` are rejected); URL-encode `+` as `%2B`, since an unencoded `+` is read as a space. An offset target returns `timezone=null`. On bulk-capable routes, a comma-separated list enables bulk mode with at most 10 values; request URLs are limited to 8192 characters. |  |
 **auto_tz** | Option<**bool**> | Set to `true` to resolve using the caller IP from Cloudflare headers. Counts as a selector family, so it cannot be combined with `tz`, `ip`, `lat`/`lon` or `offset`. Not supported on `/v1/time/clock`. Enabled by `true`, `1` or `yes` (case-insensitive); any other value leaves it off without an error. |  |
 **sign** | Option<**bool**> | Set to `true`, `1` or `yes` (case-insensitive) to ask the gateway to sign the final JSON response. Any other value, a bare `sign`, or repeated `sign` values leave the response unsigned. Every authenticated JSON response, including errors, then includes signing headers. Not supported on `/v1/time/clock`. |  |
+**format** | Option<**String**> | Custom date/time format template using supported `strftime`-style directives such as `%Y-%m-%d %H:%M:%S`. Supported directives: `%a %A %b %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x %X %y %Y %z %:z %Z %%`, with the `-`, `_` and `0` padding flags on numeric directives. `%Z` prints the IANA zone name (or `UTC+HH:MM` for an offset target, `UTC` with no target), not an abbreviation. Any other directive (for example `%U`, `%f`, `%Q`) or a trailing `%` returns 400 INVALID_PARAMETER naming the directive. |  |
 
 ### Return type
 
-[**models::GetTimezone200Response**](getTimezone_200_response.md)
+[**models::TimezoneResponse**](TimezoneResponse.md)
 
 ### Authorization
 

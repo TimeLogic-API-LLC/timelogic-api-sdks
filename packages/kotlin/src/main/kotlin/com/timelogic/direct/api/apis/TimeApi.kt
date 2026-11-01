@@ -25,8 +25,8 @@ import com.timelogic.direct.api.models.DstResponse
 import com.timelogic.direct.api.models.ElapsedResponse
 import com.timelogic.direct.api.models.ErrorResponse
 import com.timelogic.direct.api.models.GetCurrentTime200Response
-import com.timelogic.direct.api.models.GetTimezone200Response
 import com.timelogic.direct.api.models.TimePayload
+import com.timelogic.direct.api.models.TimezoneResponse
 
 import com.squareup.moshi.Json
 
@@ -1447,7 +1447,8 @@ class TimeApi(basePath: kotlin.String = defaultBasePath, client: Call.Factory = 
      * @param offset Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format only (&#x60;+0530&#x60; and &#x60;+5&#x60; are rejected); URL-encode &#x60;+&#x60; as &#x60;%2B&#x60;, since an unencoded &#x60;+&#x60; is read as a space. An offset target returns &#x60;timezone&#x3D;null&#x60;. On bulk-capable routes, a comma-separated list enables bulk mode with at most 10 values; request URLs are limited to 8192 characters. (optional)
      * @param autoTz Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. Counts as a selector family, so it cannot be combined with &#x60;tz&#x60;, &#x60;ip&#x60;, &#x60;lat&#x60;/&#x60;lon&#x60; or &#x60;offset&#x60;. Not supported on &#x60;/v1/time/clock&#x60;. Enabled by &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive); any other value leaves it off without an error. (optional)
      * @param sign Set to &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive) to ask the gateway to sign the final JSON response. Any other value, a bare &#x60;sign&#x60;, or repeated &#x60;sign&#x60; values leave the response unsigned. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. (optional)
-     * @return GetTimezone200Response
+     * @param format Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Supported directives: &#x60;%a %A %b %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x %X %y %Y %z %:z %Z %%&#x60;, with the &#x60;-&#x60;, &#x60;_&#x60; and &#x60;0&#x60; padding flags on numeric directives. &#x60;%Z&#x60; prints the IANA zone name (or &#x60;UTC+HH:MM&#x60; for an offset target, &#x60;UTC&#x60; with no target), not an abbreviation. Any other directive (for example &#x60;%U&#x60;, &#x60;%f&#x60;, &#x60;%Q&#x60;) or a trailing &#x60;%&#x60; returns 400 INVALID_PARAMETER naming the directive. (optional)
+     * @return TimezoneResponse
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
@@ -1456,11 +1457,11 @@ class TimeApi(basePath: kotlin.String = defaultBasePath, client: Call.Factory = 
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getTimezone(tz: kotlin.String? = null, ip: kotlin.String? = null, lat: kotlin.Double? = null, lon: kotlin.Double? = null, offset: kotlin.String? = null, autoTz: kotlin.Boolean? = null, sign: kotlin.Boolean? = null) : GetTimezone200Response {
-        val localVarResponse = getTimezoneWithHttpInfo(tz = tz, ip = ip, lat = lat, lon = lon, offset = offset, autoTz = autoTz, sign = sign)
+    fun getTimezone(tz: kotlin.String? = null, ip: kotlin.String? = null, lat: kotlin.Double? = null, lon: kotlin.Double? = null, offset: kotlin.String? = null, autoTz: kotlin.Boolean? = null, sign: kotlin.Boolean? = null, format: kotlin.String? = null) : TimezoneResponse {
+        val localVarResponse = getTimezoneWithHttpInfo(tz = tz, ip = ip, lat = lat, lon = lon, offset = offset, autoTz = autoTz, sign = sign, format = format)
 
         return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as GetTimezone200Response
+            ResponseType.Success -> (localVarResponse as Success<*>).data as TimezoneResponse
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -1484,16 +1485,17 @@ class TimeApi(basePath: kotlin.String = defaultBasePath, client: Call.Factory = 
      * @param offset Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format only (&#x60;+0530&#x60; and &#x60;+5&#x60; are rejected); URL-encode &#x60;+&#x60; as &#x60;%2B&#x60;, since an unencoded &#x60;+&#x60; is read as a space. An offset target returns &#x60;timezone&#x3D;null&#x60;. On bulk-capable routes, a comma-separated list enables bulk mode with at most 10 values; request URLs are limited to 8192 characters. (optional)
      * @param autoTz Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. Counts as a selector family, so it cannot be combined with &#x60;tz&#x60;, &#x60;ip&#x60;, &#x60;lat&#x60;/&#x60;lon&#x60; or &#x60;offset&#x60;. Not supported on &#x60;/v1/time/clock&#x60;. Enabled by &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive); any other value leaves it off without an error. (optional)
      * @param sign Set to &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive) to ask the gateway to sign the final JSON response. Any other value, a bare &#x60;sign&#x60;, or repeated &#x60;sign&#x60; values leave the response unsigned. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. (optional)
-     * @return ApiResponse<GetTimezone200Response?>
+     * @param format Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Supported directives: &#x60;%a %A %b %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x %X %y %Y %z %:z %Z %%&#x60;, with the &#x60;-&#x60;, &#x60;_&#x60; and &#x60;0&#x60; padding flags on numeric directives. &#x60;%Z&#x60; prints the IANA zone name (or &#x60;UTC+HH:MM&#x60; for an offset target, &#x60;UTC&#x60; with no target), not an abbreviation. Any other directive (for example &#x60;%U&#x60;, &#x60;%f&#x60;, &#x60;%Q&#x60;) or a trailing &#x60;%&#x60; returns 400 INVALID_PARAMETER naming the directive. (optional)
+     * @return ApiResponse<TimezoneResponse?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun getTimezoneWithHttpInfo(tz: kotlin.String?, ip: kotlin.String?, lat: kotlin.Double?, lon: kotlin.Double?, offset: kotlin.String?, autoTz: kotlin.Boolean?, sign: kotlin.Boolean?) : ApiResponse<GetTimezone200Response?> {
-        val localVariableConfig = getTimezoneRequestConfig(tz = tz, ip = ip, lat = lat, lon = lon, offset = offset, autoTz = autoTz, sign = sign)
+    fun getTimezoneWithHttpInfo(tz: kotlin.String?, ip: kotlin.String?, lat: kotlin.Double?, lon: kotlin.Double?, offset: kotlin.String?, autoTz: kotlin.Boolean?, sign: kotlin.Boolean?, format: kotlin.String?) : ApiResponse<TimezoneResponse?> {
+        val localVariableConfig = getTimezoneRequestConfig(tz = tz, ip = ip, lat = lat, lon = lon, offset = offset, autoTz = autoTz, sign = sign, format = format)
 
-        return request<Unit, GetTimezone200Response>(
+        return request<Unit, TimezoneResponse>(
             localVariableConfig
         )
     }
@@ -1508,9 +1510,10 @@ class TimeApi(basePath: kotlin.String = defaultBasePath, client: Call.Factory = 
      * @param offset Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format only (&#x60;+0530&#x60; and &#x60;+5&#x60; are rejected); URL-encode &#x60;+&#x60; as &#x60;%2B&#x60;, since an unencoded &#x60;+&#x60; is read as a space. An offset target returns &#x60;timezone&#x3D;null&#x60;. On bulk-capable routes, a comma-separated list enables bulk mode with at most 10 values; request URLs are limited to 8192 characters. (optional)
      * @param autoTz Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. Counts as a selector family, so it cannot be combined with &#x60;tz&#x60;, &#x60;ip&#x60;, &#x60;lat&#x60;/&#x60;lon&#x60; or &#x60;offset&#x60;. Not supported on &#x60;/v1/time/clock&#x60;. Enabled by &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive); any other value leaves it off without an error. (optional)
      * @param sign Set to &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive) to ask the gateway to sign the final JSON response. Any other value, a bare &#x60;sign&#x60;, or repeated &#x60;sign&#x60; values leave the response unsigned. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. (optional)
+     * @param format Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Supported directives: &#x60;%a %A %b %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x %X %y %Y %z %:z %Z %%&#x60;, with the &#x60;-&#x60;, &#x60;_&#x60; and &#x60;0&#x60; padding flags on numeric directives. &#x60;%Z&#x60; prints the IANA zone name (or &#x60;UTC+HH:MM&#x60; for an offset target, &#x60;UTC&#x60; with no target), not an abbreviation. Any other directive (for example &#x60;%U&#x60;, &#x60;%f&#x60;, &#x60;%Q&#x60;) or a trailing &#x60;%&#x60; returns 400 INVALID_PARAMETER naming the directive. (optional)
      * @return RequestConfig
      */
-    fun getTimezoneRequestConfig(tz: kotlin.String?, ip: kotlin.String?, lat: kotlin.Double?, lon: kotlin.Double?, offset: kotlin.String?, autoTz: kotlin.Boolean?, sign: kotlin.Boolean?) : RequestConfig<Unit> {
+    fun getTimezoneRequestConfig(tz: kotlin.String?, ip: kotlin.String?, lat: kotlin.Double?, lon: kotlin.Double?, offset: kotlin.String?, autoTz: kotlin.Boolean?, sign: kotlin.Boolean?, format: kotlin.String?) : RequestConfig<Unit> {
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf<kotlin.String, kotlin.collections.List<kotlin.String>>()
             .apply {
@@ -1534,6 +1537,9 @@ class TimeApi(basePath: kotlin.String = defaultBasePath, client: Call.Factory = 
                 }
                 if (sign != null) {
                     put("sign", listOf(sign.toString()))
+                }
+                if (format != null) {
+                    put("format", listOf(format.toString()))
                 }
             }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()

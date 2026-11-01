@@ -257,10 +257,6 @@ module TimeLogic::Api
         fail ArgumentError, "invalid value for 'opts[:\"source_offset\"]' when calling TimeApi.convert_time, must conform to the pattern #{pattern}."
       end
 
-      if @api_client.config.client_side_validation && !opts[:'tz'].nil? && opts[:'tz'].to_s.length > 64
-        fail ArgumentError, 'invalid value for "opts[:"tz"]" when calling TimeApi.convert_time, the character length must be smaller than or equal to 64.'
-      end
-
       if @api_client.config.client_side_validation && !opts[:'lat'].nil? && opts[:'lat'] > 90
         fail ArgumentError, 'invalid value for "opts[:"lat"]" when calling TimeApi.convert_time, must be smaller than or equal to 90.'
       end
@@ -275,11 +271,6 @@ module TimeLogic::Api
 
       if @api_client.config.client_side_validation && !opts[:'lon'].nil? && opts[:'lon'] < -180
         fail ArgumentError, 'invalid value for "opts[:"lon"]" when calling TimeApi.convert_time, must be greater than or equal to -180.'
-      end
-
-      pattern = Regexp.new(/^[+-](0\d|1\d|2[0-3]):[0-5]\d$/)
-      if @api_client.config.client_side_validation && !opts[:'offset'].nil? && opts[:'offset'] !~ pattern
-        fail ArgumentError, "invalid value for 'opts[:\"offset\"]' when calling TimeApi.convert_time, must conform to the pattern #{pattern}."
       end
 
       # resource path
@@ -851,10 +842,6 @@ module TimeLogic::Api
       if @api_client.config.debugging
         @api_client.config.logger.debug 'Calling API: TimeApi.get_current_time ...'
       end
-      if @api_client.config.client_side_validation && !opts[:'tz'].nil? && opts[:'tz'].to_s.length > 64
-        fail ArgumentError, 'invalid value for "opts[:"tz"]" when calling TimeApi.get_current_time, the character length must be smaller than or equal to 64.'
-      end
-
       if @api_client.config.client_side_validation && !opts[:'lat'].nil? && opts[:'lat'] > 90
         fail ArgumentError, 'invalid value for "opts[:"lat"]" when calling TimeApi.get_current_time, must be smaller than or equal to 90.'
       end
@@ -869,11 +856,6 @@ module TimeLogic::Api
 
       if @api_client.config.client_side_validation && !opts[:'lon'].nil? && opts[:'lon'] < -180
         fail ArgumentError, 'invalid value for "opts[:"lon"]" when calling TimeApi.get_current_time, must be greater than or equal to -180.'
-      end
-
-      pattern = Regexp.new(/^[+-](0\d|1\d|2[0-3]):[0-5]\d$/)
-      if @api_client.config.client_side_validation && !opts[:'offset'].nil? && opts[:'offset'] !~ pattern
-        fail ArgumentError, "invalid value for 'opts[:\"offset\"]' when calling TimeApi.get_current_time, must conform to the pattern #{pattern}."
       end
 
       # resource path
@@ -1258,7 +1240,8 @@ module TimeLogic::Api
     # @option opts [String] :offset Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format only (&#x60;+0530&#x60; and &#x60;+5&#x60; are rejected); URL-encode &#x60;+&#x60; as &#x60;%2B&#x60;, since an unencoded &#x60;+&#x60; is read as a space. An offset target returns &#x60;timezone&#x3D;null&#x60;. On bulk-capable routes, a comma-separated list enables bulk mode with at most 10 values; request URLs are limited to 8192 characters.
     # @option opts [Boolean] :auto_tz Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. Counts as a selector family, so it cannot be combined with &#x60;tz&#x60;, &#x60;ip&#x60;, &#x60;lat&#x60;/&#x60;lon&#x60; or &#x60;offset&#x60;. Not supported on &#x60;/v1/time/clock&#x60;. Enabled by &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive); any other value leaves it off without an error.
     # @option opts [Boolean] :sign Set to &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive) to ask the gateway to sign the final JSON response. Any other value, a bare &#x60;sign&#x60;, or repeated &#x60;sign&#x60; values leave the response unsigned. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;.
-    # @return [GetTimezone200Response]
+    # @option opts [String] :format Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Supported directives: &#x60;%a %A %b %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x %X %y %Y %z %:z %Z %%&#x60;, with the &#x60;-&#x60;, &#x60;_&#x60; and &#x60;0&#x60; padding flags on numeric directives. &#x60;%Z&#x60; prints the IANA zone name (or &#x60;UTC+HH:MM&#x60; for an offset target, &#x60;UTC&#x60; with no target), not an abbreviation. Any other directive (for example &#x60;%U&#x60;, &#x60;%f&#x60;, &#x60;%Q&#x60;) or a trailing &#x60;%&#x60; returns 400 INVALID_PARAMETER naming the directive.
+    # @return [TimezoneResponse]
     def get_timezone(opts = {})
       data, _status_code, _headers = get_timezone_with_http_info(opts)
       data
@@ -1274,7 +1257,8 @@ module TimeLogic::Api
     # @option opts [String] :offset Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format only (&#x60;+0530&#x60; and &#x60;+5&#x60; are rejected); URL-encode &#x60;+&#x60; as &#x60;%2B&#x60;, since an unencoded &#x60;+&#x60; is read as a space. An offset target returns &#x60;timezone&#x3D;null&#x60;. On bulk-capable routes, a comma-separated list enables bulk mode with at most 10 values; request URLs are limited to 8192 characters.
     # @option opts [Boolean] :auto_tz Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. Counts as a selector family, so it cannot be combined with &#x60;tz&#x60;, &#x60;ip&#x60;, &#x60;lat&#x60;/&#x60;lon&#x60; or &#x60;offset&#x60;. Not supported on &#x60;/v1/time/clock&#x60;. Enabled by &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive); any other value leaves it off without an error.
     # @option opts [Boolean] :sign Set to &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive) to ask the gateway to sign the final JSON response. Any other value, a bare &#x60;sign&#x60;, or repeated &#x60;sign&#x60; values leave the response unsigned. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;.
-    # @return [Array<(GetTimezone200Response, Integer, Hash)>] GetTimezone200Response data, response status code and response headers
+    # @option opts [String] :format Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Supported directives: &#x60;%a %A %b %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x %X %y %Y %z %:z %Z %%&#x60;, with the &#x60;-&#x60;, &#x60;_&#x60; and &#x60;0&#x60; padding flags on numeric directives. &#x60;%Z&#x60; prints the IANA zone name (or &#x60;UTC+HH:MM&#x60; for an offset target, &#x60;UTC&#x60; with no target), not an abbreviation. Any other directive (for example &#x60;%U&#x60;, &#x60;%f&#x60;, &#x60;%Q&#x60;) or a trailing &#x60;%&#x60; returns 400 INVALID_PARAMETER naming the directive.
+    # @return [Array<(TimezoneResponse, Integer, Hash)>] TimezoneResponse data, response status code and response headers
     def get_timezone_with_http_info(opts = {})
       if @api_client.config.debugging
         @api_client.config.logger.debug 'Calling API: TimeApi.get_timezone ...'
@@ -1316,6 +1300,7 @@ module TimeLogic::Api
       query_params[:'offset'] = opts[:'offset'] if !opts[:'offset'].nil?
       query_params[:'auto_tz'] = opts[:'auto_tz'] if !opts[:'auto_tz'].nil?
       query_params[:'sign'] = opts[:'sign'] if !opts[:'sign'].nil?
+      query_params[:'format'] = opts[:'format'] if !opts[:'format'].nil?
 
       # header parameters
       header_params = opts[:header_params] || {}
@@ -1329,7 +1314,7 @@ module TimeLogic::Api
       post_body = opts[:debug_body]
 
       # return_type
-      return_type = opts[:debug_return_type] || 'GetTimezone200Response'
+      return_type = opts[:debug_return_type] || 'TimezoneResponse'
 
       # auth_names
       auth_names = opts[:debug_auth_names] || ['apiKeyHeader', 'bearerAuth', 'apiKeyQuery', 'rapidApiKey', 'rapidApiHost']

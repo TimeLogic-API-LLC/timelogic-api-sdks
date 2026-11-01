@@ -3602,6 +3602,7 @@ type ApiGetTimezoneRequest struct {
 	offset *string
 	autoTz *bool
 	sign *bool
+	format *string
 }
 
 // IANA timezone name, matched case-insensitively. Links and aliases resolve to their canonical zone, so the returned &#x60;timezone&#x60; can differ (&#x60;Europe/Stockholm&#x60; returns &#x60;Europe/Berlin&#x60;, &#x60;UTC&#x60; returns &#x60;Etc/UTC&#x60;). &#x60;Etc/GMT+5&#x60; is UTC-05:00 (POSIX sign). On bulk-capable routes, a comma-separated list enables bulk mode with at most 10 values (any comma, even a trailing one, returns an array); request URLs are limited to 8192 characters. On single-target routes a list is rejected as an invalid timezone.
@@ -3646,7 +3647,13 @@ func (r ApiGetTimezoneRequest) Sign(sign bool) ApiGetTimezoneRequest {
 	return r
 }
 
-func (r ApiGetTimezoneRequest) Execute() (*GetTimezone200Response, *http.Response, error) {
+// Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Supported directives: &#x60;%a %A %b %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x %X %y %Y %z %:z %Z %%&#x60;, with the &#x60;-&#x60;, &#x60;_&#x60; and &#x60;0&#x60; padding flags on numeric directives. &#x60;%Z&#x60; prints the IANA zone name (or &#x60;UTC+HH:MM&#x60; for an offset target, &#x60;UTC&#x60; with no target), not an abbreviation. Any other directive (for example &#x60;%U&#x60;, &#x60;%f&#x60;, &#x60;%Q&#x60;) or a trailing &#x60;%&#x60; returns 400 INVALID_PARAMETER naming the directive.
+func (r ApiGetTimezoneRequest) Format(format string) ApiGetTimezoneRequest {
+	r.format = &format
+	return r
+}
+
+func (r ApiGetTimezoneRequest) Execute() (*TimezoneResponse, *http.Response, error) {
 	return r.ApiService.GetTimezoneExecute(r)
 }
 
@@ -3678,13 +3685,13 @@ func (a *TimeAPIService) GetTimezone(ctx context.Context) ApiGetTimezoneRequest 
 }
 
 // Execute executes the request
-//  @return GetTimezone200Response
-func (a *TimeAPIService) GetTimezoneExecute(r ApiGetTimezoneRequest) (*GetTimezone200Response, *http.Response, error) {
+//  @return TimezoneResponse
+func (a *TimeAPIService) GetTimezoneExecute(r ApiGetTimezoneRequest) (*TimezoneResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
 		formFiles            []formFile
-		localVarReturnValue  *GetTimezone200Response
+		localVarReturnValue  *TimezoneResponse
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TimeAPIService.GetTimezone")
@@ -3718,6 +3725,9 @@ func (a *TimeAPIService) GetTimezoneExecute(r ApiGetTimezoneRequest) (*GetTimezo
 	}
 	if r.sign != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "sign", r.sign, "form", "")
+	}
+	if r.format != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "format", r.format, "form", "")
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
