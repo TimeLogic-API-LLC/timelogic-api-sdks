@@ -1,0 +1,727 @@
+openapi: 3.0.3
+info:
+  title: TimeLogic API — WorldTimeAPI-compatible routes
+  version: 1.0.0
+  description: 'Drop-in replacement for the worldtimeapi.org API on the TimeLogic direct gateway.
+
+
+    The `/api/*` routes answer the same paths, field names, field types, field formats,
+    plain-text (`.txt`) variants, error bodies and content types as worldtimeapi.org.
+    The one difference is authentication: every route requires a TimeLogic API key,
+    accepted exactly as on `/v1` (`Authorization: Bearer`, `X-API-Key`, or the `api_key`
+    query parameter). A missing or invalid key returns the standard TimeLogic error body.
+    Successful requests are metered and counted against the monthly quota like `/v1`.
+
+
+    Behavioral notes:
+
+    - all routes are `GET` (and `HEAD`); query strings other than `api_key` and `sign`
+    are ignored
+
+    - `sign=true` is optional and adds the same detached signature headers as `/v1`
+    (`X-TimeLogic-Signature`, `X-TimeLogic-Key-Id`, `X-TimeLogic-Signature-Alg`,
+    `X-TimeLogic-Signature-Timestamp`, `X-TimeLogic-Content-SHA256`, `X-TimeLogic-Signature-Input`),
+    exposed to browsers through CORS. The body stays byte-identical to the unsigned
+    WorldTimeAPI-compatible body, in JSON and in `.txt`. Verify with the keys at
+    `/.well-known/time-api-public-key`. Without `sign`, nothing changes
+
+    - zone names match in any letter case; one trailing slash is ignored
+
+    - `datetime` and `utc_datetime` carry six fractional digits like worldtimeapi.org;
+    the clock resolution is one millisecond, so the last three digits are `000`
+
+    - JSON keys come in the order worldtimeapi.org used from August 2024; `.txt` lines
+    come in the fixed alphabetical order it used from 2019 to July 2024
+
+    - errors are `404` with `{"error":"unknown location"}`, `{"error":"malformed ip"}`
+    or `{"error":"not found"}`, or a line starting with `Error:` on `.txt` paths'
+servers:
+- url: https://{host}
+  description: Default direct customer API host.
+  variables:
+    host:
+      default: api.timelogicapi.com
+      description: HTTPS hostname serving this API.
+security:
+- directBearerAuth: []
+- directApiKeyHeader: []
+- directApiKeyQuery: []
+tags:
+- name: WorldTimeAPI compatible
+  description: worldtimeapi.org paths and payloads, served from TimeLogic's tz and IP data.
+paths:
+  /api/timezone:
+    get:
+      tags:
+      - WorldTimeAPI compatible
+      summary: List all timezones (JSON)
+      description: >-
+        Every tzdata zone and link name, sorted, as a JSON array (the list worldtimeapi.org served from 2025 on).
+      operationId: listTimezonesWta
+      parameters:
+      - $ref: '#/components/parameters/SignFlag'
+      responses:
+        '200':
+          $ref: '#/components/responses/WtaListJson'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/SubscriptionInactive'
+        '429':
+          $ref: '#/components/responses/QuotaExceeded'
+  /api/timezone.txt:
+    get:
+      tags:
+      - WorldTimeAPI compatible
+      summary: List all timezones (plain text)
+      description: >-
+        The same list as `/api/timezone`, one name per line, with no trailing newline.
+      operationId: listTimezonesWtaText
+      parameters:
+      - $ref: '#/components/parameters/SignFlag'
+      responses:
+        '200':
+          $ref: '#/components/responses/WtaListText'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/SubscriptionInactive'
+        '429':
+          $ref: '#/components/responses/QuotaExceeded'
+  /api/timezone/{area}:
+    get:
+      tags:
+      - WorldTimeAPI compatible
+      summary: List the timezones in an area, or the time in a one-word zone (JSON)
+      description: >-
+        `{area}` is the first segment of a zone name (`Europe`, `America`, `Etc`) and returns the names under it.
+        A one-word zone (`UTC`, `EST`, `CET`) returns its time object instead.
+        Matching ignores letter case. A name that is neither returns 404 `{"error":"unknown location"}`.
+      operationId: getAreaOrZoneWta
+      parameters:
+      - $ref: '#/components/parameters/WtaArea'
+      - $ref: '#/components/parameters/SignFlag'
+      responses:
+        '200':
+          $ref: '#/components/responses/WtaAreaOrTimeJson'
+        '404':
+          $ref: '#/components/responses/WtaNotFoundJson'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/SubscriptionInactive'
+        '429':
+          $ref: '#/components/responses/QuotaExceeded'
+  /api/timezone/{area}.txt:
+    get:
+      tags:
+      - WorldTimeAPI compatible
+      summary: List the timezones in an area, or the time in a one-word zone (plain text)
+      description: >-
+        Plain-text variant of `/api/timezone/{area}`.
+      operationId: getAreaOrZoneWtaText
+      parameters:
+      - $ref: '#/components/parameters/WtaArea'
+      - $ref: '#/components/parameters/SignFlag'
+      responses:
+        '200':
+          $ref: '#/components/responses/WtaAreaOrTimeText'
+        '404':
+          $ref: '#/components/responses/WtaNotFoundText'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/SubscriptionInactive'
+        '429':
+          $ref: '#/components/responses/QuotaExceeded'
+  /api/timezone/{area}/{location}:
+    get:
+      tags:
+      - WorldTimeAPI compatible
+      summary: Current time in a timezone (JSON)
+      description: >-
+        Current time for `Area/Location`, for example `Europe/London`.
+        Zone and link names match in any letter case; `timezone` echoes the tzdata spelling of the name requested.
+        An unknown name returns 404 `{"error":"unknown location"}`.
+      operationId: getTimezoneWta
+      parameters:
+      - $ref: '#/components/parameters/WtaArea'
+      - $ref: '#/components/parameters/WtaLocation'
+      - $ref: '#/components/parameters/SignFlag'
+      responses:
+        '200':
+          $ref: '#/components/responses/WtaTimeJson'
+        '404':
+          $ref: '#/components/responses/WtaNotFoundJson'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/SubscriptionInactive'
+        '429':
+          $ref: '#/components/responses/QuotaExceeded'
+  /api/timezone/{area}/{location}.txt:
+    get:
+      tags:
+      - WorldTimeAPI compatible
+      summary: Current time in a timezone (plain text)
+      description: >-
+        Plain-text variant: one `key: value` line per field, in alphabetical order; null values are empty.
+      operationId: getTimezoneWtaText
+      parameters:
+      - $ref: '#/components/parameters/WtaArea'
+      - $ref: '#/components/parameters/WtaLocation'
+      - $ref: '#/components/parameters/SignFlag'
+      responses:
+        '200':
+          $ref: '#/components/responses/WtaTimeText'
+        '404':
+          $ref: '#/components/responses/WtaNotFoundText'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/SubscriptionInactive'
+        '429':
+          $ref: '#/components/responses/QuotaExceeded'
+  /api/timezone/{area}/{location}/{region}:
+    get:
+      tags:
+      - WorldTimeAPI compatible
+      summary: Current time in a three-part timezone (JSON)
+      description: >-
+        Current time for `Area/Location/Region`, for example `America/Argentina/Salta`.
+      operationId: getRegionTimezoneWta
+      parameters:
+      - $ref: '#/components/parameters/WtaArea'
+      - $ref: '#/components/parameters/WtaLocation'
+      - $ref: '#/components/parameters/WtaRegion'
+      - $ref: '#/components/parameters/SignFlag'
+      responses:
+        '200':
+          $ref: '#/components/responses/WtaTimeJson'
+        '404':
+          $ref: '#/components/responses/WtaNotFoundJson'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/SubscriptionInactive'
+        '429':
+          $ref: '#/components/responses/QuotaExceeded'
+  /api/timezone/{area}/{location}/{region}.txt:
+    get:
+      tags:
+      - WorldTimeAPI compatible
+      summary: Current time in a three-part timezone (plain text)
+      description: >-
+        Plain-text variant of `/api/timezone/{area}/{location}/{region}`.
+      operationId: getRegionTimezoneWtaText
+      parameters:
+      - $ref: '#/components/parameters/WtaArea'
+      - $ref: '#/components/parameters/WtaLocation'
+      - $ref: '#/components/parameters/WtaRegion'
+      - $ref: '#/components/parameters/SignFlag'
+      responses:
+        '200':
+          $ref: '#/components/responses/WtaTimeText'
+        '404':
+          $ref: '#/components/responses/WtaNotFoundText'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/SubscriptionInactive'
+        '429':
+          $ref: '#/components/responses/QuotaExceeded'
+  /api/ip:
+    get:
+      tags:
+      - WorldTimeAPI compatible
+      summary: Current time for the caller's IP address (JSON)
+      description: >-
+        Resolves the timezone of the request's client address (`CF-Connecting-IP`) with TimeLogic's IP-to-timezone data.
+        An address with no timezone mapping returns 404 `{"error":"unknown location"}`.
+      operationId: getCallerIpTimeWta
+      parameters:
+      - $ref: '#/components/parameters/SignFlag'
+      responses:
+        '200':
+          $ref: '#/components/responses/WtaTimeJson'
+        '404':
+          $ref: '#/components/responses/WtaNotFoundJson'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/SubscriptionInactive'
+        '429':
+          $ref: '#/components/responses/QuotaExceeded'
+  /api/ip.txt:
+    get:
+      tags:
+      - WorldTimeAPI compatible
+      summary: Current time for the caller's IP address (plain text)
+      description: >-
+        Plain-text variant of `/api/ip`.
+      operationId: getCallerIpTimeWtaText
+      parameters:
+      - $ref: '#/components/parameters/SignFlag'
+      responses:
+        '200':
+          $ref: '#/components/responses/WtaTimeText'
+        '404':
+          $ref: '#/components/responses/WtaNotFoundText'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/SubscriptionInactive'
+        '429':
+          $ref: '#/components/responses/QuotaExceeded'
+  /api/ip/{ip}:
+    get:
+      tags:
+      - WorldTimeAPI compatible
+      summary: Current time for an IP address (JSON)
+      description: >-
+        Resolves the timezone of an IPv4 or IPv6 address. `client_ip` stays the caller's own address.
+        A value that is not an IP address returns 404 `{"error":"malformed ip"}`; an address with no mapping returns 404 `{"error":"unknown location"}`.
+      operationId: getIpTimeWta
+      parameters:
+      - $ref: '#/components/parameters/WtaIp'
+      - $ref: '#/components/parameters/SignFlag'
+      responses:
+        '200':
+          $ref: '#/components/responses/WtaTimeJson'
+        '404':
+          $ref: '#/components/responses/WtaNotFoundJson'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/SubscriptionInactive'
+        '429':
+          $ref: '#/components/responses/QuotaExceeded'
+  /api/ip/{ip}.txt:
+    get:
+      tags:
+      - WorldTimeAPI compatible
+      summary: Current time for an IP address (plain text)
+      description: >-
+        Plain-text variant of `/api/ip/{ip}`.
+      operationId: getIpTimeWtaText
+      parameters:
+      - $ref: '#/components/parameters/WtaIp'
+      - $ref: '#/components/parameters/SignFlag'
+      responses:
+        '200':
+          $ref: '#/components/responses/WtaTimeText'
+        '404':
+          $ref: '#/components/responses/WtaNotFoundText'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/SubscriptionInactive'
+        '429':
+          $ref: '#/components/responses/QuotaExceeded'
+components:
+  securitySchemes:
+    directBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: TimeLogic API key
+      description: 'Direct API key supplied as Authorization: Bearer.'
+    directApiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Direct API key supplied as X-API-Key.
+    directApiKeyQuery:
+      type: apiKey
+      in: query
+      name: api_key
+      description: Direct API key supplied as a query parameter; headers are preferred.
+  parameters:
+    WtaArea:
+      name: area
+      in: path
+      required: true
+      description: First segment of a tzdata name (`Europe`), or a one-word zone (`UTC`).
+      schema:
+        type: string
+      example: Europe
+    WtaLocation:
+      name: location
+      in: path
+      required: true
+      description: Second segment of a tzdata name.
+      schema:
+        type: string
+      example: London
+    WtaRegion:
+      name: region
+      in: path
+      required: true
+      description: Third segment of a three-part tzdata name.
+      schema:
+        type: string
+      example: Salta
+    WtaIp:
+      name: ip
+      in: path
+      required: true
+      description: IPv4 or IPv6 address.
+      schema:
+        type: string
+      example: 8.8.8.8
+    SignFlag:
+      name: sign
+      in: query
+      description: Optional. `sign=true` adds the same detached signature headers as `/v1`,
+        signed by the same key; the body stays byte-identical to the unsigned response, in JSON
+        and in `.txt`. Leave it out for plain WorldTimeAPI behaviour.
+      required: false
+      schema:
+        type: boolean
+      example: true
+  headers:
+    XRequestId:
+      description: Gateway-generated or forwarded request identifier.
+      schema:
+        type: string
+    XTimeLogicSignature:
+      description: Present only with `sign=true`. Base64 Ed25519 detached signature over the decoded `X-TimeLogic-Signature-Input`.
+      schema:
+        type: string
+    XTimeLogicKeyId:
+      description: With `sign=true`, the signing key identifier used for `X-TimeLogic-Signature` (look it up at `/.well-known/time-api-public-key`). Without it, the customer's API key id.
+      schema:
+        type: string
+      example: ed25519-2026-07-19
+    XTimeLogicSignatureAlg:
+      description: Present only with `sign=true`. Signature algorithm.
+      schema:
+        type: string
+        enum:
+        - Ed25519
+    XTimeLogicSignatureTimestamp:
+      description: Present only with `sign=true`. UNIX seconds used in the signing envelope.
+      schema:
+        type: string
+        pattern: ^-?\d+$
+    XTimeLogicContentSha256:
+      description: Present only with `sign=true`. Standard Base64 SHA-256 hash of the exact response body bytes (JSON or `.txt`).
+      schema:
+        type: string
+    XTimeLogicSignatureInput:
+      description: Present only with `sign=true`. Base64URL-encoded exact UTF-8 v1 signing input; it includes the status, method, signed path and query (including `sign=true`, excluding `api_key`), timestamp and body hash, and excludes scheme, host and Content-Type.
+      schema:
+        type: string
+  responses:
+    WtaListJson:
+      description: Zone names as a JSON array.
+      headers:
+        X-TimeLogic-Signature:
+          $ref: '#/components/headers/XTimeLogicSignature'
+        X-TimeLogic-Key-Id:
+          $ref: '#/components/headers/XTimeLogicKeyId'
+        X-TimeLogic-Signature-Alg:
+          $ref: '#/components/headers/XTimeLogicSignatureAlg'
+        X-TimeLogic-Signature-Timestamp:
+          $ref: '#/components/headers/XTimeLogicSignatureTimestamp'
+        X-TimeLogic-Content-SHA256:
+          $ref: '#/components/headers/XTimeLogicContentSha256'
+        X-TimeLogic-Signature-Input:
+          $ref: '#/components/headers/XTimeLogicSignatureInput'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/WtaListJson'
+          example:
+          - Europe/Amsterdam
+          - Europe/Andorra
+          - Europe/Astrakhan
+    WtaListText:
+      description: Zone names, one per line.
+      headers:
+        X-TimeLogic-Signature:
+          $ref: '#/components/headers/XTimeLogicSignature'
+        X-TimeLogic-Key-Id:
+          $ref: '#/components/headers/XTimeLogicKeyId'
+        X-TimeLogic-Signature-Alg:
+          $ref: '#/components/headers/XTimeLogicSignatureAlg'
+        X-TimeLogic-Signature-Timestamp:
+          $ref: '#/components/headers/XTimeLogicSignatureTimestamp'
+        X-TimeLogic-Content-SHA256:
+          $ref: '#/components/headers/XTimeLogicContentSha256'
+        X-TimeLogic-Signature-Input:
+          $ref: '#/components/headers/XTimeLogicSignatureInput'
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: "Europe/Amsterdam\nEurope/Andorra\nEurope/Astrakhan"
+    WtaTimeJson:
+      description: The current time in the zone.
+      headers:
+        X-TimeLogic-Signature:
+          $ref: '#/components/headers/XTimeLogicSignature'
+        X-TimeLogic-Key-Id:
+          $ref: '#/components/headers/XTimeLogicKeyId'
+        X-TimeLogic-Signature-Alg:
+          $ref: '#/components/headers/XTimeLogicSignatureAlg'
+        X-TimeLogic-Signature-Timestamp:
+          $ref: '#/components/headers/XTimeLogicSignatureTimestamp'
+        X-TimeLogic-Content-SHA256:
+          $ref: '#/components/headers/XTimeLogicContentSha256'
+        X-TimeLogic-Signature-Input:
+          $ref: '#/components/headers/XTimeLogicSignatureInput'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/WtaDateTimeJson'
+          example: {"utc_offset":"+00:00","timezone":"Europe/London","day_of_week":4,"day_of_year":302,"datetime":"2026-10-29T18:38:13.436000+00:00","utc_datetime":"2026-10-29T18:38:13.436000+00:00","unixtime":1793299093,"raw_offset":0,"week_number":44,"dst":false,"abbreviation":"GMT","dst_offset":0,"dst_from":null,"dst_until":null,"client_ip":"203.0.113.7"}
+    WtaTimeText:
+      description: 'The current time in the zone, as `key: value` lines.'
+      headers:
+        X-TimeLogic-Signature:
+          $ref: '#/components/headers/XTimeLogicSignature'
+        X-TimeLogic-Key-Id:
+          $ref: '#/components/headers/XTimeLogicKeyId'
+        X-TimeLogic-Signature-Alg:
+          $ref: '#/components/headers/XTimeLogicSignatureAlg'
+        X-TimeLogic-Signature-Timestamp:
+          $ref: '#/components/headers/XTimeLogicSignatureTimestamp'
+        X-TimeLogic-Content-SHA256:
+          $ref: '#/components/headers/XTimeLogicContentSha256'
+        X-TimeLogic-Signature-Input:
+          $ref: '#/components/headers/XTimeLogicSignatureInput'
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: "abbreviation: GMT\nclient_ip: 203.0.113.7\ndatetime: 2026-10-29T18:38:13.436000+00:00\nday_of_week: 4\nday_of_year: 302\ndst: false\ndst_from: \ndst_offset: 0\ndst_until: \nraw_offset: 0\ntimezone: Europe/London\nunixtime: 1793299093\nutc_datetime: 2026-10-29T18:38:13.436000+00:00\nutc_offset: +00:00\nweek_number: 44"
+    WtaAreaOrTimeJson:
+      description: The names in the area, or the time object for a one-word zone.
+      headers:
+        X-TimeLogic-Signature:
+          $ref: '#/components/headers/XTimeLogicSignature'
+        X-TimeLogic-Key-Id:
+          $ref: '#/components/headers/XTimeLogicKeyId'
+        X-TimeLogic-Signature-Alg:
+          $ref: '#/components/headers/XTimeLogicSignatureAlg'
+        X-TimeLogic-Signature-Timestamp:
+          $ref: '#/components/headers/XTimeLogicSignatureTimestamp'
+        X-TimeLogic-Content-SHA256:
+          $ref: '#/components/headers/XTimeLogicContentSha256'
+        X-TimeLogic-Signature-Input:
+          $ref: '#/components/headers/XTimeLogicSignatureInput'
+      content:
+        application/json:
+          schema:
+            oneOf:
+            - $ref: '#/components/schemas/WtaListJson'
+            - $ref: '#/components/schemas/WtaDateTimeJson'
+    WtaAreaOrTimeText:
+      description: 'The names in the area one per line, or the time object as `key: value` lines.'
+      headers:
+        X-TimeLogic-Signature:
+          $ref: '#/components/headers/XTimeLogicSignature'
+        X-TimeLogic-Key-Id:
+          $ref: '#/components/headers/XTimeLogicKeyId'
+        X-TimeLogic-Signature-Alg:
+          $ref: '#/components/headers/XTimeLogicSignatureAlg'
+        X-TimeLogic-Signature-Timestamp:
+          $ref: '#/components/headers/XTimeLogicSignatureTimestamp'
+        X-TimeLogic-Content-SHA256:
+          $ref: '#/components/headers/XTimeLogicContentSha256'
+        X-TimeLogic-Signature-Input:
+          $ref: '#/components/headers/XTimeLogicSignatureInput'
+      content:
+        text/plain:
+          schema:
+            type: string
+    WtaNotFoundJson:
+      description: Unknown location, malformed IP address, or a path that is not an endpoint.
+      headers:
+        X-TimeLogic-Signature:
+          $ref: '#/components/headers/XTimeLogicSignature'
+        X-TimeLogic-Key-Id:
+          $ref: '#/components/headers/XTimeLogicKeyId'
+        X-TimeLogic-Signature-Alg:
+          $ref: '#/components/headers/XTimeLogicSignatureAlg'
+        X-TimeLogic-Signature-Timestamp:
+          $ref: '#/components/headers/XTimeLogicSignatureTimestamp'
+        X-TimeLogic-Content-SHA256:
+          $ref: '#/components/headers/XTimeLogicContentSha256'
+        X-TimeLogic-Signature-Input:
+          $ref: '#/components/headers/XTimeLogicSignatureInput'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/WtaError'
+          examples:
+            unknownLocation:
+              value:
+                error: unknown location
+            malformedIp:
+              value:
+                error: malformed ip
+            notFound:
+              value:
+                error: not found
+    WtaNotFoundText:
+      description: The same errors as plain text.
+      headers:
+        X-TimeLogic-Signature:
+          $ref: '#/components/headers/XTimeLogicSignature'
+        X-TimeLogic-Key-Id:
+          $ref: '#/components/headers/XTimeLogicKeyId'
+        X-TimeLogic-Signature-Alg:
+          $ref: '#/components/headers/XTimeLogicSignatureAlg'
+        X-TimeLogic-Signature-Timestamp:
+          $ref: '#/components/headers/XTimeLogicSignatureTimestamp'
+        X-TimeLogic-Content-SHA256:
+          $ref: '#/components/headers/XTimeLogicContentSha256'
+        X-TimeLogic-Signature-Input:
+          $ref: '#/components/headers/XTimeLogicSignatureInput'
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: 'Error: unknown location'
+    Unauthorized:
+      description: Missing or invalid API key (standard TimeLogic error body).
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/XRequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: UNAUTHORIZED
+              message: Missing API key credentials.
+            request_id: f3eb6ec5-77a8-454f-8b6a-5c68aabe7abb
+    SubscriptionInactive:
+      description: The key or customer subscription is not active.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/XRequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    QuotaExceeded:
+      description: The monthly quota is exceeded.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/XRequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    WtaListJson:
+      type: array
+      description: tzdata zone and link names.
+      items:
+        type: string
+    WtaDateTimeJson:
+      type: object
+      required:
+      - utc_offset
+      - timezone
+      - day_of_week
+      - day_of_year
+      - datetime
+      - utc_datetime
+      - unixtime
+      - raw_offset
+      - week_number
+      - dst
+      - abbreviation
+      - dst_offset
+      - dst_from
+      - dst_until
+      - client_ip
+      properties:
+        utc_offset:
+          type: string
+          description: Current offset from UTC, `±HH:MM`, daylight saving time included.
+          example: '+01:00'
+        timezone:
+          type: string
+          description: Zone name in `Area/Location` or `Area/Location/Region` format (tzdata spelling of the name requested).
+        day_of_week:
+          type: integer
+          description: Local day of the week, Sunday is 0.
+        day_of_year:
+          type: integer
+          description: Ordinal local date, starting at 1.
+        datetime:
+          type: string
+          description: Local date and time, ISO 8601 with six fractional digits and the offset.
+          example: '2026-07-01T09:30:00.250000+01:00'
+        utc_datetime:
+          type: string
+          description: The same instant in UTC, ending in `+00:00`.
+          example: '2026-07-01T08:30:00.250000+00:00'
+        unixtime:
+          type: integer
+          description: Seconds since the Unix epoch.
+        raw_offset:
+          type: integer
+          description: Offset from UTC in seconds, excluding daylight saving time.
+        week_number:
+          type: integer
+          description: ISO 8601 week number of the local date.
+        dst:
+          type: boolean
+          description: Whether daylight saving time is in effect.
+        abbreviation:
+          type: string
+          description: The tzdata abbreviation (`GMT`, `BST`, `EST`; `-03` where tzdata has no letters).
+        dst_offset:
+          type: integer
+          description: Daylight saving time in effect, in seconds (0 outside it).
+        dst_from:
+          type: string
+          nullable: true
+          description: UTC instant the current daylight saving period started; null when `dst` is false.
+          example: '2026-03-29T01:00:00+00:00'
+        dst_until:
+          type: string
+          nullable: true
+          description: UTC instant the current daylight saving period ends; null when `dst` is false.
+          example: '2026-10-25T01:00:00+00:00'
+        client_ip:
+          type: string
+          description: The IP address the request came from.
+    WtaError:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: string
+          enum:
+          - unknown location
+          - malformed ip
+          - not found
+    ApiError:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details: {}
+    ErrorResponse:
+      type: object
+      required:
+      - error
+      - request_id
+      properties:
+        error:
+          $ref: '#/components/schemas/ApiError'
+        request_id:
+          type: string
