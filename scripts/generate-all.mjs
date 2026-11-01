@@ -64,4 +64,5 @@ for (const target of targets) {
 }
 
 await import('./normalize-generated.mjs');
+await import('./add-worldtimeapi.mjs');
 console.log(`Generated ${targets.length} SDK targets.`);

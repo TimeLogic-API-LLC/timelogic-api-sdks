@@ -61,3 +61,4 @@ module TimeLogic::Api
     end
   end
 end
+require 'timelogic-api/world_time_api'

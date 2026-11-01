@@ -23,9 +23,12 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run validate
+      - name: Report whether openapi.yaml is behind openapi-direct.yaml
+        run: npm run build-spec -- --check
       - run: npm run generate
       - run: npm run verify-generated
       - run: npm run test:contract
+      - run: npm run verify-worldtimeapi
       - name: Ensure generated output is committed
         run: git diff --exit-code -- openapi packages config Package.swift Package.resolved composer.json phpunit.xml.dist
 
@@ -104,3 +107,58 @@ jobs:
         run: swift build
       - name: Test Swift SDK
         run: swift test
+
+  worldtimeapi-clients:
+    name: WorldTimeAPI-compatible clients (TypeScript, Python, Go, Rust, .NET, Ruby)
+    needs: validate-generate-test
+    runs-on: ubuntu-latest
+    env:
+      TIMELOGIC_API_KEY: ${{ secrets.TIMELOGIC_SDK_TEST_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Check the contract against every SDK client
+        run: npm run verify-worldtimeapi
+      - name: TypeScript
+        working-directory: packages/typescript
+        run: |
+          npm install --no-package-lock --no-audit --no-fund
+          npm run build
+          node --test test/worldtimeapi.test.mjs
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Python
+        working-directory: packages/python
+        run: |
+          python -m pip install -e . pytest
+          python -m pytest -q test/test_worldtimeapi.py
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+      - name: Go
+        working-directory: packages/go
+        run: |
+          go vet ./worldtimeapi/
+          go test ./worldtimeapi/
+      - name: Rust
+        working-directory: packages/rust
+        run: cargo test worldtimeapi
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: .NET
+        working-directory: packages/csharp
+        run: dotnet test src/TimeLogic.Api.Test/TimeLogic.Api.Test.csproj --filter "FullyQualifiedName~WorldTimeApi"
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          working-directory: packages/ruby
+          bundler-cache: true
+      - name: Ruby
+        working-directory: packages/ruby
+        run: bundle exec rspec spec/world_time_api_spec.rb
