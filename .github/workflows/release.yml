@@ -297,11 +297,13 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.5'
           extensions: curl, mbstring
           tools: composer:v2
       - run: composer validate --strict
       - run: composer install --no-interaction --prefer-dist
+      - name: Check dependencies for security advisories
+        run: composer audit --abandoned=report
       - run: vendor/bin/phpunit -c phpunit.xml.dist
       - name: Report Packagist release behavior
         run: echo "Packagist indexes the committed Git tag through its repository webhook; no archive upload is required."

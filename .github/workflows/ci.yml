@@ -49,19 +49,38 @@ jobs:
         run: find "packages/${{ matrix.language }}" -maxdepth 2 -type f | sort | head -80
 
   php-build-test:
-    name: Validate and test PHP SDK
+    name: Validate and test PHP SDK (PHP ${{ matrix.php }}, ${{ matrix.dependencies }} dependencies)
     needs: validate-generate-test
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 8.5 is the latest PHP release; 8.2-8.4 are the other branches that
+        # still receive security fixes. 7.4 with the lowest allowed
+        # dependencies proves the oldest versions composer.json accepts.
+        php: ['8.5', '8.4', '8.3', '8.2']
+        dependencies: [highest]
+        include:
+          - php: '7.4'
+            dependencies: lowest
     steps:
       - uses: actions/checkout@v4
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: ${{ matrix.php }}
           extensions: curl, mbstring
           tools: composer:v2
       - run: composer validate --strict
-      - run: composer install --no-interaction --prefer-dist
+      - name: Install dependencies
+        run: |
+          if [ "${{ matrix.dependencies }}" = "lowest" ]; then
+            composer update --no-interaction --prefer-dist --prefer-lowest --prefer-stable
+          else
+            composer update --no-interaction --prefer-dist
+          fi
+      - name: Check dependencies for security advisories
+        run: composer audit --abandoned=report
       - run: vendor/bin/phpunit -c phpunit.xml.dist
 
   java-build-test:

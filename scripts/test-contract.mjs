@@ -6,7 +6,9 @@ if (!apiKey) {
   process.exit(0);
 }
 
-const headers = { Authorization: `Bearer ${apiKey}`, 'CF-Connecting-IP': '203.0.113.10' };
+// Only the API key. Cloudflare sets CF-Connecting-IP itself on every request
+// it forwards and rejects requests whose client already sent it (403, error 1000).
+const headers = { Authorization: `Bearer ${apiKey}` };
 const check = async (path, expected, label, options = {}) => {
   const response = await fetch(`${baseUrl}${path}`, options);
   if (response.status !== expected) throw new Error(`${label}: expected ${expected}, received ${response.status}: ${await response.text()}`);
