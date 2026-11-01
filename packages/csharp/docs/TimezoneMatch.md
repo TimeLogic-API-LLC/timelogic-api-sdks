@@ -1,22 +1,13 @@
 # TimeLogic.Api.Model.TimezoneMatch
+One geographic zone whose current offset equals the requested offset.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Unix** | **long** |  |
-**UnixMs** | **long** |  |
-**Utc** | **DateTime** |  |
-**IsoLocal** | **string** |  |
-**Rfc2822** | **string** |  |
-**Human** | **string** |  |
-**DayNumber** | **int** | Day of the week counted from Sunday (1 &#x3D; Sunday, 2 &#x3D; Monday ... 7 &#x3D; Saturday). |
-**DayShort** | **string** |  |
-**DayFull** | **string** |  |
-**Timezone** | **string** |  |
-**Formatted** | **string** |  | [optional]
-**Offset** | **int** |  |
-**Dst** | **bool** |  |
+**Timezone** | **string** | IANA timezone name. |
+**Offset** | **int** | Current UTC offset of the zone in minutes. |
+**Dst** | **bool** | Whether daylight saving time is currently in effect in the zone. |
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

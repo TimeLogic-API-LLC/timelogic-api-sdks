@@ -35,6 +35,7 @@ use \TimeLogic\Api\ObjectSerializer;
  * TimezoneMatch Class Doc Comment
  *
  * @category Class
+ * @description One geographic zone whose current offset equals the requested offset.
  * @package  TimeLogic\Api
  * @author   TimeLogic API LLC
  * @link     https://github.com/TimeLogic-API-LLC/timelogic-api-sdks
@@ -57,17 +58,7 @@ class TimezoneMatch implements ModelInterface, ArrayAccess, \JsonSerializable
       * @var string[]
       */
     protected static $openAPITypes = [
-        'unix' => 'int',
-        'unixMs' => 'int',
-        'utc' => '\DateTime',
-        'isoLocal' => 'string',
-        'rfc2822' => 'string',
-        'human' => 'string',
-        'dayNumber' => 'int',
-        'dayShort' => 'string',
-        'dayFull' => 'string',
         'timezone' => 'string',
-        'formatted' => 'string',
         'offset' => 'int',
         'dst' => 'bool'
     ];
@@ -80,17 +71,7 @@ class TimezoneMatch implements ModelInterface, ArrayAccess, \JsonSerializable
       * @psalm-var array<string, string|null>
       */
     protected static $openAPIFormats = [
-        'unix' => 'int64',
-        'unixMs' => 'int64',
-        'utc' => 'date-time',
-        'isoLocal' => null,
-        'rfc2822' => null,
-        'human' => null,
-        'dayNumber' => null,
-        'dayShort' => null,
-        'dayFull' => null,
         'timezone' => null,
-        'formatted' => null,
         'offset' => null,
         'dst' => null
     ];
@@ -101,17 +82,7 @@ class TimezoneMatch implements ModelInterface, ArrayAccess, \JsonSerializable
       * @var boolean[]
       */
     protected static array $openAPINullables = [
-        'unix' => false,
-        'unixMs' => false,
-        'utc' => false,
-        'isoLocal' => true,
-        'rfc2822' => false,
-        'human' => false,
-        'dayNumber' => false,
-        'dayShort' => false,
-        'dayFull' => false,
         'timezone' => false,
-        'formatted' => false,
         'offset' => false,
         'dst' => false
     ];
@@ -202,17 +173,7 @@ class TimezoneMatch implements ModelInterface, ArrayAccess, \JsonSerializable
      * @var string[]
      */
     protected static $attributeMap = [
-        'unix' => 'unix',
-        'unixMs' => 'unix_ms',
-        'utc' => 'utc',
-        'isoLocal' => 'iso_local',
-        'rfc2822' => 'rfc2822',
-        'human' => 'human',
-        'dayNumber' => 'day_number',
-        'dayShort' => 'day_short',
-        'dayFull' => 'day_full',
         'timezone' => 'timezone',
-        'formatted' => 'formatted',
         'offset' => 'offset',
         'dst' => 'dst'
     ];
@@ -223,17 +184,7 @@ class TimezoneMatch implements ModelInterface, ArrayAccess, \JsonSerializable
      * @var string[]
      */
     protected static $setters = [
-        'unix' => 'setUnix',
-        'unixMs' => 'setUnixMs',
-        'utc' => 'setUtc',
-        'isoLocal' => 'setIsoLocal',
-        'rfc2822' => 'setRfc2822',
-        'human' => 'setHuman',
-        'dayNumber' => 'setDayNumber',
-        'dayShort' => 'setDayShort',
-        'dayFull' => 'setDayFull',
         'timezone' => 'setTimezone',
-        'formatted' => 'setFormatted',
         'offset' => 'setOffset',
         'dst' => 'setDst'
     ];
@@ -244,17 +195,7 @@ class TimezoneMatch implements ModelInterface, ArrayAccess, \JsonSerializable
      * @var string[]
      */
     protected static $getters = [
-        'unix' => 'getUnix',
-        'unixMs' => 'getUnixMs',
-        'utc' => 'getUtc',
-        'isoLocal' => 'getIsoLocal',
-        'rfc2822' => 'getRfc2822',
-        'human' => 'getHuman',
-        'dayNumber' => 'getDayNumber',
-        'dayShort' => 'getDayShort',
-        'dayFull' => 'getDayFull',
         'timezone' => 'getTimezone',
-        'formatted' => 'getFormatted',
         'offset' => 'getOffset',
         'dst' => 'getDst'
     ];
@@ -316,17 +257,7 @@ class TimezoneMatch implements ModelInterface, ArrayAccess, \JsonSerializable
      */
     public function __construct(?array $data = null)
     {
-        $this->setIfExists('unix', $data ?? [], null);
-        $this->setIfExists('unixMs', $data ?? [], null);
-        $this->setIfExists('utc', $data ?? [], null);
-        $this->setIfExists('isoLocal', $data ?? [], null);
-        $this->setIfExists('rfc2822', $data ?? [], null);
-        $this->setIfExists('human', $data ?? [], null);
-        $this->setIfExists('dayNumber', $data ?? [], null);
-        $this->setIfExists('dayShort', $data ?? [], null);
-        $this->setIfExists('dayFull', $data ?? [], null);
         $this->setIfExists('timezone', $data ?? [], null);
-        $this->setIfExists('formatted', $data ?? [], null);
         $this->setIfExists('offset', $data ?? [], null);
         $this->setIfExists('dst', $data ?? [], null);
     }
@@ -358,41 +289,6 @@ class TimezoneMatch implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
-        if ($this->container['unix'] === null) {
-            $invalidProperties[] = "'unix' can't be null";
-        }
-        if ($this->container['unixMs'] === null) {
-            $invalidProperties[] = "'unixMs' can't be null";
-        }
-        if ($this->container['utc'] === null) {
-            $invalidProperties[] = "'utc' can't be null";
-        }
-        if ($this->container['isoLocal'] === null) {
-            $invalidProperties[] = "'isoLocal' can't be null";
-        }
-        if ($this->container['rfc2822'] === null) {
-            $invalidProperties[] = "'rfc2822' can't be null";
-        }
-        if ($this->container['human'] === null) {
-            $invalidProperties[] = "'human' can't be null";
-        }
-        if ($this->container['dayNumber'] === null) {
-            $invalidProperties[] = "'dayNumber' can't be null";
-        }
-        if (($this->container['dayNumber'] > 7)) {
-            $invalidProperties[] = "invalid value for 'dayNumber', must be smaller than or equal to 7.";
-        }
-
-        if (($this->container['dayNumber'] < 1)) {
-            $invalidProperties[] = "invalid value for 'dayNumber', must be bigger than or equal to 1.";
-        }
-
-        if ($this->container['dayShort'] === null) {
-            $invalidProperties[] = "'dayShort' can't be null";
-        }
-        if ($this->container['dayFull'] === null) {
-            $invalidProperties[] = "'dayFull' can't be null";
-        }
         if ($this->container['timezone'] === null) {
             $invalidProperties[] = "'timezone' can't be null";
         }
@@ -418,264 +314,6 @@ class TimezoneMatch implements ModelInterface, ArrayAccess, \JsonSerializable
 
 
     /**
-     * Gets unix
-     *
-     * @return int
-     */
-    public function getUnix()
-    {
-        return $this->container['unix'];
-    }
-
-    /**
-     * Sets unix
-     *
-     * @param int $unix unix
-     *
-     * @return self
-     */
-    public function setUnix($unix)
-    {
-        if (is_null($unix)) {
-            throw new \InvalidArgumentException('non-nullable unix cannot be null');
-        }
-        $this->container['unix'] = $unix;
-
-        return $this;
-    }
-
-    /**
-     * Gets unixMs
-     *
-     * @return int
-     */
-    public function getUnixMs()
-    {
-        return $this->container['unixMs'];
-    }
-
-    /**
-     * Sets unixMs
-     *
-     * @param int $unixMs unixMs
-     *
-     * @return self
-     */
-    public function setUnixMs($unixMs)
-    {
-        if (is_null($unixMs)) {
-            throw new \InvalidArgumentException('non-nullable unixMs cannot be null');
-        }
-        $this->container['unixMs'] = $unixMs;
-
-        return $this;
-    }
-
-    /**
-     * Gets utc
-     *
-     * @return \DateTime
-     */
-    public function getUtc()
-    {
-        return $this->container['utc'];
-    }
-
-    /**
-     * Sets utc
-     *
-     * @param \DateTime $utc utc
-     *
-     * @return self
-     */
-    public function setUtc($utc)
-    {
-        if (is_null($utc)) {
-            throw new \InvalidArgumentException('non-nullable utc cannot be null');
-        }
-        $this->container['utc'] = $utc;
-
-        return $this;
-    }
-
-    /**
-     * Gets isoLocal
-     *
-     * @return string
-     */
-    public function getIsoLocal()
-    {
-        return $this->container['isoLocal'];
-    }
-
-    /**
-     * Sets isoLocal
-     *
-     * @param string $isoLocal isoLocal
-     *
-     * @return self
-     */
-    public function setIsoLocal($isoLocal)
-    {
-        if (is_null($isoLocal)) {
-            array_push($this->openAPINullablesSetToNull, 'isoLocal');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('isoLocal', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
-        }
-        $this->container['isoLocal'] = $isoLocal;
-
-        return $this;
-    }
-
-    /**
-     * Gets rfc2822
-     *
-     * @return string
-     */
-    public function getRfc2822()
-    {
-        return $this->container['rfc2822'];
-    }
-
-    /**
-     * Sets rfc2822
-     *
-     * @param string $rfc2822 rfc2822
-     *
-     * @return self
-     */
-    public function setRfc2822($rfc2822)
-    {
-        if (is_null($rfc2822)) {
-            throw new \InvalidArgumentException('non-nullable rfc2822 cannot be null');
-        }
-        $this->container['rfc2822'] = $rfc2822;
-
-        return $this;
-    }
-
-    /**
-     * Gets human
-     *
-     * @return string
-     */
-    public function getHuman()
-    {
-        return $this->container['human'];
-    }
-
-    /**
-     * Sets human
-     *
-     * @param string $human human
-     *
-     * @return self
-     */
-    public function setHuman($human)
-    {
-        if (is_null($human)) {
-            throw new \InvalidArgumentException('non-nullable human cannot be null');
-        }
-        $this->container['human'] = $human;
-
-        return $this;
-    }
-
-    /**
-     * Gets dayNumber
-     *
-     * @return int
-     */
-    public function getDayNumber()
-    {
-        return $this->container['dayNumber'];
-    }
-
-    /**
-     * Sets dayNumber
-     *
-     * @param int $dayNumber Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday).
-     *
-     * @return self
-     */
-    public function setDayNumber($dayNumber)
-    {
-        if (is_null($dayNumber)) {
-            throw new \InvalidArgumentException('non-nullable dayNumber cannot be null');
-        }
-
-        if (($dayNumber > 7)) {
-            throw new \InvalidArgumentException('invalid value for $dayNumber when calling TimezoneMatch., must be smaller than or equal to 7.');
-        }
-        if (($dayNumber < 1)) {
-            throw new \InvalidArgumentException('invalid value for $dayNumber when calling TimezoneMatch., must be bigger than or equal to 1.');
-        }
-
-        $this->container['dayNumber'] = $dayNumber;
-
-        return $this;
-    }
-
-    /**
-     * Gets dayShort
-     *
-     * @return string
-     */
-    public function getDayShort()
-    {
-        return $this->container['dayShort'];
-    }
-
-    /**
-     * Sets dayShort
-     *
-     * @param string $dayShort dayShort
-     *
-     * @return self
-     */
-    public function setDayShort($dayShort)
-    {
-        if (is_null($dayShort)) {
-            throw new \InvalidArgumentException('non-nullable dayShort cannot be null');
-        }
-        $this->container['dayShort'] = $dayShort;
-
-        return $this;
-    }
-
-    /**
-     * Gets dayFull
-     *
-     * @return string
-     */
-    public function getDayFull()
-    {
-        return $this->container['dayFull'];
-    }
-
-    /**
-     * Sets dayFull
-     *
-     * @param string $dayFull dayFull
-     *
-     * @return self
-     */
-    public function setDayFull($dayFull)
-    {
-        if (is_null($dayFull)) {
-            throw new \InvalidArgumentException('non-nullable dayFull cannot be null');
-        }
-        $this->container['dayFull'] = $dayFull;
-
-        return $this;
-    }
-
-    /**
      * Gets timezone
      *
      * @return string
@@ -688,7 +326,7 @@ class TimezoneMatch implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets timezone
      *
-     * @param string $timezone timezone
+     * @param string $timezone IANA timezone name.
      *
      * @return self
      */
@@ -698,33 +336,6 @@ class TimezoneMatch implements ModelInterface, ArrayAccess, \JsonSerializable
             throw new \InvalidArgumentException('non-nullable timezone cannot be null');
         }
         $this->container['timezone'] = $timezone;
-
-        return $this;
-    }
-
-    /**
-     * Gets formatted
-     *
-     * @return string|null
-     */
-    public function getFormatted()
-    {
-        return $this->container['formatted'];
-    }
-
-    /**
-     * Sets formatted
-     *
-     * @param string|null $formatted formatted
-     *
-     * @return self
-     */
-    public function setFormatted($formatted)
-    {
-        if (is_null($formatted)) {
-            throw new \InvalidArgumentException('non-nullable formatted cannot be null');
-        }
-        $this->container['formatted'] = $formatted;
 
         return $this;
     }
@@ -742,7 +353,7 @@ class TimezoneMatch implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets offset
      *
-     * @param int $offset offset
+     * @param int $offset Current UTC offset of the zone in minutes.
      *
      * @return self
      */
@@ -769,7 +380,7 @@ class TimezoneMatch implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets dst
      *
-     * @param bool $dst dst
+     * @param bool $dst Whether daylight saving time is currently in effect in the zone.
      *
      * @return self
      */

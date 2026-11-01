@@ -17,8 +17,8 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, StrictStr, field_validator
-from typing import Any, ClassVar, Dict, List
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr, field_validator
+from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional, Set
 from typing_extensions import Self
 
@@ -32,7 +32,9 @@ class JwkKey(BaseModel):
     use: StrictStr
     kid: StrictStr
     x: StrictStr
-    __properties: ClassVar[List[str]] = ["kty", "crv", "alg", "use", "kid", "x"]
+    key_ops: Optional[List[StrictStr]] = Field(default=None, description="Permitted key operations; published keys allow only `verify`.")
+    ext: Optional[StrictBool] = Field(default=None, description="JWK extractable flag as exported by the signing worker; always `true`.")
+    __properties: ClassVar[List[str]] = ["kty", "crv", "alg", "use", "kid", "x", "key_ops", "ext"]
 
     @field_validator('kty')
     def kty_validate_enum(cls, value):
@@ -60,6 +62,17 @@ class JwkKey(BaseModel):
         """Validates the enum"""
         if value not in set(['sig']):
             raise ValueError("must be one of enum values ('sig')")
+        return value
+
+    @field_validator('key_ops')
+    def key_ops_validate_enum(cls, value):
+        """Validates the enum"""
+        if value is None:
+            return value
+
+        for i in value:
+            if i not in set(['verify']):
+                raise ValueError("each list item must be one of ('verify')")
         return value
 
     model_config = ConfigDict(
@@ -118,7 +131,9 @@ class JwkKey(BaseModel):
             "alg": obj.get("alg"),
             "use": obj.get("use"),
             "kid": obj.get("kid"),
-            "x": obj.get("x")
+            "x": obj.get("x"),
+            "key_ops": obj.get("key_ops"),
+            "ext": obj.get("ext")
         })
         return _obj
 

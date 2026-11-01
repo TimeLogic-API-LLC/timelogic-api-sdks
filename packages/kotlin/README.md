@@ -24,13 +24,14 @@ Get an API key, export it as `TIMELOGIC_API_KEY`, and run:
 ```kotlin
 import com.timelogic.direct.api.apis.TimeApi
 import com.timelogic.direct.api.infrastructure.TransportConfiguration
+import com.timelogic.direct.api.models.TimePayload
 
 fun main() {
     // Credentials are stored process-wide on ApiClient; the returned client carries the base URL
     val client = TransportConfiguration.create(System.getenv("TIMELOGIC_API_KEY"))
     val time = TimeApi(client.baseUrl)
 
-    val now = time.getCurrentTime(tz = "America/New_York")
+    val now = time.getCurrentTime(tz = "America/New_York") as TimePayload
     println("${now.isoLocal} ${now.timezone}")
 }
 ```
@@ -180,30 +181,48 @@ fun main() {
 
 Routes, fields and errors: [WorldTimeAPI-compatible routes](#worldtimeapi-compatible-routes).
 
-## Known issues
+## Migrating from 1.x to 2.0
 
-Checked against the live API for this release. All other operations, including single-target `current`, `convert` and `timezone` calls, decode normally.
+2.0 changes the `/v1` response types so that every response decodes into a typed model. The API itself is unchanged. What changed in the contract, for every language:
 
-- Bulk `getCurrentTime` / `convertTime` calls (comma-separated selectors) and `offset` lookups with `getTimezone` throw `JsonDataException`. Read those responses as JSON:
+- `timezone` returns one model, `TimezoneResponse`: the time payload plus `offset`, `dst`, and `matching_zones` (present only for `offset` lookups). The `oneOf` wrapper `GetTimezone200Response` and its members `TimezoneResolvedResponse` and `TimezoneOffsetResponse` are removed.
+- `TimezoneMatch` (the `matching_zones` item) is `timezone`, `offset` and `dst`, as the API returns it. It previously described a full time payload.
+- `timezone` takes the `format` parameter, after `sign`.
+- `JwkKey` lists the optional `key_ops` and `ext` members.
+- `current` and `convert` no longer reject a comma-separated `tz` list longer than 64 characters or an `offset` list before sending it; an invalid value in a list comes back as a `BulkError` item.
+
+In this package:
+
+- `GetCurrentTime200Response` is a sealed interface implemented by `TimePayload` (one target) and `TimePayloadBulkResponse` (a bulk selector). `TimePayloadBulkItem` is a sealed interface implemented by `TimePayload` and `BulkError`. In 1.x both were flattened data classes with every member required, so bulk calls threw `JsonDataException`.
+- `getTimezone` returns `TimezoneResponse` and takes `format`. 1.x returned `GetTimezone200Response`.
+
+Before (1.x):
 
 ```kotlin
-import com.timelogic.direct.api.infrastructure.ApiClient
-import com.timelogic.direct.api.infrastructure.TransportConfiguration
-import okhttp3.Request
-
-fun main() {
-    val key = System.getenv("TIMELOGIC_API_KEY")
-    val client = TransportConfiguration.create(key)
-
-    // Bulk current/convert and offset timezone lookups: read the JSON with the SDK's OkHttp client
-    fun rawJson(pathAndQuery: String): String {
-        val request = Request.Builder().url(client.baseUrl + pathAndQuery).header("Authorization", "Bearer $key").build()
-        ApiClient.defaultClient.newCall(request).execute().use { return it.body!!.string() }
-    }
-    println(rawJson("/v1/time/current?tz=Europe/London,Asia/Tokyo"))
-    println(rawJson("/v1/timezone?offset=%2B05:30")) // ..."matching_zones":[{"timezone":"Asia/Colombo",...
-}
+val now = time.getCurrentTime(tz = "America/New_York")
+println(now.isoLocal)
 ```
+
+After (2.0):
+
+```kotlin
+when (val now = time.getCurrentTime(tz = "America/New_York,Nope/Zone")) {
+    is TimePayload -> println(now.isoLocal)
+    is TimePayloadBulkResponse -> now.forEach { item ->
+        when (item) {
+            is TimePayload -> println(item.isoLocal)
+            is BulkError -> println("${item.item}: ${item.error.code}")
+        }
+    }
+}
+
+val ist = time.getTimezone(offset = "+05:30")
+println(ist.matchingZones?.map { it.timezone }) // [Asia/Colombo, Asia/Kolkata]
+```
+
+## Known issues
+
+Checked against the live API for this release: every `/v1` operation, including bulk `current` / `convert` calls and `offset` lookups with `timezone`, decodes into the typed models. There are no known issues.
 
 ## How the API works
 

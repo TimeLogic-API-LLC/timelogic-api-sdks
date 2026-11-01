@@ -20,7 +20,6 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
-import java.time.OffsetDateTime;
 import java.util.Arrays;
 
 import com.google.gson.Gson;
@@ -47,64 +46,14 @@ import java.util.Set;
 import com.timelogic.direct.JSON;
 
 /**
- * TimezoneMatch
+ * One geographic zone whose current offset equals the requested offset.
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "1970-01-01T00:00:00Z[Etc/UTC]", comments = "Generator version: 7.10.0")
 public class TimezoneMatch {
-  public static final String SERIALIZED_NAME_UNIX = "unix";
-  @SerializedName(SERIALIZED_NAME_UNIX)
-  @javax.annotation.Nonnull
-  private Long unix;
-
-  public static final String SERIALIZED_NAME_UNIX_MS = "unix_ms";
-  @SerializedName(SERIALIZED_NAME_UNIX_MS)
-  @javax.annotation.Nonnull
-  private Long unixMs;
-
-  public static final String SERIALIZED_NAME_UTC = "utc";
-  @SerializedName(SERIALIZED_NAME_UTC)
-  @javax.annotation.Nonnull
-  private OffsetDateTime utc;
-
-  public static final String SERIALIZED_NAME_ISO_LOCAL = "iso_local";
-  @SerializedName(SERIALIZED_NAME_ISO_LOCAL)
-  @javax.annotation.Nullable
-  private String isoLocal;
-
-  public static final String SERIALIZED_NAME_RFC2822 = "rfc2822";
-  @SerializedName(SERIALIZED_NAME_RFC2822)
-  @javax.annotation.Nonnull
-  private String rfc2822;
-
-  public static final String SERIALIZED_NAME_HUMAN = "human";
-  @SerializedName(SERIALIZED_NAME_HUMAN)
-  @javax.annotation.Nonnull
-  private String human;
-
-  public static final String SERIALIZED_NAME_DAY_NUMBER = "day_number";
-  @SerializedName(SERIALIZED_NAME_DAY_NUMBER)
-  @javax.annotation.Nonnull
-  private Integer dayNumber;
-
-  public static final String SERIALIZED_NAME_DAY_SHORT = "day_short";
-  @SerializedName(SERIALIZED_NAME_DAY_SHORT)
-  @javax.annotation.Nonnull
-  private String dayShort;
-
-  public static final String SERIALIZED_NAME_DAY_FULL = "day_full";
-  @SerializedName(SERIALIZED_NAME_DAY_FULL)
-  @javax.annotation.Nonnull
-  private String dayFull;
-
   public static final String SERIALIZED_NAME_TIMEZONE = "timezone";
   @SerializedName(SERIALIZED_NAME_TIMEZONE)
   @javax.annotation.Nonnull
   private String timezone;
-
-  public static final String SERIALIZED_NAME_FORMATTED = "formatted";
-  @SerializedName(SERIALIZED_NAME_FORMATTED)
-  @javax.annotation.Nullable
-  private String formatted;
 
   public static final String SERIALIZED_NAME_OFFSET = "offset";
   @SerializedName(SERIALIZED_NAME_OFFSET)
@@ -119,186 +68,13 @@ public class TimezoneMatch {
   public TimezoneMatch() {
   }
 
-  public TimezoneMatch unix(@javax.annotation.Nonnull Long unix) {
-    this.unix = unix;
-    return this;
-  }
-
-  /**
-   * Get unix
-   * @return unix
-   */
-  @javax.annotation.Nonnull
-  public Long getUnix() {
-    return unix;
-  }
-
-  public void setUnix(@javax.annotation.Nonnull Long unix) {
-    this.unix = unix;
-  }
-
-
-  public TimezoneMatch unixMs(@javax.annotation.Nonnull Long unixMs) {
-    this.unixMs = unixMs;
-    return this;
-  }
-
-  /**
-   * Get unixMs
-   * @return unixMs
-   */
-  @javax.annotation.Nonnull
-  public Long getUnixMs() {
-    return unixMs;
-  }
-
-  public void setUnixMs(@javax.annotation.Nonnull Long unixMs) {
-    this.unixMs = unixMs;
-  }
-
-
-  public TimezoneMatch utc(@javax.annotation.Nonnull OffsetDateTime utc) {
-    this.utc = utc;
-    return this;
-  }
-
-  /**
-   * Get utc
-   * @return utc
-   */
-  @javax.annotation.Nonnull
-  public OffsetDateTime getUtc() {
-    return utc;
-  }
-
-  public void setUtc(@javax.annotation.Nonnull OffsetDateTime utc) {
-    this.utc = utc;
-  }
-
-
-  public TimezoneMatch isoLocal(@javax.annotation.Nullable String isoLocal) {
-    this.isoLocal = isoLocal;
-    return this;
-  }
-
-  /**
-   * Get isoLocal
-   * @return isoLocal
-   */
-  @javax.annotation.Nullable
-  public String getIsoLocal() {
-    return isoLocal;
-  }
-
-  public void setIsoLocal(@javax.annotation.Nullable String isoLocal) {
-    this.isoLocal = isoLocal;
-  }
-
-
-  public TimezoneMatch rfc2822(@javax.annotation.Nonnull String rfc2822) {
-    this.rfc2822 = rfc2822;
-    return this;
-  }
-
-  /**
-   * Get rfc2822
-   * @return rfc2822
-   */
-  @javax.annotation.Nonnull
-  public String getRfc2822() {
-    return rfc2822;
-  }
-
-  public void setRfc2822(@javax.annotation.Nonnull String rfc2822) {
-    this.rfc2822 = rfc2822;
-  }
-
-
-  public TimezoneMatch human(@javax.annotation.Nonnull String human) {
-    this.human = human;
-    return this;
-  }
-
-  /**
-   * Get human
-   * @return human
-   */
-  @javax.annotation.Nonnull
-  public String getHuman() {
-    return human;
-  }
-
-  public void setHuman(@javax.annotation.Nonnull String human) {
-    this.human = human;
-  }
-
-
-  public TimezoneMatch dayNumber(@javax.annotation.Nonnull Integer dayNumber) {
-    this.dayNumber = dayNumber;
-    return this;
-  }
-
-  /**
-   * Day of the week counted from Sunday (1 &#x3D; Sunday, 2 &#x3D; Monday ... 7 &#x3D; Saturday).
-   * minimum: 1
-   * maximum: 7
-   * @return dayNumber
-   */
-  @javax.annotation.Nonnull
-  public Integer getDayNumber() {
-    return dayNumber;
-  }
-
-  public void setDayNumber(@javax.annotation.Nonnull Integer dayNumber) {
-    this.dayNumber = dayNumber;
-  }
-
-
-  public TimezoneMatch dayShort(@javax.annotation.Nonnull String dayShort) {
-    this.dayShort = dayShort;
-    return this;
-  }
-
-  /**
-   * Get dayShort
-   * @return dayShort
-   */
-  @javax.annotation.Nonnull
-  public String getDayShort() {
-    return dayShort;
-  }
-
-  public void setDayShort(@javax.annotation.Nonnull String dayShort) {
-    this.dayShort = dayShort;
-  }
-
-
-  public TimezoneMatch dayFull(@javax.annotation.Nonnull String dayFull) {
-    this.dayFull = dayFull;
-    return this;
-  }
-
-  /**
-   * Get dayFull
-   * @return dayFull
-   */
-  @javax.annotation.Nonnull
-  public String getDayFull() {
-    return dayFull;
-  }
-
-  public void setDayFull(@javax.annotation.Nonnull String dayFull) {
-    this.dayFull = dayFull;
-  }
-
-
   public TimezoneMatch timezone(@javax.annotation.Nonnull String timezone) {
     this.timezone = timezone;
     return this;
   }
 
   /**
-   * Get timezone
+   * IANA timezone name.
    * @return timezone
    */
   @javax.annotation.Nonnull
@@ -311,32 +87,13 @@ public class TimezoneMatch {
   }
 
 
-  public TimezoneMatch formatted(@javax.annotation.Nullable String formatted) {
-    this.formatted = formatted;
-    return this;
-  }
-
-  /**
-   * Get formatted
-   * @return formatted
-   */
-  @javax.annotation.Nullable
-  public String getFormatted() {
-    return formatted;
-  }
-
-  public void setFormatted(@javax.annotation.Nullable String formatted) {
-    this.formatted = formatted;
-  }
-
-
   public TimezoneMatch offset(@javax.annotation.Nonnull Integer offset) {
     this.offset = offset;
     return this;
   }
 
   /**
-   * Get offset
+   * Current UTC offset of the zone in minutes.
    * @return offset
    */
   @javax.annotation.Nonnull
@@ -355,7 +112,7 @@ public class TimezoneMatch {
   }
 
   /**
-   * Get dst
+   * Whether daylight saving time is currently in effect in the zone.
    * @return dst
    */
   @javax.annotation.Nonnull
@@ -378,41 +135,21 @@ public class TimezoneMatch {
       return false;
     }
     TimezoneMatch timezoneMatch = (TimezoneMatch) o;
-    return Objects.equals(this.unix, timezoneMatch.unix) &&
-        Objects.equals(this.unixMs, timezoneMatch.unixMs) &&
-        Objects.equals(this.utc, timezoneMatch.utc) &&
-        Objects.equals(this.isoLocal, timezoneMatch.isoLocal) &&
-        Objects.equals(this.rfc2822, timezoneMatch.rfc2822) &&
-        Objects.equals(this.human, timezoneMatch.human) &&
-        Objects.equals(this.dayNumber, timezoneMatch.dayNumber) &&
-        Objects.equals(this.dayShort, timezoneMatch.dayShort) &&
-        Objects.equals(this.dayFull, timezoneMatch.dayFull) &&
-        Objects.equals(this.timezone, timezoneMatch.timezone) &&
-        Objects.equals(this.formatted, timezoneMatch.formatted) &&
+    return Objects.equals(this.timezone, timezoneMatch.timezone) &&
         Objects.equals(this.offset, timezoneMatch.offset) &&
         Objects.equals(this.dst, timezoneMatch.dst);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(unix, unixMs, utc, isoLocal, rfc2822, human, dayNumber, dayShort, dayFull, timezone, formatted, offset, dst);
+    return Objects.hash(timezone, offset, dst);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class TimezoneMatch {\n");
-    sb.append("    unix: ").append(toIndentedString(unix)).append("\n");
-    sb.append("    unixMs: ").append(toIndentedString(unixMs)).append("\n");
-    sb.append("    utc: ").append(toIndentedString(utc)).append("\n");
-    sb.append("    isoLocal: ").append(toIndentedString(isoLocal)).append("\n");
-    sb.append("    rfc2822: ").append(toIndentedString(rfc2822)).append("\n");
-    sb.append("    human: ").append(toIndentedString(human)).append("\n");
-    sb.append("    dayNumber: ").append(toIndentedString(dayNumber)).append("\n");
-    sb.append("    dayShort: ").append(toIndentedString(dayShort)).append("\n");
-    sb.append("    dayFull: ").append(toIndentedString(dayFull)).append("\n");
     sb.append("    timezone: ").append(toIndentedString(timezone)).append("\n");
-    sb.append("    formatted: ").append(toIndentedString(formatted)).append("\n");
     sb.append("    offset: ").append(toIndentedString(offset)).append("\n");
     sb.append("    dst: ").append(toIndentedString(dst)).append("\n");
     sb.append("}");
@@ -437,31 +174,12 @@ public class TimezoneMatch {
   static {
     // a set of all properties/fields (JSON key names)
     openapiFields = new HashSet<String>();
-    openapiFields.add("unix");
-    openapiFields.add("unix_ms");
-    openapiFields.add("utc");
-    openapiFields.add("iso_local");
-    openapiFields.add("rfc2822");
-    openapiFields.add("human");
-    openapiFields.add("day_number");
-    openapiFields.add("day_short");
-    openapiFields.add("day_full");
     openapiFields.add("timezone");
-    openapiFields.add("formatted");
     openapiFields.add("offset");
     openapiFields.add("dst");
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>();
-    openapiRequiredFields.add("unix");
-    openapiRequiredFields.add("unix_ms");
-    openapiRequiredFields.add("utc");
-    openapiRequiredFields.add("iso_local");
-    openapiRequiredFields.add("rfc2822");
-    openapiRequiredFields.add("human");
-    openapiRequiredFields.add("day_number");
-    openapiRequiredFields.add("day_short");
-    openapiRequiredFields.add("day_full");
     openapiRequiredFields.add("timezone");
     openapiRequiredFields.add("offset");
     openapiRequiredFields.add("dst");
@@ -495,26 +213,8 @@ public class TimezoneMatch {
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("iso_local") != null && !jsonObj.get("iso_local").isJsonNull()) && !jsonObj.get("iso_local").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format("Expected the field `iso_local` to be a primitive type in the JSON string but got `%s`", jsonObj.get("iso_local").toString()));
-      }
-      if (!jsonObj.get("rfc2822").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format("Expected the field `rfc2822` to be a primitive type in the JSON string but got `%s`", jsonObj.get("rfc2822").toString()));
-      }
-      if (!jsonObj.get("human").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format("Expected the field `human` to be a primitive type in the JSON string but got `%s`", jsonObj.get("human").toString()));
-      }
-      if (!jsonObj.get("day_short").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format("Expected the field `day_short` to be a primitive type in the JSON string but got `%s`", jsonObj.get("day_short").toString()));
-      }
-      if (!jsonObj.get("day_full").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format("Expected the field `day_full` to be a primitive type in the JSON string but got `%s`", jsonObj.get("day_full").toString()));
-      }
       if (!jsonObj.get("timezone").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format("Expected the field `timezone` to be a primitive type in the JSON string but got `%s`", jsonObj.get("timezone").toString()));
-      }
-      if ((jsonObj.get("formatted") != null && !jsonObj.get("formatted").isJsonNull()) && !jsonObj.get("formatted").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format("Expected the field `formatted` to be a primitive type in the JSON string but got `%s`", jsonObj.get("formatted").toString()));
       }
   }
 

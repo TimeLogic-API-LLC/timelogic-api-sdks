@@ -102,15 +102,13 @@ public class JSON {
         gsonBuilder.registerTypeAdapterFactory(new com.timelogic.direct.model.ElapsedResponse.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new com.timelogic.direct.model.ErrorResponse.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new com.timelogic.direct.model.GetCurrentTime200Response.CustomTypeAdapterFactory());
-        gsonBuilder.registerTypeAdapterFactory(new com.timelogic.direct.model.GetTimezone200Response.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new com.timelogic.direct.model.JwkKey.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new com.timelogic.direct.model.JwksResponse.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new com.timelogic.direct.model.TimePayload.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new com.timelogic.direct.model.TimePayloadBulkItem.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new com.timelogic.direct.model.TimePayloadBulkResponse.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new com.timelogic.direct.model.TimezoneMatch.CustomTypeAdapterFactory());
-        gsonBuilder.registerTypeAdapterFactory(new com.timelogic.direct.model.TimezoneOffsetResponse.CustomTypeAdapterFactory());
-        gsonBuilder.registerTypeAdapterFactory(new com.timelogic.direct.model.TimezoneResolvedResponse.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new com.timelogic.direct.model.TimezoneResponse.CustomTypeAdapterFactory());
         gson = gsonBuilder.create();
     }
 

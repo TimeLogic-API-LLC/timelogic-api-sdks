@@ -105,19 +105,12 @@ public class TimePayloadBulkResponse extends ArrayList<TimePayloadBulkItem> {
    * @throws IOException if the JSON Element is invalid with respect to TimePayloadBulkResponse
    */
   public static void validateJsonElement(JsonElement jsonElement) throws IOException {
-      if (jsonElement == null) {
-        if (!TimePayloadBulkResponse.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
-          throw new IllegalArgumentException(String.format("The required field(s) %s in TimePayloadBulkResponse is not found in the empty JSON string", TimePayloadBulkResponse.openapiRequiredFields.toString()));
-        }
-      }
-
-      Set<Map.Entry<String, JsonElement>> entries = jsonElement.getAsJsonObject().entrySet();
-      // check to see if the JSON string contains additional fields
-      for (Map.Entry<String, JsonElement> entry : entries) {
-        if (!TimePayloadBulkResponse.openapiFields.contains(entry.getKey())) {
-          throw new IllegalArgumentException(String.format("The field `%s` in the JSON string is not defined in the `TimePayloadBulkResponse` properties. JSON: %s", entry.getKey(), jsonElement.toString()));
-        }
-      }
+    if (jsonElement == null || !jsonElement.isJsonArray()) {
+      throw new IllegalArgumentException(String.format("Expected a JSON array for TimePayloadBulkResponse but got `%s`", jsonElement));
+    }
+    for (JsonElement item : jsonElement.getAsJsonArray()) {
+      TimePayloadBulkItem.validateJsonElement(item);
+    }
   }
 
   public static class CustomTypeAdapterFactory implements TypeAdapterFactory {
@@ -128,21 +121,27 @@ public class TimePayloadBulkResponse extends ArrayList<TimePayloadBulkItem> {
          return null; // this class only serializes 'TimePayloadBulkResponse' and its subtypes
        }
        final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
-       final TypeAdapter<TimePayloadBulkResponse> thisAdapter
-                        = gson.getDelegateAdapter(this, TypeToken.get(TimePayloadBulkResponse.class));
+       final TypeAdapter<TimePayloadBulkItem> itemAdapter = gson.getAdapter(TimePayloadBulkItem.class);
 
        return (TypeAdapter<T>) new TypeAdapter<TimePayloadBulkResponse>() {
            @Override
            public void write(JsonWriter out, TimePayloadBulkResponse value) throws IOException {
-             JsonObject obj = thisAdapter.toJsonTree(value).getAsJsonObject();
-             elementAdapter.write(out, obj);
+             JsonArray array = new JsonArray();
+             for (TimePayloadBulkItem item : value) {
+               array.add(itemAdapter.toJsonTree(item));
+             }
+             elementAdapter.write(out, array);
            }
 
            @Override
            public TimePayloadBulkResponse read(JsonReader in) throws IOException {
              JsonElement jsonElement = elementAdapter.read(in);
              validateJsonElement(jsonElement);
-             return thisAdapter.fromJsonTree(jsonElement);
+             TimePayloadBulkResponse result = new TimePayloadBulkResponse();
+             for (JsonElement item : jsonElement.getAsJsonArray()) {
+               result.add(itemAdapter.fromJsonTree(item));
+             }
+             return result;
            }
 
        }.nullSafe();

@@ -33,7 +33,7 @@ export interface TimePayloadBulkResponse extends Array<TimePayloadBulkItem> {
  * Check if a given object implements the TimePayloadBulkResponse interface.
  */
 export function instanceOfTimePayloadBulkResponse(value: object): value is TimePayloadBulkResponse {
-    return true;
+    return Array.isArray(value);
 }
 
 export function TimePayloadBulkResponseFromJSON(json: any): TimePayloadBulkResponse {
@@ -41,7 +41,10 @@ export function TimePayloadBulkResponseFromJSON(json: any): TimePayloadBulkRespo
 }
 
 export function TimePayloadBulkResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): TimePayloadBulkResponse {
-    return json;
+    if (json == null) {
+        return json;
+    }
+    return (json as Array<any>).map(TimePayloadBulkItemFromJSON);
 }
 
 export function TimePayloadBulkResponseToJSON(json: any): TimePayloadBulkResponse {
@@ -49,6 +52,9 @@ export function TimePayloadBulkResponseToJSON(json: any): TimePayloadBulkRespons
 }
 
 export function TimePayloadBulkResponseToJSONTyped(value?: TimePayloadBulkResponse | null, ignoreDiscriminator: boolean = false): any {
-    return value;
+    if (value == null) {
+        return value;
+    }
+    return (value as Array<TimePayloadBulkItem>).map(TimePayloadBulkItemToJSON);
 }
 

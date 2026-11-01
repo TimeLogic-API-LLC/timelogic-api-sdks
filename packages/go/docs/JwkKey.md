@@ -10,6 +10,8 @@ Name | Type | Description | Notes
 **Use** | **string** |  |
 **Kid** | **string** |  |
 **X** | **string** |  |
+**KeyOps** | Pointer to **[]string** | Permitted key operations; published keys allow only &#x60;verify&#x60;. | [optional]
+**Ext** | Pointer to **bool** | JWK extractable flag as exported by the signing worker; always &#x60;true&#x60;. | [optional]
 
 ## Methods
 
@@ -149,6 +151,56 @@ and a boolean to check if the value has been set.
 
 SetX sets X field to given value.
 
+
+### GetKeyOps
+
+`func (o *JwkKey) GetKeyOps() []string`
+
+GetKeyOps returns the KeyOps field if non-nil, zero value otherwise.
+
+### GetKeyOpsOk
+
+`func (o *JwkKey) GetKeyOpsOk() (*[]string, bool)`
+
+GetKeyOpsOk returns a tuple with the KeyOps field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetKeyOps
+
+`func (o *JwkKey) SetKeyOps(v []string)`
+
+SetKeyOps sets KeyOps field to given value.
+
+### HasKeyOps
+
+`func (o *JwkKey) HasKeyOps() bool`
+
+HasKeyOps returns a boolean if a field has been set.
+
+### GetExt
+
+`func (o *JwkKey) GetExt() bool`
+
+GetExt returns the Ext field if non-nil, zero value otherwise.
+
+### GetExtOk
+
+`func (o *JwkKey) GetExtOk() (*bool, bool)`
+
+GetExtOk returns a tuple with the Ext field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetExt
+
+`func (o *JwkKey) SetExt(v bool)`
+
+SetExt sets Ext field to given value.
+
+### HasExt
+
+`func (o *JwkKey) HasExt() bool`
+
+HasExt returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -5,12 +5,12 @@ Official Go client for [TimeLogic API](https://api.timelogicapi.com): current ti
 - the `/v1` client, generated from the [TimeLogic API contract](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/openapi/openapi.yaml), with direct and RapidAPI transports;
 - a [WorldTimeAPI-compatible client](#worldtimeapi-compatible-client) for the `/api/timezone` and `/api/ip` routes, which use worldtimeapi.org's paths, fields and plain-text format.
 
-Package: [`github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go`](https://pkg.go.dev/github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go), version 1.1.0. Changes are listed in the [changelog](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/CHANGELOG.md).
+Package: [`github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2`](https://pkg.go.dev/github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2), version 1.1.0. Changes are listed in the [changelog](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/CHANGELOG.md).
 
 ## Install
 
 ```bash
-go get github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go@v1.1.0
+go get github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2@v1.1.0
 ```
 
 Requires Go 1.18+. The package name is `timelogicapi`.
@@ -28,7 +28,7 @@ import (
 	"log"
 	"os"
 
-	timelogicapi "github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go"
+	timelogicapi "github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2"
 )
 
 func main() {
@@ -60,7 +60,7 @@ import (
 	"os"
 	"time"
 
-	timelogicapi "github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go"
+	timelogicapi "github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2"
 )
 
 func main() {
@@ -120,7 +120,7 @@ import (
 	"log"
 	"os"
 
-	timelogicapi "github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go"
+	timelogicapi "github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2"
 )
 
 func main() {
@@ -192,7 +192,7 @@ import (
 	"log"
 	"os"
 
-	timelogicapi "github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go"
+	timelogicapi "github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2"
 )
 
 func main() {
@@ -237,7 +237,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/worldtimeapi"
+	"github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2/worldtimeapi"
 )
 
 func main() {
@@ -273,54 +273,48 @@ func main() {
 
 Routes, fields and errors: [WorldTimeAPI-compatible routes](#worldtimeapi-compatible-routes).
 
-## Known issues
+## Migrating from 1.x to 2.0
 
-Checked against the live API for this release. All other operations, including single-target `current`, `convert` and `timezone` calls, decode normally.
+2.0 changes the `/v1` response types so that every response decodes into a typed model. The API itself is unchanged. What changed in the contract, for every language:
 
-- An `offset` lookup with `GetTimezone` returns a decoding error. The raw body is kept on the error:
+- `timezone` returns one model, `TimezoneResponse`: the time payload plus `offset`, `dst`, and `matching_zones` (present only for `offset` lookups). The `oneOf` wrapper `GetTimezone200Response` and its members `TimezoneResolvedResponse` and `TimezoneOffsetResponse` are removed.
+- `TimezoneMatch` (the `matching_zones` item) is `timezone`, `offset` and `dst`, as the API returns it. It previously described a full time payload.
+- `timezone` takes the `format` parameter, after `sign`.
+- `JwkKey` lists the optional `key_ops` and `ext` members.
+- `current` and `convert` no longer reject a comma-separated `tz` list longer than 64 characters or an `offset` list before sending it; an invalid value in a list comes back as a `BulkError` item.
+
+In this package:
+
+- The module path ends in `/v2`, as Go requires for a new major version: `github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2` (and `.../packages/go/v2/worldtimeapi`). Update the import paths and run `go get github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2@latest`.
+- `GetTimezone(ctx)…Execute()` returns `*TimezoneResponse`. 1.x returned `*GetTimezone200Response` and could not decode `offset` lookups.
+- `MatchingZones` items are `TimezoneMatch` (`Timezone`, `Offset`, `Dst`).
+
+Before (1.x):
 
 ```go
-package main
+import timelogicapi "github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go"
 
-import (
-	"context"
-	"encoding/json"
-	"errors"
-	"fmt"
-	"log"
-	"os"
+zone, _, err := client.TimeAPI.GetTimezone(ctx).Tz("Europe/Berlin").Execute()
+fmt.Println(zone.TimezoneResolvedResponse.GetTimezone())
+```
 
-	timelogicapi "github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go"
-)
+After (2.0):
 
-func main() {
-	transport, err := timelogicapi.NewTransport(timelogicapi.TransportOptions{APIKey: os.Getenv("TIMELOGIC_API_KEY")})
-	if err != nil {
-		log.Fatal(err)
-	}
-	client := timelogicapi.NewAPIClient(transport.Configuration)
-	ctx := transport.Context(context.Background())
+```go
+import timelogicapi "github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2"
 
-	// Offset lookups: the typed decoder rejects the answer, but the error keeps the raw body
-	_, _, err = client.TimeAPI.GetTimezone(ctx).Offset("+05:30").Execute()
-	var apiErr *timelogicapi.GenericOpenAPIError
-	if errors.As(err, &apiErr) {
-		var body struct {
-			Offset        int `json:"offset"`
-			MatchingZones []struct {
-				Timezone string `json:"timezone"`
-				Offset   int    `json:"offset"`
-				DST      bool   `json:"dst"`
-			} `json:"matching_zones"`
-		}
-		if json.Unmarshal(apiErr.Body(), &body) == nil {
-			for _, zone := range body.MatchingZones {
-				fmt.Println(zone.Timezone) // Asia/Colombo, Asia/Kolkata
-			}
-		}
-	}
+zone, _, err := client.TimeAPI.GetTimezone(ctx).Tz("Europe/Berlin").Execute()
+fmt.Println(zone.GetTimezone())
+
+ist, _, err := client.TimeAPI.GetTimezone(ctx).Offset("+05:30").Execute()
+for _, match := range ist.GetMatchingZones() {
+	fmt.Println(match.Timezone, match.Offset, match.Dst)
 }
 ```
+
+## Known issues
+
+Checked against the live API for this release: every `/v1` operation, including bulk `current` / `convert` calls and `offset` lookups with `timezone`, decodes into the typed models. There are no known issues.
 
 ## How the API works
 

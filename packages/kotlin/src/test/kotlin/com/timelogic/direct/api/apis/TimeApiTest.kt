@@ -25,8 +25,8 @@ import com.timelogic.direct.api.models.DstResponse
 import com.timelogic.direct.api.models.ElapsedResponse
 import com.timelogic.direct.api.models.ErrorResponse
 import com.timelogic.direct.api.models.GetCurrentTime200Response
-import com.timelogic.direct.api.models.GetTimezone200Response
 import com.timelogic.direct.api.models.TimePayload
+import com.timelogic.direct.api.models.TimezoneResponse
 
 class TimeApiTest : ShouldSpec() {
     init {
@@ -230,7 +230,8 @@ class TimeApiTest : ShouldSpec() {
             //val offset : kotlin.String = -04:00 // kotlin.String | Fixed UTC offset in `+HH:MM` or `-HH:MM` format only (`+0530` and `+5` are rejected); URL-encode `+` as `%2B`, since an unencoded `+` is read as a space. An offset target returns `timezone=null`. On bulk-capable routes, a comma-separated list enables bulk mode with at most 10 values; request URLs are limited to 8192 characters.
             //val autoTz : kotlin.Boolean = true // kotlin.Boolean | Set to `true` to resolve using the caller IP from Cloudflare headers. Counts as a selector family, so it cannot be combined with `tz`, `ip`, `lat`/`lon` or `offset`. Not supported on `/v1/time/clock`. Enabled by `true`, `1` or `yes` (case-insensitive); any other value leaves it off without an error.
             //val sign : kotlin.Boolean = true // kotlin.Boolean | Set to `true`, `1` or `yes` (case-insensitive) to ask the gateway to sign the final JSON response. Any other value, a bare `sign`, or repeated `sign` values leave the response unsigned. Every authenticated JSON response, including errors, then includes signing headers. Not supported on `/v1/time/clock`.
-            //val result : GetTimezone200Response = apiInstance.getTimezone(tz, ip, lat, lon, offset, autoTz, sign)
+            //val format : kotlin.String = %Y-%m-%d %H:%M:%S // kotlin.String | Custom date/time format template using supported `strftime`-style directives such as `%Y-%m-%d %H:%M:%S`. Supported directives: `%a %A %b %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x %X %y %Y %z %:z %Z %%`, with the `-`, `_` and `0` padding flags on numeric directives. `%Z` prints the IANA zone name (or `UTC+HH:MM` for an offset target, `UTC` with no target), not an abbreviation. Any other directive (for example `%U`, `%f`, `%Q`) or a trailing `%` returns 400 INVALID_PARAMETER naming the directive.
+            //val result : TimezoneResponse = apiInstance.getTimezone(tz, ip, lat, lon, offset, autoTz, sign, format)
             //result shouldBe ("TODO")
         }
 

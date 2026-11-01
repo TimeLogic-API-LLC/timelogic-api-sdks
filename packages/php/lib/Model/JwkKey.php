@@ -62,7 +62,9 @@ class JwkKey implements ModelInterface, ArrayAccess, \JsonSerializable
         'alg' => 'string',
         'use' => 'string',
         'kid' => 'string',
-        'x' => 'string'
+        'x' => 'string',
+        'keyOps' => 'string[]',
+        'ext' => 'bool'
     ];
 
     /**
@@ -78,7 +80,9 @@ class JwkKey implements ModelInterface, ArrayAccess, \JsonSerializable
         'alg' => null,
         'use' => null,
         'kid' => null,
-        'x' => null
+        'x' => null,
+        'keyOps' => null,
+        'ext' => null
     ];
 
     /**
@@ -92,7 +96,9 @@ class JwkKey implements ModelInterface, ArrayAccess, \JsonSerializable
         'alg' => false,
         'use' => false,
         'kid' => false,
-        'x' => false
+        'x' => false,
+        'keyOps' => false,
+        'ext' => false
     ];
 
     /**
@@ -186,7 +192,9 @@ class JwkKey implements ModelInterface, ArrayAccess, \JsonSerializable
         'alg' => 'alg',
         'use' => 'use',
         'kid' => 'kid',
-        'x' => 'x'
+        'x' => 'x',
+        'keyOps' => 'key_ops',
+        'ext' => 'ext'
     ];
 
     /**
@@ -200,7 +208,9 @@ class JwkKey implements ModelInterface, ArrayAccess, \JsonSerializable
         'alg' => 'setAlg',
         'use' => 'setUse',
         'kid' => 'setKid',
-        'x' => 'setX'
+        'x' => 'setX',
+        'keyOps' => 'setKeyOps',
+        'ext' => 'setExt'
     ];
 
     /**
@@ -214,7 +224,9 @@ class JwkKey implements ModelInterface, ArrayAccess, \JsonSerializable
         'alg' => 'getAlg',
         'use' => 'getUse',
         'kid' => 'getKid',
-        'x' => 'getX'
+        'x' => 'getX',
+        'keyOps' => 'getKeyOps',
+        'ext' => 'getExt'
     ];
 
     /**
@@ -262,6 +274,7 @@ class JwkKey implements ModelInterface, ArrayAccess, \JsonSerializable
     public const CRV_ED25519 = 'Ed25519';
     public const ALG_ED_DSA = 'EdDSA';
     public const MODEL_USE_SIG = 'sig';
+    public const KEY_OPS_VERIFY = 'verify';
 
     /**
      * Gets allowable values of the enum
@@ -312,6 +325,18 @@ class JwkKey implements ModelInterface, ArrayAccess, \JsonSerializable
     }
 
     /**
+     * Gets allowable values of the enum
+     *
+     * @return string[]
+     */
+    public function getKeyOpsAllowableValues()
+    {
+        return [
+            self::KEY_OPS_VERIFY,
+        ];
+    }
+
+    /**
      * Associative array for storing property values
      *
      * @var mixed[]
@@ -332,6 +357,8 @@ class JwkKey implements ModelInterface, ArrayAccess, \JsonSerializable
         $this->setIfExists('use', $data ?? [], null);
         $this->setIfExists('kid', $data ?? [], null);
         $this->setIfExists('x', $data ?? [], null);
+        $this->setIfExists('keyOps', $data ?? [], null);
+        $this->setIfExists('ext', $data ?? [], null);
     }
 
     /**
@@ -628,6 +655,69 @@ class JwkKey implements ModelInterface, ArrayAccess, \JsonSerializable
             throw new \InvalidArgumentException('non-nullable x cannot be null');
         }
         $this->container['x'] = $x;
+
+        return $this;
+    }
+
+    /**
+     * Gets keyOps
+     *
+     * @return string[]|null
+     */
+    public function getKeyOps()
+    {
+        return $this->container['keyOps'];
+    }
+
+    /**
+     * Sets keyOps
+     *
+     * @param string[]|null $keyOps Permitted key operations; published keys allow only `verify`.
+     *
+     * @return self
+     */
+    public function setKeyOps($keyOps)
+    {
+        if (is_null($keyOps)) {
+            throw new \InvalidArgumentException('non-nullable keyOps cannot be null');
+        }
+        $allowedValues = $this->getKeyOpsAllowableValues();
+        if (array_diff($keyOps, $allowedValues)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    "Invalid value for 'keyOps', must be one of '%s'",
+                    implode("', '", $allowedValues)
+                )
+            );
+        }
+        $this->container['keyOps'] = $keyOps;
+
+        return $this;
+    }
+
+    /**
+     * Gets ext
+     *
+     * @return bool|null
+     */
+    public function getExt()
+    {
+        return $this->container['ext'];
+    }
+
+    /**
+     * Sets ext
+     *
+     * @param bool|null $ext JWK extractable flag as exported by the signing worker; always `true`.
+     *
+     * @return self
+     */
+    public function setExt($ext)
+    {
+        if (is_null($ext)) {
+            throw new \InvalidArgumentException('non-nullable ext cannot be null');
+        }
+        $this->container['ext'] = $ext;
 
         return $this;
     }

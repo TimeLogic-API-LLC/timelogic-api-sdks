@@ -55,6 +55,18 @@ export interface JwkKey {
      * @memberof JwkKey
      */
     x: string;
+    /**
+     * Permitted key operations; published keys allow only `verify`.
+     * @type {Array<string>}
+     * @memberof JwkKey
+     */
+    keyOps?: Array<JwkKeyKeyOpsEnum>;
+    /**
+     * JWK extractable flag as exported by the signing worker; always `true`.
+     * @type {boolean}
+     * @memberof JwkKey
+     */
+    ext?: boolean;
 }
 
 
@@ -90,6 +102,14 @@ export const JwkKeyUseEnum = {
 } as const;
 export type JwkKeyUseEnum = typeof JwkKeyUseEnum[keyof typeof JwkKeyUseEnum];
 
+/**
+ * @export
+ */
+export const JwkKeyKeyOpsEnum = {
+    Verify: 'verify'
+} as const;
+export type JwkKeyKeyOpsEnum = typeof JwkKeyKeyOpsEnum[keyof typeof JwkKeyKeyOpsEnum];
+
 
 /**
  * Check if a given object implements the JwkKey interface.
@@ -120,6 +140,8 @@ export function JwkKeyFromJSONTyped(json: any, ignoreDiscriminator: boolean): Jw
         'use': json['use'],
         'kid': json['kid'],
         'x': json['x'],
+        'keyOps': json['key_ops'] == null ? undefined : json['key_ops'],
+        'ext': json['ext'] == null ? undefined : json['ext'],
     };
 }
 
@@ -140,6 +162,8 @@ export function JwkKeyToJSONTyped(value?: JwkKey | null, ignoreDiscriminator: bo
         'use': value['use'],
         'kid': value['kid'],
         'x': value['x'],
+        'key_ops': value['keyOps'],
+        'ext': value['ext'],
     };
 }
 

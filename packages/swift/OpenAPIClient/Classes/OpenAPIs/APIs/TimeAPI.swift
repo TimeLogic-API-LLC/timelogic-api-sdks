@@ -931,12 +931,13 @@ open class TimeAPI {
      - parameter offset: (query) Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format only (&#x60;+0530&#x60; and &#x60;+5&#x60; are rejected); URL-encode &#x60;+&#x60; as &#x60;%2B&#x60;, since an unencoded &#x60;+&#x60; is read as a space. An offset target returns &#x60;timezone&#x3D;null&#x60;. On bulk-capable routes, a comma-separated list enables bulk mode with at most 10 values; request URLs are limited to 8192 characters. (optional)
      - parameter autoTz: (query) Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. Counts as a selector family, so it cannot be combined with &#x60;tz&#x60;, &#x60;ip&#x60;, &#x60;lat&#x60;/&#x60;lon&#x60; or &#x60;offset&#x60;. Not supported on &#x60;/v1/time/clock&#x60;. Enabled by &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive); any other value leaves it off without an error. (optional)
      - parameter sign: (query) Set to &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive) to ask the gateway to sign the final JSON response. Any other value, a bare &#x60;sign&#x60;, or repeated &#x60;sign&#x60; values leave the response unsigned. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. (optional)
+     - parameter format: (query) Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Supported directives: &#x60;%a %A %b %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x %X %y %Y %z %:z %Z %%&#x60;, with the &#x60;-&#x60;, &#x60;_&#x60; and &#x60;0&#x60; padding flags on numeric directives. &#x60;%Z&#x60; prints the IANA zone name (or &#x60;UTC+HH:MM&#x60; for an offset target, &#x60;UTC&#x60; with no target), not an abbreviation. Any other directive (for example &#x60;%U&#x60;, &#x60;%f&#x60;, &#x60;%Q&#x60;) or a trailing &#x60;%&#x60; returns 400 INVALID_PARAMETER naming the directive. (optional)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - parameter completion: completion handler to receive the data and the error objects
      */
     @discardableResult
-    open class func getTimezone(tz: String? = nil, ip: String? = nil, lat: Double? = nil, lon: Double? = nil, offset: String? = nil, autoTz: Bool? = nil, sign: Bool? = nil, apiResponseQueue: DispatchQueue = TimeLogicAPIClient.apiResponseQueue, completion: @escaping ((_ data: GetTimezone200Response?, _ error: Error?) -> Void)) -> RequestTask {
-        return getTimezoneWithRequestBuilder(tz: tz, ip: ip, lat: lat, lon: lon, offset: offset, autoTz: autoTz, sign: sign).execute(apiResponseQueue) { result in
+    open class func getTimezone(tz: String? = nil, ip: String? = nil, lat: Double? = nil, lon: Double? = nil, offset: String? = nil, autoTz: Bool? = nil, sign: Bool? = nil, format: String? = nil, apiResponseQueue: DispatchQueue = TimeLogicAPIClient.apiResponseQueue, completion: @escaping ((_ data: TimezoneResponse?, _ error: Error?) -> Void)) -> RequestTask {
+        return getTimezoneWithRequestBuilder(tz: tz, ip: ip, lat: lat, lon: lon, offset: offset, autoTz: autoTz, sign: sign, format: format).execute(apiResponseQueue) { result in
             switch result {
             case let .success(response):
                 completion(response.body, nil)
@@ -973,9 +974,10 @@ open class TimeAPI {
      - parameter offset: (query) Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format only (&#x60;+0530&#x60; and &#x60;+5&#x60; are rejected); URL-encode &#x60;+&#x60; as &#x60;%2B&#x60;, since an unencoded &#x60;+&#x60; is read as a space. An offset target returns &#x60;timezone&#x3D;null&#x60;. On bulk-capable routes, a comma-separated list enables bulk mode with at most 10 values; request URLs are limited to 8192 characters. (optional)
      - parameter autoTz: (query) Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. Counts as a selector family, so it cannot be combined with &#x60;tz&#x60;, &#x60;ip&#x60;, &#x60;lat&#x60;/&#x60;lon&#x60; or &#x60;offset&#x60;. Not supported on &#x60;/v1/time/clock&#x60;. Enabled by &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive); any other value leaves it off without an error. (optional)
      - parameter sign: (query) Set to &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive) to ask the gateway to sign the final JSON response. Any other value, a bare &#x60;sign&#x60;, or repeated &#x60;sign&#x60; values leave the response unsigned. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. (optional)
-     - returns: RequestBuilder<GetTimezone200Response>
+     - parameter format: (query) Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Supported directives: &#x60;%a %A %b %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x %X %y %Y %z %:z %Z %%&#x60;, with the &#x60;-&#x60;, &#x60;_&#x60; and &#x60;0&#x60; padding flags on numeric directives. &#x60;%Z&#x60; prints the IANA zone name (or &#x60;UTC+HH:MM&#x60; for an offset target, &#x60;UTC&#x60; with no target), not an abbreviation. Any other directive (for example &#x60;%U&#x60;, &#x60;%f&#x60;, &#x60;%Q&#x60;) or a trailing &#x60;%&#x60; returns 400 INVALID_PARAMETER naming the directive. (optional)
+     - returns: RequestBuilder<TimezoneResponse>
      */
-    open class func getTimezoneWithRequestBuilder(tz: String? = nil, ip: String? = nil, lat: Double? = nil, lon: Double? = nil, offset: String? = nil, autoTz: Bool? = nil, sign: Bool? = nil) -> RequestBuilder<GetTimezone200Response> {
+    open class func getTimezoneWithRequestBuilder(tz: String? = nil, ip: String? = nil, lat: Double? = nil, lon: Double? = nil, offset: String? = nil, autoTz: Bool? = nil, sign: Bool? = nil, format: String? = nil) -> RequestBuilder<TimezoneResponse> {
         let localVariablePath = "/v1/timezone"
         let localVariableURLString = TimeLogicAPIClient.basePath + localVariablePath
         let localVariableParameters: [String: Any]? = nil
@@ -989,6 +991,7 @@ open class TimeAPI {
             "offset": (wrappedValue: offset?.encodeToJSON(), isExplode: true),
             "auto_tz": (wrappedValue: autoTz?.encodeToJSON(), isExplode: true),
             "sign": (wrappedValue: sign?.encodeToJSON(), isExplode: true),
+            "format": (wrappedValue: format?.encodeToJSON(), isExplode: true),
         ])
 
         let localVariableNillableHeaders: [String: Any?] = [
@@ -997,7 +1000,7 @@ open class TimeAPI {
 
         let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
 
-        let localVariableRequestBuilder: RequestBuilder<GetTimezone200Response>.Type = TimeLogicAPIClient.requestBuilderFactory.getBuilder()
+        let localVariableRequestBuilder: RequestBuilder<TimezoneResponse>.Type = TimeLogicAPIClient.requestBuilderFactory.getBuilder()
 
         return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string?.replacingOccurrences(of: "+", with: "%2B") ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true)
     }

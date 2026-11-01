@@ -27,15 +27,23 @@ namespace TimeLogic.Api.Model
 {
     /// <summary>
     /// Bulk response array returned when &#x60;/v1/time/current&#x60; or &#x60;/v1/time/convert&#x60; receives one comma-separated &#x60;tz&#x60;, &#x60;ip&#x60;, or &#x60;offset&#x60; selector.
+    /// Each item is a <see cref="TimePayloadBulkItem" /> holding a <see cref="TimePayload" /> or a <see cref="BulkError" />, in the order of the requested selectors.
     /// </summary>
-    [DataContract(Name = "TimePayloadBulkResponse")]
-    public partial class TimePayloadBulkResponse : IValidatableObject
+    public partial class TimePayloadBulkResponse : List<TimePayloadBulkItem>, IValidatableObject
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="TimePayloadBulkResponse" /> class.
+        /// Initializes a new, empty instance of the <see cref="TimePayloadBulkResponse" /> class.
         /// </summary>
         [JsonConstructorAttribute]
         public TimePayloadBulkResponse()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TimePayloadBulkResponse" /> class with the given items.
+        /// </summary>
+        /// <param name="items">Bulk items in request order.</param>
+        public TimePayloadBulkResponse(IEnumerable<TimePayloadBulkItem> items) : base(items)
         {
         }
 
@@ -47,6 +55,10 @@ namespace TimeLogic.Api.Model
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("class TimePayloadBulkResponse {\n");
+            foreach (TimePayloadBulkItem item in this)
+            {
+                sb.Append("  ").Append(item).Append("\n");
+            }
             sb.Append("}\n");
             return sb.ToString();
         }

@@ -132,4 +132,22 @@ class JwkKeyTest extends TestCase
         // TODO: implement
         self::markTestIncomplete('Not implemented');
     }
+
+    /**
+     * Test attribute "keyOps"
+     */
+    public function testPropertyKeyOps()
+    {
+        // TODO: implement
+        self::markTestIncomplete('Not implemented');
+    }
+
+    /**
+     * Test attribute "ext"
+     */
+    public function testPropertyExt()
+    {
+        // TODO: implement
+        self::markTestIncomplete('Not implemented');
+    }
 }

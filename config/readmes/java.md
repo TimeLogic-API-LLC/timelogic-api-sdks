@@ -116,7 +116,7 @@ public class Operations {
     ElapsedResponse left = time.getElapsed(null, null, "2027-01-01T00:00:00Z", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
     // Zone details, DST status with the next transition, ISO week number
-    TimezoneResolvedResponse berlin = time.getTimezone("Europe/Berlin", null, null, null, null, null, null).getTimezoneResolvedResponse();
+    TimezoneResponse berlin = time.getTimezone("Europe/Berlin", null, null, null, null, null, null, null);
     DstResponse dst = time.getDst("America/New_York", null, null, null, null, null, null, true, null);
     CalendarResponse calendar = time.getCalendar(null, null, null, null, null, null, null, null, "Europe/London", null, null, null, null, null, null, true, null);
 
@@ -201,34 +201,50 @@ public class WorldTime {
 
 Routes, fields and errors: [WorldTimeAPI-compatible routes](#worldtimeapi-compatible-routes).
 
-## Known issues
+## Migrating from 1.x to 2.0
 
-Checked against the live API for this release. All other operations, including single-target `current`, `convert` and `timezone` calls, decode normally.
+2.0 changes the `/v1` response types so that every response decodes into a typed model. The API itself is unchanged. What changed in the contract, for every language:
 
-- Bulk `getCurrentTime` / `convertTime` calls (comma-separated selectors) and `offset` lookups with `getTimezone` throw while decoding the response. Run the prepared `…Call` and read the JSON:
+- `timezone` returns one model, `TimezoneResponse`: the time payload plus `offset`, `dst`, and `matching_zones` (present only for `offset` lookups). The `oneOf` wrapper `GetTimezone200Response` and its members `TimezoneResolvedResponse` and `TimezoneOffsetResponse` are removed.
+- `TimezoneMatch` (the `matching_zones` item) is `timezone`, `offset` and `dst`, as the API returns it. It previously described a full time payload.
+- `timezone` takes the `format` parameter, after `sign`.
+- `JwkKey` lists the optional `key_ops` and `ext` members.
+- `current` and `convert` no longer reject a comma-separated `tz` list longer than 64 characters or an `offset` list before sending it; an invalid value in a list comes back as a `BulkError` item.
+
+In this package:
+
+- `TimePayloadBulkResponse` is a `List<TimePayloadBulkItem>`; bulk `getCurrentTime` / `convertTime` calls decode, and each item holds a `TimePayload` or a `BulkError`. 1.x threw while decoding.
+- `getTimezone` returns `TimezoneResponse` and takes `format` as an eighth argument, after `sign`. 1.x returned `GetTimezone200Response`. `getMatchingZones()` is empty unless the lookup used `offset`.
+
+Before (1.x):
 
 ```java
-import com.google.gson.JsonParser;
-import com.timelogic.direct.ApiClient;
-import com.timelogic.direct.TransportConfiguration;
-import com.timelogic.direct.api.TimeApi;
-import okhttp3.Response;
+TimezoneResponse berlin = time.getTimezone("Europe/Berlin", null, null, null, null, null, null, null);
+```
 
-public class RawCalls {
-  public static void main(String[] args) throws Exception {
-    ApiClient client = TransportConfiguration.create(System.getenv("TIMELOGIC_API_KEY"), false, null, null);
-    TimeApi time = new TimeApi(client);
+After (2.0):
 
-    // Bulk current/convert and offset timezone lookups: run the prepared call and read the JSON
-    try (Response response = time.getCurrentTimeCall("Europe/London,Asia/Tokyo", null, null, null, null, null, null, null, null).execute()) {
-      System.out.println(JsonParser.parseString(response.body().string()).getAsJsonArray().size()); // 2
-    }
-    try (Response response = time.getTimezoneCall(null, null, null, null, "+05:30", null, null, null).execute()) {
-      System.out.println(JsonParser.parseString(response.body().string()).getAsJsonObject().get("matching_zones"));
-    }
+```java
+// tz, ip, lat, lon, offset, autoTz, sign, format
+TimezoneResponse berlin = time.getTimezone("Europe/Berlin", null, null, null, null, null, null, null);
+TimezoneResponse ist = time.getTimezone(null, null, null, null, "+05:30", null, null, null);
+for (TimezoneMatch zone : ist.getMatchingZones()) {
+  System.out.println(zone.getTimezone() + " " + zone.getOffset());
+}
+
+TimePayloadBulkResponse many = time.getCurrentTime("Europe/London,Nope/Zone", null, null, null, null, null, null, null).getTimePayloadBulkResponse();
+for (TimePayloadBulkItem item : many) {
+  if (item.getActualInstance() instanceof BulkError) {
+    System.out.println(item.getBulkError().getItem() + ": " + item.getBulkError().getError().getCode());
+  } else {
+    System.out.println(item.getTimePayload().getIsoLocal());
   }
 }
 ```
+
+## Known issues
+
+Checked against the live API for this release: every `/v1` operation, including bulk `current` / `convert` calls and `offset` lookups with `timezone`, decodes into the typed models. There are no known issues.
 
 <!-- include: shared/v1-api.md -->
 

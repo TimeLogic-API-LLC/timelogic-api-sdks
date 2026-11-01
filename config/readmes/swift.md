@@ -183,28 +183,43 @@ signed.requestRaw("/api/timezone/Europe/London") { result in
 
 Routes, fields and errors: [WorldTimeAPI-compatible routes](#worldtimeapi-compatible-routes).
 
-## Known issues
+## Migrating from 1.x to 2.0
 
-Checked against the live API for this release. All other operations, including single-target `current`, `convert` and `timezone` calls, decode normally.
+2.0 changes the `/v1` response types so that every response decodes into a typed model. The API itself is unchanged. What changed in the contract, for every language:
 
-- An `offset` lookup with `getTimezone` decodes to `.typeTimezoneResolvedResponse` and drops `matching_zones`. Read it from the raw body:
+- `timezone` returns one model, `TimezoneResponse`: the time payload plus `offset`, `dst`, and `matching_zones` (present only for `offset` lookups). The `oneOf` wrapper `GetTimezone200Response` and its members `TimezoneResolvedResponse` and `TimezoneOffsetResponse` are removed.
+- `TimezoneMatch` (the `matching_zones` item) is `timezone`, `offset` and `dst`, as the API returns it. It previously described a full time payload.
+- `timezone` takes the `format` parameter, after `sign`.
+- `JwkKey` lists the optional `key_ops` and `ext` members.
+- `current` and `convert` no longer reject a comma-separated `tz` list longer than 64 characters or an `offset` list before sending it; an invalid value in a list comes back as a `BulkError` item.
+
+In this package:
+
+- `getTimezone` completes with `TimezoneResponse`. 1.x completed with the `GetTimezone200Response` enum (`.typeTimezoneResolvedResponse` / `.typeTimezoneOffsetResponse`) and dropped `matchingZones` for `offset` lookups. `getTimezone` takes `format`.
+- `matchingZones` items are `TimezoneMatch` (`timezone`, `offset`, `dst`).
+
+Before (1.x):
 
 ```swift
-import Foundation
-import TimeLogicAPI
-
-TransportConfiguration.configure(apiKey: ProcessInfo.processInfo.environment["TIMELOGIC_API_KEY"]!)
-
-// Offset timezone lookups: the typed value omits matching_zones, so read the raw body
-TimeAPI.getTimezoneWithRequestBuilder(offset: "+05:30").execute { result in
-    if case let .success(response) = result,
-       let data = response.bodyData,
-       let body = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-       let zones = body["matching_zones"] as? [[String: Any]] {
-        print(zones.compactMap { $0["timezone"] as? String }) // ["Asia/Colombo", "Asia/Kolkata"]
-    }
+TimeAPI.getTimezone(tz: "Europe/Berlin") { response, error in
+    if case let .typeTimezoneResolvedResponse(zone)? = response { print(zone.timezone ?? "") }
 }
 ```
+
+After (2.0):
+
+```swift
+TimeAPI.getTimezone(tz: "Europe/Berlin") { zone, error in
+    print(zone?.timezone ?? "")
+}
+TimeAPI.getTimezone(offset: "+05:30") { zone, error in
+    print(zone?.matchingZones?.map(\.timezone) ?? []) // ["Asia/Colombo", "Asia/Kolkata"]
+}
+```
+
+## Known issues
+
+Checked against the live API for this release: every `/v1` operation, including bulk `current` / `convert` calls and `offset` lookups with `timezone`, decodes into the typed models. There are no known issues.
 
 <!-- include: shared/v1-api.md -->
 

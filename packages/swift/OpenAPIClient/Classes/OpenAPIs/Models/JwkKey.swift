@@ -24,20 +24,29 @@ public struct JwkKey: Codable, JSONEncodable, Hashable {
     public enum Use: String, Codable, CaseIterable {
         case sig = "sig"
     }
+    public enum KeyOps: String, Codable, CaseIterable {
+        case verify = "verify"
+    }
     public var kty: Kty
     public var crv: Crv
     public var alg: Alg
     public var use: Use
     public var kid: String
     public var x: String
+    /** Permitted key operations; published keys allow only `verify`. */
+    public var keyOps: [KeyOps]?
+    /** JWK extractable flag as exported by the signing worker; always `true`. */
+    public var ext: Bool?
 
-    public init(kty: Kty, crv: Crv, alg: Alg, use: Use, kid: String, x: String) {
+    public init(kty: Kty, crv: Crv, alg: Alg, use: Use, kid: String, x: String, keyOps: [KeyOps]? = nil, ext: Bool? = nil) {
         self.kty = kty
         self.crv = crv
         self.alg = alg
         self.use = use
         self.kid = kid
         self.x = x
+        self.keyOps = keyOps
+        self.ext = ext
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
@@ -47,6 +56,8 @@ public struct JwkKey: Codable, JSONEncodable, Hashable {
         case use
         case kid
         case x
+        case keyOps = "key_ops"
+        case ext
     }
 
     // Encodable protocol methods
@@ -59,6 +70,8 @@ public struct JwkKey: Codable, JSONEncodable, Hashable {
         try container.encode(use, forKey: .use)
         try container.encode(kid, forKey: .kid)
         try container.encode(x, forKey: .x)
+        try container.encodeIfPresent(keyOps, forKey: .keyOps)
+        try container.encodeIfPresent(ext, forKey: .ext)
     }
 }
 

@@ -21,8 +21,8 @@ import type {
   ElapsedResponse,
   ErrorResponse,
   GetCurrentTime200Response,
-  GetTimezone200Response,
   TimePayload,
+  TimezoneResponse,
 } from '../models/index';
 import {
     CalendarResponseFromJSON,
@@ -37,10 +37,10 @@ import {
     ErrorResponseToJSON,
     GetCurrentTime200ResponseFromJSON,
     GetCurrentTime200ResponseToJSON,
-    GetTimezone200ResponseFromJSON,
-    GetTimezone200ResponseToJSON,
     TimePayloadFromJSON,
     TimePayloadToJSON,
+    TimezoneResponseFromJSON,
+    TimezoneResponseToJSON,
 } from '../models/index';
 
 export interface AddTimeRequest {
@@ -206,6 +206,7 @@ export interface GetTimezoneRequest {
     offset?: string;
     autoTz?: boolean;
     sign?: boolean;
+    format?: string;
 }
 
 /**
@@ -1182,7 +1183,7 @@ export class TimeApi extends runtime.BaseAPI {
      * Resolves timezone metadata for a single target.  Target selector rules: - Use exactly one selector family: `tz`, `ip`, `lat` + `lon`, `offset`, or `auto_tz=true`. - Bulk is not supported on this route. - With no selector the route returns 400 MISSING_TARGET. - `offset` queries return a specialized payload with `timezone=null` and `matching_zones` for the request-time offset match. Only geographic zones are listed; `UTC` and `Etc/_*` are intentionally excluded (use `tz=UTC` for UTC). - `tz` names resolve to their canonical zone (`Europe/Stockholm` returns `Europe/Berlin`). - An `ip` with no timezone mapping returns 404 NOT_FOUND.  Examples: - Single target: `/v1/timezone?tz=America/New_York` - Offset match: `/v1/timezone?offset=-04:00`
      * Resolve timezone information for a target
      */
-    async getTimezoneRaw(requestParameters: GetTimezoneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetTimezone200Response>> {
+    async getTimezoneRaw(requestParameters: GetTimezoneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TimezoneResponse>> {
         const queryParameters: any = {};
 
         if (requestParameters['tz'] != null) {
@@ -1211,6 +1212,10 @@ export class TimeApi extends runtime.BaseAPI {
 
         if (requestParameters['sign'] != null) {
             queryParameters['sign'] = requestParameters['sign'];
+        }
+
+        if (requestParameters['format'] != null) {
+            queryParameters['format'] = requestParameters['format'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -1246,14 +1251,14 @@ export class TimeApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => GetTimezone200ResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => TimezoneResponseFromJSON(jsonValue));
     }
 
     /**
      * Resolves timezone metadata for a single target.  Target selector rules: - Use exactly one selector family: `tz`, `ip`, `lat` + `lon`, `offset`, or `auto_tz=true`. - Bulk is not supported on this route. - With no selector the route returns 400 MISSING_TARGET. - `offset` queries return a specialized payload with `timezone=null` and `matching_zones` for the request-time offset match. Only geographic zones are listed; `UTC` and `Etc/_*` are intentionally excluded (use `tz=UTC` for UTC). - `tz` names resolve to their canonical zone (`Europe/Stockholm` returns `Europe/Berlin`). - An `ip` with no timezone mapping returns 404 NOT_FOUND.  Examples: - Single target: `/v1/timezone?tz=America/New_York` - Offset match: `/v1/timezone?offset=-04:00`
      * Resolve timezone information for a target
      */
-    async getTimezone(requestParameters: GetTimezoneRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetTimezone200Response> {
+    async getTimezone(requestParameters: GetTimezoneRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TimezoneResponse> {
         const response = await this.getTimezoneRaw(requestParameters, initOverrides);
         return await response.value();
     }

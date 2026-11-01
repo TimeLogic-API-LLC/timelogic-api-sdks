@@ -1,4 +1,4 @@
-module github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go
+module github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2
 
 go 1.18
 

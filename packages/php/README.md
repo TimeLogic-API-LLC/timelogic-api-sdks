@@ -178,27 +178,48 @@ echo $raw->status, ' ', $raw->headers['x-timelogic-signature'], ' ', $raw->body,
 
 Routes, fields and errors: [WorldTimeAPI-compatible routes](#worldtimeapi-compatible-routes).
 
-## Known issues
+## Migrating from 1.x to 2.0
 
-Checked against the live API for this release. All other operations, including single-target `current`, `convert` and `timezone` calls, decode normally.
+2.0 changes the `/v1` response types so that every response decodes into a typed model. The API itself is unchanged. What changed in the contract, for every language:
 
-- Bulk `getCurrentTime` / `convertTime` calls (comma-separated selectors) return a model without the items. Send the prepared request and decode the JSON:
+- `timezone` returns one model, `TimezoneResponse`: the time payload plus `offset`, `dst`, and `matching_zones` (present only for `offset` lookups). The `oneOf` wrapper `GetTimezone200Response` and its members `TimezoneResolvedResponse` and `TimezoneOffsetResponse` are removed.
+- `TimezoneMatch` (the `matching_zones` item) is `timezone`, `offset` and `dst`, as the API returns it. It previously described a full time payload.
+- `timezone` takes the `format` parameter, after `sign`.
+- `JwkKey` lists the optional `key_ops` and `ext` members.
+- `current` and `convert` no longer reject a comma-separated `tz` list longer than 64 characters or an `offset` list before sending it; an invalid value in a list comes back as a `BulkError` item.
+
+In this package:
+
+- Bulk `getCurrentTime` / `convertTime` calls return `TimePayloadBulkResponse`, a countable, iterable and array-accessible list of `TimePayload` and `BulkError` objects. 1.x returned a `GetCurrentTime200Response` without the items. One target still returns `GetCurrentTime200Response`.
+- `getTimezone` returns `TimezoneResponse` and takes `format`. `getMatchingZones()` holds `TimezoneMatch` objects.
+
+Before (1.x):
 
 ```php
-<?php
-require __DIR__ . '/vendor/autoload.php';
-
-use TimeLogic\Api\Api\TimeApi;
-use TimeLogic\Api\TransportConfiguration;
-
-$http = new GuzzleHttp\Client();
-$time = new TimeApi($http, TransportConfiguration::create(getenv('TIMELOGIC_API_KEY')));
-
-// Bulk current/convert: send the prepared request and read the JSON
 $response = $http->send($time->getCurrentTimeRequest(tz: 'Europe/London,Asia/Tokyo'));
 $items = json_decode((string) $response->getBody(), true);
-echo $items[1]['timezone'], PHP_EOL; // Asia/Tokyo
 ```
+
+After (2.0):
+
+```php
+use TimeLogic\Api\Model\BulkError;
+
+foreach ($time->getCurrentTime(tz: 'Europe/London,Nope/Zone') as $item) {
+    echo $item instanceof BulkError
+        ? $item->getItem() . ': ' . $item->getError()->getCode()
+        : $item->getIsoLocal(), PHP_EOL;
+}
+
+$ist = $time->getTimezone(offset: '+05:30');
+foreach ($ist->getMatchingZones() as $zone) {
+    echo $zone->getTimezone(), ' ', $zone->getOffset(), PHP_EOL;
+}
+```
+
+## Known issues
+
+Checked against the live API for this release: every `/v1` operation, including bulk `current` / `convert` calls and `offset` lookups with `timezone`, decodes into the typed models. There are no known issues.
 
 ## How the API works
 

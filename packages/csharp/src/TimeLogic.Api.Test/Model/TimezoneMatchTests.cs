@@ -55,102 +55,12 @@ namespace TimeLogic.Api.Test.Model
         }
 
         /// <summary>
-        /// Test the property 'Unix'
-        /// </summary>
-        [Fact]
-        public void UnixTest()
-        {
-            // TODO unit test for the property 'Unix'
-        }
-
-        /// <summary>
-        /// Test the property 'UnixMs'
-        /// </summary>
-        [Fact]
-        public void UnixMsTest()
-        {
-            // TODO unit test for the property 'UnixMs'
-        }
-
-        /// <summary>
-        /// Test the property 'Utc'
-        /// </summary>
-        [Fact]
-        public void UtcTest()
-        {
-            // TODO unit test for the property 'Utc'
-        }
-
-        /// <summary>
-        /// Test the property 'IsoLocal'
-        /// </summary>
-        [Fact]
-        public void IsoLocalTest()
-        {
-            // TODO unit test for the property 'IsoLocal'
-        }
-
-        /// <summary>
-        /// Test the property 'Rfc2822'
-        /// </summary>
-        [Fact]
-        public void Rfc2822Test()
-        {
-            // TODO unit test for the property 'Rfc2822'
-        }
-
-        /// <summary>
-        /// Test the property 'Human'
-        /// </summary>
-        [Fact]
-        public void HumanTest()
-        {
-            // TODO unit test for the property 'Human'
-        }
-
-        /// <summary>
-        /// Test the property 'DayNumber'
-        /// </summary>
-        [Fact]
-        public void DayNumberTest()
-        {
-            // TODO unit test for the property 'DayNumber'
-        }
-
-        /// <summary>
-        /// Test the property 'DayShort'
-        /// </summary>
-        [Fact]
-        public void DayShortTest()
-        {
-            // TODO unit test for the property 'DayShort'
-        }
-
-        /// <summary>
-        /// Test the property 'DayFull'
-        /// </summary>
-        [Fact]
-        public void DayFullTest()
-        {
-            // TODO unit test for the property 'DayFull'
-        }
-
-        /// <summary>
         /// Test the property 'Timezone'
         /// </summary>
         [Fact]
         public void TimezoneTest()
         {
             // TODO unit test for the property 'Timezone'
-        }
-
-        /// <summary>
-        /// Test the property 'Formatted'
-        /// </summary>
-        [Fact]
-        public void FormattedTest()
-        {
-            // TODO unit test for the property 'Formatted'
         }
 
         /// <summary>

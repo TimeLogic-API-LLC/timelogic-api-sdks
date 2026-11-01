@@ -61,5 +61,17 @@ class JwkKeyTest : ShouldSpec() {
             //modelInstance.x shouldBe ("TODO")
         }
 
+        // to test the property `keyOps` - Permitted key operations; published keys allow only `verify`.
+        should("test keyOps") {
+            // uncomment below to test the property
+            //modelInstance.keyOps shouldBe ("TODO")
+        }
+
+        // to test the property `ext` - JWK extractable flag as exported by the signing worker; always `true`.
+        should("test ext") {
+            // uncomment below to test the property
+            //modelInstance.ext shouldBe ("TODO")
+        }
+
     }
 }

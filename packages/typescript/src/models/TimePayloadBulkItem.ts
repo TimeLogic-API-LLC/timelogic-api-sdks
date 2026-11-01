@@ -34,6 +34,14 @@ import {
  */
 export type TimePayloadBulkItem = BulkError | TimePayload;
 
+/**
+ * True when a bulk item is a per-item error. Narrows the item to BulkError;
+ * otherwise it is a TimePayload.
+ */
+export function isBulkError(value: TimePayloadBulkItem): value is BulkError {
+    return value != null && typeof value === 'object' && 'error' in value && 'item' in value;
+}
+
 export function TimePayloadBulkItemFromJSON(json: any): TimePayloadBulkItem {
     return TimePayloadBulkItemFromJSONTyped(json, false);
 }
@@ -42,14 +50,10 @@ export function TimePayloadBulkItemFromJSONTyped(json: any, ignoreDiscriminator:
     if (json == null) {
         return json;
     }
-    if (instanceOfBulkError(json)) {
+    if (typeof json === 'object' && 'error' in json) {
         return BulkErrorFromJSONTyped(json, true);
     }
-    if (instanceOfTimePayload(json)) {
-        return TimePayloadFromJSONTyped(json, true);
-    }
-
-    return {} as any;
+    return TimePayloadFromJSONTyped(json, true);
 }
 
 export function TimePayloadBulkItemToJSON(json: any): any {
@@ -61,13 +65,9 @@ export function TimePayloadBulkItemToJSONTyped(value?: TimePayloadBulkItem | nul
         return value;
     }
 
-    if (instanceOfBulkError(value)) {
-        return BulkErrorToJSON(value as BulkError);
+    if (isBulkError(value)) {
+        return BulkErrorToJSON(value);
     }
-    if (instanceOfTimePayload(value)) {
-        return TimePayloadToJSON(value as TimePayload);
-    }
-
-    return {};
+    return TimePayloadToJSON(value as TimePayload);
 }
 

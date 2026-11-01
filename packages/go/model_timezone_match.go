@@ -12,7 +12,6 @@ package timelogicapi
 
 import (
 	"encoding/json"
-	"time"
 	"bytes"
 	"fmt"
 )
@@ -20,21 +19,13 @@ import (
 // checks if the TimezoneMatch type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &TimezoneMatch{}
 
-// TimezoneMatch struct for TimezoneMatch
+// TimezoneMatch One geographic zone whose current offset equals the requested offset.
 type TimezoneMatch struct {
-	Unix int64 `json:"unix"`
-	UnixMs int64 `json:"unix_ms"`
-	Utc time.Time `json:"utc"`
-	IsoLocal NullableString `json:"iso_local"`
-	Rfc2822 string `json:"rfc2822"`
-	Human string `json:"human"`
-	// Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday).
-	DayNumber int32 `json:"day_number"`
-	DayShort string `json:"day_short"`
-	DayFull string `json:"day_full"`
+	// IANA timezone name.
 	Timezone string `json:"timezone"`
-	Formatted *string `json:"formatted,omitempty"`
+	// Current UTC offset of the zone in minutes.
 	Offset int32 `json:"offset"`
+	// Whether daylight saving time is currently in effect in the zone.
 	Dst bool `json:"dst"`
 }
 
@@ -44,17 +35,8 @@ type _TimezoneMatch TimezoneMatch
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTimezoneMatch(unix int64, unixMs int64, utc time.Time, isoLocal NullableString, rfc2822 string, human string, dayNumber int32, dayShort string, dayFull string, timezone string, offset int32, dst bool) *TimezoneMatch {
+func NewTimezoneMatch(timezone string, offset int32, dst bool) *TimezoneMatch {
 	this := TimezoneMatch{}
-	this.Unix = unix
-	this.UnixMs = unixMs
-	this.Utc = utc
-	this.IsoLocal = isoLocal
-	this.Rfc2822 = rfc2822
-	this.Human = human
-	this.DayNumber = dayNumber
-	this.DayShort = dayShort
-	this.DayFull = dayFull
 	this.Timezone = timezone
 	this.Offset = offset
 	this.Dst = dst
@@ -67,224 +49,6 @@ func NewTimezoneMatch(unix int64, unixMs int64, utc time.Time, isoLocal Nullable
 func NewTimezoneMatchWithDefaults() *TimezoneMatch {
 	this := TimezoneMatch{}
 	return &this
-}
-
-// GetUnix returns the Unix field value
-func (o *TimezoneMatch) GetUnix() int64 {
-	if o == nil {
-		var ret int64
-		return ret
-	}
-
-	return o.Unix
-}
-
-// GetUnixOk returns a tuple with the Unix field value
-// and a boolean to check if the value has been set.
-func (o *TimezoneMatch) GetUnixOk() (*int64, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Unix, true
-}
-
-// SetUnix sets field value
-func (o *TimezoneMatch) SetUnix(v int64) {
-	o.Unix = v
-}
-
-// GetUnixMs returns the UnixMs field value
-func (o *TimezoneMatch) GetUnixMs() int64 {
-	if o == nil {
-		var ret int64
-		return ret
-	}
-
-	return o.UnixMs
-}
-
-// GetUnixMsOk returns a tuple with the UnixMs field value
-// and a boolean to check if the value has been set.
-func (o *TimezoneMatch) GetUnixMsOk() (*int64, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.UnixMs, true
-}
-
-// SetUnixMs sets field value
-func (o *TimezoneMatch) SetUnixMs(v int64) {
-	o.UnixMs = v
-}
-
-// GetUtc returns the Utc field value
-func (o *TimezoneMatch) GetUtc() time.Time {
-	if o == nil {
-		var ret time.Time
-		return ret
-	}
-
-	return o.Utc
-}
-
-// GetUtcOk returns a tuple with the Utc field value
-// and a boolean to check if the value has been set.
-func (o *TimezoneMatch) GetUtcOk() (*time.Time, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Utc, true
-}
-
-// SetUtc sets field value
-func (o *TimezoneMatch) SetUtc(v time.Time) {
-	o.Utc = v
-}
-
-// GetIsoLocal returns the IsoLocal field value
-// If the value is explicit nil, the zero value for string will be returned
-func (o *TimezoneMatch) GetIsoLocal() string {
-	if o == nil || o.IsoLocal.Get() == nil {
-		var ret string
-		return ret
-	}
-
-	return *o.IsoLocal.Get()
-}
-
-// GetIsoLocalOk returns a tuple with the IsoLocal field value
-// and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
-func (o *TimezoneMatch) GetIsoLocalOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return o.IsoLocal.Get(), o.IsoLocal.IsSet()
-}
-
-// SetIsoLocal sets field value
-func (o *TimezoneMatch) SetIsoLocal(v string) {
-	o.IsoLocal.Set(&v)
-}
-
-// GetRfc2822 returns the Rfc2822 field value
-func (o *TimezoneMatch) GetRfc2822() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Rfc2822
-}
-
-// GetRfc2822Ok returns a tuple with the Rfc2822 field value
-// and a boolean to check if the value has been set.
-func (o *TimezoneMatch) GetRfc2822Ok() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Rfc2822, true
-}
-
-// SetRfc2822 sets field value
-func (o *TimezoneMatch) SetRfc2822(v string) {
-	o.Rfc2822 = v
-}
-
-// GetHuman returns the Human field value
-func (o *TimezoneMatch) GetHuman() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Human
-}
-
-// GetHumanOk returns a tuple with the Human field value
-// and a boolean to check if the value has been set.
-func (o *TimezoneMatch) GetHumanOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Human, true
-}
-
-// SetHuman sets field value
-func (o *TimezoneMatch) SetHuman(v string) {
-	o.Human = v
-}
-
-// GetDayNumber returns the DayNumber field value
-func (o *TimezoneMatch) GetDayNumber() int32 {
-	if o == nil {
-		var ret int32
-		return ret
-	}
-
-	return o.DayNumber
-}
-
-// GetDayNumberOk returns a tuple with the DayNumber field value
-// and a boolean to check if the value has been set.
-func (o *TimezoneMatch) GetDayNumberOk() (*int32, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.DayNumber, true
-}
-
-// SetDayNumber sets field value
-func (o *TimezoneMatch) SetDayNumber(v int32) {
-	o.DayNumber = v
-}
-
-// GetDayShort returns the DayShort field value
-func (o *TimezoneMatch) GetDayShort() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.DayShort
-}
-
-// GetDayShortOk returns a tuple with the DayShort field value
-// and a boolean to check if the value has been set.
-func (o *TimezoneMatch) GetDayShortOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.DayShort, true
-}
-
-// SetDayShort sets field value
-func (o *TimezoneMatch) SetDayShort(v string) {
-	o.DayShort = v
-}
-
-// GetDayFull returns the DayFull field value
-func (o *TimezoneMatch) GetDayFull() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.DayFull
-}
-
-// GetDayFullOk returns a tuple with the DayFull field value
-// and a boolean to check if the value has been set.
-func (o *TimezoneMatch) GetDayFullOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.DayFull, true
-}
-
-// SetDayFull sets field value
-func (o *TimezoneMatch) SetDayFull(v string) {
-	o.DayFull = v
 }
 
 // GetTimezone returns the Timezone field value
@@ -309,38 +73,6 @@ func (o *TimezoneMatch) GetTimezoneOk() (*string, bool) {
 // SetTimezone sets field value
 func (o *TimezoneMatch) SetTimezone(v string) {
 	o.Timezone = v
-}
-
-// GetFormatted returns the Formatted field value if set, zero value otherwise.
-func (o *TimezoneMatch) GetFormatted() string {
-	if o == nil || IsNil(o.Formatted) {
-		var ret string
-		return ret
-	}
-	return *o.Formatted
-}
-
-// GetFormattedOk returns a tuple with the Formatted field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *TimezoneMatch) GetFormattedOk() (*string, bool) {
-	if o == nil || IsNil(o.Formatted) {
-		return nil, false
-	}
-	return o.Formatted, true
-}
-
-// HasFormatted returns a boolean if a field has been set.
-func (o *TimezoneMatch) HasFormatted() bool {
-	if o != nil && !IsNil(o.Formatted) {
-		return true
-	}
-
-	return false
-}
-
-// SetFormatted gets a reference to the given string and assigns it to the Formatted field.
-func (o *TimezoneMatch) SetFormatted(v string) {
-	o.Formatted = &v
 }
 
 // GetOffset returns the Offset field value
@@ -401,19 +133,7 @@ func (o TimezoneMatch) MarshalJSON() ([]byte, error) {
 
 func (o TimezoneMatch) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["unix"] = o.Unix
-	toSerialize["unix_ms"] = o.UnixMs
-	toSerialize["utc"] = o.Utc
-	toSerialize["iso_local"] = o.IsoLocal.Get()
-	toSerialize["rfc2822"] = o.Rfc2822
-	toSerialize["human"] = o.Human
-	toSerialize["day_number"] = o.DayNumber
-	toSerialize["day_short"] = o.DayShort
-	toSerialize["day_full"] = o.DayFull
 	toSerialize["timezone"] = o.Timezone
-	if !IsNil(o.Formatted) {
-		toSerialize["formatted"] = o.Formatted
-	}
 	toSerialize["offset"] = o.Offset
 	toSerialize["dst"] = o.Dst
 	return toSerialize, nil
@@ -424,15 +144,6 @@ func (o *TimezoneMatch) UnmarshalJSON(data []byte) (err error) {
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
-		"unix",
-		"unix_ms",
-		"utc",
-		"iso_local",
-		"rfc2822",
-		"human",
-		"day_number",
-		"day_short",
-		"day_full",
 		"timezone",
 		"offset",
 		"dst",

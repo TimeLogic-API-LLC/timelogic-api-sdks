@@ -414,6 +414,13 @@ class ObjectSerializer
             return null;
         }
 
+        // current/convert answer one payload, or a JSON array for one
+        // comma-separated selector; the array decodes into a typed collection.
+        if (($class === '\TimeLogic\Api\Model\GetCurrentTime200Response' || $class === '\TimeLogic\Api\Model\TimePayloadBulkResponse')
+            && is_array($data = is_string($data) ? json_decode($data) : $data)) {
+            return \TimeLogic\Api\Model\TimePayloadBulkResponse::fromDecodedJson($data);
+        }
+
         if (strcasecmp(substr($class, -2), '[]') === 0) {
             $data = is_string($data) ? json_decode($data) : $data;
 

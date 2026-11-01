@@ -1076,7 +1076,7 @@ pub async fn get_elapsed(configuration: &configuration::Configuration, unix: Opt
 }
 
 /// Resolves timezone metadata for a single target.  Target selector rules: - Use exactly one selector family: `tz`, `ip`, `lat` + `lon`, `offset`, or `auto_tz=true`. - Bulk is not supported on this route. - With no selector the route returns 400 MISSING_TARGET. - `offset` queries return a specialized payload with `timezone=null` and `matching_zones` for the request-time offset match. Only geographic zones are listed; `UTC` and `Etc/_*` are intentionally excluded (use `tz=UTC` for UTC). - `tz` names resolve to their canonical zone (`Europe/Stockholm` returns `Europe/Berlin`). - An `ip` with no timezone mapping returns 404 NOT_FOUND.  Examples: - Single target: `/v1/timezone?tz=America/New_York` - Offset match: `/v1/timezone?offset=-04:00`
-pub async fn get_timezone(configuration: &configuration::Configuration, tz: Option<&str>, ip: Option<&str>, lat: Option<f64>, lon: Option<f64>, offset: Option<&str>, auto_tz: Option<bool>, sign: Option<bool>) -> Result<models::GetTimezone200Response, Error<GetTimezoneError>> {
+pub async fn get_timezone(configuration: &configuration::Configuration, tz: Option<&str>, ip: Option<&str>, lat: Option<f64>, lon: Option<f64>, offset: Option<&str>, auto_tz: Option<bool>, sign: Option<bool>, format: Option<&str>) -> Result<models::TimezoneResponse, Error<GetTimezoneError>> {
     let local_var_configuration = configuration;
 
     let local_var_client = &local_var_configuration.client;
@@ -1104,6 +1104,9 @@ pub async fn get_timezone(configuration: &configuration::Configuration, tz: Opti
     }
     if let Some(ref local_var_str) = sign {
         local_var_req_builder = local_var_req_builder.query(&[("sign", &local_var_str.to_string())]);
+    }
+    if let Some(ref local_var_str) = format {
+        local_var_req_builder = local_var_req_builder.query(&[("format", &local_var_str.to_string())]);
     }
     if !local_var_configuration.rapid_api {
     if let Some(ref local_var_apikey) = local_var_configuration.api_key {

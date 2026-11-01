@@ -140,7 +140,8 @@ paths:
         name: tz
         required: false
         schema:
-          maxLength: 64
+          description: "One IANA timezone name, or a comma-separated list of at most\
+            \ 10 of them. An invalid name in a list comes back as a per-item error."
           type: string
         style: form
       - description: "IP address. On bulk-capable routes, a comma-separated list enables\
@@ -188,7 +189,9 @@ paths:
         name: offset
         required: false
         schema:
-          pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+          description: "One `+HH:MM` or `-HH:MM` offset, or a comma-separated list\
+            \ of at most 10 of them. A malformed value in a list comes back as a per-item\
+            \ error."
           type: string
         style: form
       - description: "Set to `true` to resolve using the caller IP from Cloudflare\
@@ -530,7 +533,8 @@ paths:
         name: tz
         required: false
         schema:
-          maxLength: 64
+          description: "One IANA timezone name, or a comma-separated list of at most\
+            \ 10 of them. An invalid name in a list comes back as a per-item error."
           type: string
         style: form
       - description: "IP address. On bulk-capable routes, a comma-separated list enables\
@@ -578,7 +582,9 @@ paths:
         name: offset
         required: false
         schema:
-          pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+          description: "One `+HH:MM` or `-HH:MM` offset, or a comma-separated list\
+            \ of at most 10 of them. A malformed value in a list comes back as a per-item\
+            \ error."
           type: string
         style: form
       - description: "Set to `true` to resolve using the caller IP from Cloudflare\
@@ -3356,6 +3362,22 @@ paths:
         schema:
           type: boolean
         style: form
+      - description: "Custom date/time format template using supported `strftime`-style\
+          \ directives such as `%Y-%m-%d %H:%M:%S`. Supported directives: `%a %A %b\
+          \ %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u\
+          \ %v %w %x %X %y %Y %z %:z %Z %%`, with the `-`, `_` and `0` padding flags\
+          \ on numeric directives. `%Z` prints the IANA zone name (or `UTC+HH:MM`\
+          \ for an offset target, `UTC` with no target), not an abbreviation. Any\
+          \ other directive (for example `%U`, `%f`, `%Q`) or a trailing `%` returns\
+          \ 400 INVALID_PARAMETER naming the directive."
+        example: '%Y-%m-%d %H:%M:%S'
+        explode: true
+        in: query
+        name: format
+        required: false
+        schema:
+          type: string
+        style: form
       responses:
         "200":
           content:
@@ -3366,7 +3388,7 @@ paths:
                 offsetMatches:
                   $ref: '#/components/examples/TimezoneOffsetExample'
               schema:
-                $ref: '#/components/schemas/getTimezone_200_response'
+                $ref: '#/components/schemas/TimezoneResponse'
           description: Resolved timezone payload.
           headers:
             X-Request-Id:
@@ -3780,28 +3802,10 @@ components:
         offset: -240
         dst: false
         matching_zones:
-        - unix: 1776274247
-          unix_ms: 1776274247883
-          utc: 2026-04-15T17:30:47Z
-          iso_local: 2026-04-15T13:30:47-04:00
-          rfc2822: "Wed, 15 Apr 2026 13:30:47 -0400"
-          human: "April 15, 2026, 1:30 PM America/New_York"
-          day_number: 4
-          day_short: Wed
-          day_full: Wednesday
-          timezone: America/New_York
+        - timezone: America/New_York
           offset: -240
           dst: true
-        - unix: 1776274247
-          unix_ms: 1776274247883
-          utc: 2026-04-15T17:30:47Z
-          iso_local: 2026-04-15T13:30:47-04:00
-          rfc2822: "Wed, 15 Apr 2026 13:30:47 -0400"
-          human: "April 15, 2026, 1:30 PM America/Toronto"
-          day_number: 4
-          day_short: Wed
-          day_full: Wednesday
-          timezone: America/Toronto
+        - timezone: America/Toronto
           offset: -240
           dst: true
     InvalidParameterExample:
@@ -4015,6 +4019,24 @@ components:
         maxLength: 64
         type: string
       style: form
+    TzBulkSelector:
+      description: "IANA timezone name, matched case-insensitively. Links and aliases\
+        \ resolve to their canonical zone, so the returned `timezone` can differ (`Europe/Stockholm`\
+        \ returns `Europe/Berlin`, `UTC` returns `Etc/UTC`). `Etc/GMT+5` is UTC-05:00\
+        \ (POSIX sign). On bulk-capable routes, a comma-separated list enables bulk\
+        \ mode with at most 10 values (any comma, even a trailing one, returns an\
+        \ array); request URLs are limited to 8192 characters. On single-target routes\
+        \ a list is rejected as an invalid timezone."
+      example: America/New_York
+      explode: true
+      in: query
+      name: tz
+      required: false
+      schema:
+        description: "One IANA timezone name, or a comma-separated list of at most\
+          \ 10 of them. An invalid name in a list comes back as a per-item error."
+        type: string
+      style: form
     IpSelector:
       description: "IP address. On bulk-capable routes, a comma-separated list enables\
         \ bulk mode with at most 10 values; request URLs are limited to 8192 characters."
@@ -4065,6 +4087,23 @@ components:
       required: false
       schema:
         pattern: "^[+-](0\\d|1\\d|2[0-3]):[0-5]\\d$"
+        type: string
+      style: form
+    OffsetBulkSelector:
+      description: "Fixed UTC offset in `+HH:MM` or `-HH:MM` format only (`+0530`\
+        \ and `+5` are rejected); URL-encode `+` as `%2B`, since an unencoded `+`\
+        \ is read as a space. An offset target returns `timezone=null`. On bulk-capable\
+        \ routes, a comma-separated list enables bulk mode with at most 10 values;\
+        \ request URLs are limited to 8192 characters."
+      example: -04:00
+      explode: true
+      in: query
+      name: offset
+      required: false
+      schema:
+        description: "One `+HH:MM` or `-HH:MM` offset, or a comma-separated list of\
+          \ at most 10 of them. A malformed value in a list comes back as a per-item\
+          \ error."
         type: string
       style: form
     AutoTzSelector:
@@ -5035,19 +5074,38 @@ components:
       - minutes
       - seconds
       type: object
-    TimezoneResolvedResponse:
+    TimezoneResponse:
       allOf:
       - $ref: '#/components/schemas/TimePayload'
       - properties:
           offset:
+            description: "UTC offset of the resolved target in minutes, for example\
+              \ `-240` for UTC-04:00."
             type: integer
           dst:
+            description: Whether daylight saving time is in effect for the resolved
+              target. Always `false` for `offset` lookups.
             type: boolean
+          offset_seconds:
+            description: "Exact UTC offset in seconds. Present only when the resolved\
+              \ offset has a seconds part (historical local mean time); no zone has\
+              \ one at the current instant, so lookups today do not include it."
+            type: integer
+          matching_zones:
+            description: Present only for `offset=` lookups. The geographic zones
+              whose current offset equals the requested one. `UTC` and `Etc/*` zones
+              are intentionally excluded; use `tz=UTC` for UTC.
+            items:
+              $ref: '#/components/schemas/TimezoneMatch'
+            type: array
         required:
         - dst
         - offset
         type: object
-      description: Standard single-target timezone resolution payload.
+      description: |-
+        Timezone lookup result. It is the time payload for the resolved target plus `offset` (minutes east of UTC) and `dst`.
+
+        Every selector returns this one shape. `tz`, `ip`, `lat` + `lon` and `auto_tz` lookups resolve a named zone, so `timezone` is set and `matching_zones` is absent. `offset` lookups return `timezone=null` and add `matching_zones`, the geographic zones whose current offset equals the requested one.
       example:
         offset: 5
         dst: true
@@ -5056,55 +5114,54 @@ components:
         timezone: timezone
         formatted: formatted
         rfc2822: rfc2822
+        offset_seconds: 5
         unix_ms: 6
+        matching_zones:
+        - offset: 2
+          dst: true
+          timezone: timezone
+        - offset: 2
+          dst: true
+          timezone: timezone
         day_short: day_short
         day_number: 1
         human: human
         unix: 0
         iso_local: iso_local
-      title: Resolved timezone response
+      title: Timezone lookup response
     TimezoneMatch:
-      allOf:
-      - $ref: '#/components/schemas/TimePayload'
-      - properties:
-          offset:
-            type: integer
-          dst:
-            type: boolean
-          timezone:
-            type: string
-        required:
-        - dst
-        - offset
-        - timezone
-        type: object
-    TimezoneOffsetResponse:
-      allOf:
-      - $ref: '#/components/schemas/TimezoneResolvedResponse'
-      - properties:
-          timezone:
-            nullable: true
-            type: string
-          matching_zones:
-            description: "For `offset=` lookups, the geographic zones whose current\
-              \ offset equals the requested one. `UTC` and `Etc/*` zones are intentionally\
-              \ excluded; use `tz=UTC` for UTC."
-            items:
-              $ref: '#/components/schemas/TimezoneMatch'
-            type: array
-        required:
-        - matching_zones
-        type: object
-      description: Offset-based timezone lookup result with `matching_zones` for the
-        current request-time offset match.
-      title: Offset match response
+      description: One geographic zone whose current offset equals the requested offset.
+      example:
+        offset: 2
+        dst: true
+        timezone: timezone
+      properties:
+        timezone:
+          description: IANA timezone name.
+          type: string
+        offset:
+          description: Current UTC offset of the zone in minutes.
+          type: integer
+        dst:
+          description: Whether daylight saving time is currently in effect in the
+            zone.
+          type: boolean
+      required:
+      - dst
+      - offset
+      - timezone
+      type: object
     JwkKey:
       example:
+        ext: true
         kty: OKP
         crv: Ed25519
         use: sig
         kid: ed25519-2026-07-19
         x: x
+        key_ops:
+        - verify
+        - verify
         alg: EdDSA
       properties:
         kty:
@@ -5128,6 +5185,17 @@ components:
           type: string
         x:
           type: string
+        key_ops:
+          description: Permitted key operations; published keys allow only `verify`.
+          items:
+            enum:
+            - verify
+            type: string
+          type: array
+        ext:
+          description: JWK extractable flag as exported by the signing worker; always
+            `true`.
+          type: boolean
       required:
       - alg
       - crv
@@ -5139,17 +5207,25 @@ components:
     JwksResponse:
       example:
         keys:
-        - kty: OKP
+        - ext: true
+          kty: OKP
           crv: Ed25519
           use: sig
           kid: ed25519-2026-07-19
           x: x
+          key_ops:
+          - verify
+          - verify
           alg: EdDSA
-        - kty: OKP
+        - ext: true
+          kty: OKP
           crv: Ed25519
           use: sig
           kid: ed25519-2026-07-19
           x: x
+          key_ops:
+          - verify
+          - verify
           alg: EdDSA
       properties:
         keys:
@@ -5163,10 +5239,6 @@ components:
       oneOf:
       - $ref: '#/components/schemas/TimePayload'
       - $ref: '#/components/schemas/TimePayloadBulkResponse'
-    getTimezone_200_response:
-      oneOf:
-      - $ref: '#/components/schemas/TimezoneResolvedResponse'
-      - $ref: '#/components/schemas/TimezoneOffsetResponse'
   securitySchemes:
     bearerAuth:
       bearerFormat: TimeLogic API key

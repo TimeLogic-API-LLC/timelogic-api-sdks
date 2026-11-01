@@ -19,7 +19,6 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
-import java.time.OffsetDateTime;
 import java.util.Arrays;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -39,91 +38,11 @@ public class TimezoneMatchTest {
     }
 
     /**
-     * Test the property 'unix'
-     */
-    @Test
-    public void unixTest() {
-        // TODO: test unix
-    }
-
-    /**
-     * Test the property 'unixMs'
-     */
-    @Test
-    public void unixMsTest() {
-        // TODO: test unixMs
-    }
-
-    /**
-     * Test the property 'utc'
-     */
-    @Test
-    public void utcTest() {
-        // TODO: test utc
-    }
-
-    /**
-     * Test the property 'isoLocal'
-     */
-    @Test
-    public void isoLocalTest() {
-        // TODO: test isoLocal
-    }
-
-    /**
-     * Test the property 'rfc2822'
-     */
-    @Test
-    public void rfc2822Test() {
-        // TODO: test rfc2822
-    }
-
-    /**
-     * Test the property 'human'
-     */
-    @Test
-    public void humanTest() {
-        // TODO: test human
-    }
-
-    /**
-     * Test the property 'dayNumber'
-     */
-    @Test
-    public void dayNumberTest() {
-        // TODO: test dayNumber
-    }
-
-    /**
-     * Test the property 'dayShort'
-     */
-    @Test
-    public void dayShortTest() {
-        // TODO: test dayShort
-    }
-
-    /**
-     * Test the property 'dayFull'
-     */
-    @Test
-    public void dayFullTest() {
-        // TODO: test dayFull
-    }
-
-    /**
      * Test the property 'timezone'
      */
     @Test
     public void timezoneTest() {
         // TODO: test timezone
-    }
-
-    /**
-     * Test the property 'formatted'
-     */
-    @Test
-    public void formattedTest() {
-        // TODO: test formatted
     }
 
     /**

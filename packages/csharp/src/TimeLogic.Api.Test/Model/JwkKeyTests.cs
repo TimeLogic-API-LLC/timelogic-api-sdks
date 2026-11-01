@@ -107,5 +107,23 @@ namespace TimeLogic.Api.Test.Model
         {
             // TODO unit test for the property 'X'
         }
+
+        /// <summary>
+        /// Test the property 'KeyOps'
+        /// </summary>
+        [Fact]
+        public void KeyOpsTest()
+        {
+            // TODO unit test for the property 'KeyOps'
+        }
+
+        /// <summary>
+        /// Test the property 'Ext'
+        /// </summary>
+        [Fact]
+        public void ExtTest()
+        {
+            // TODO unit test for the property 'Ext'
+        }
     }
 }

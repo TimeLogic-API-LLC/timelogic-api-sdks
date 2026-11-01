@@ -11,51 +11,25 @@
 use crate::models;
 use serde::{Deserialize, Serialize};
 
+/// TimezoneMatch : One geographic zone whose current offset equals the requested offset.
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct TimezoneMatch {
-    #[serde(rename = "unix")]
-    pub unix: i64,
-    #[serde(rename = "unix_ms")]
-    pub unix_ms: i64,
-    #[serde(rename = "utc")]
-    pub utc: String,
-    #[serde(rename = "iso_local", deserialize_with = "Option::deserialize")]
-    pub iso_local: Option<String>,
-    #[serde(rename = "rfc2822")]
-    pub rfc2822: String,
-    #[serde(rename = "human")]
-    pub human: String,
-    /// Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday).
-    #[serde(rename = "day_number")]
-    pub day_number: i32,
-    #[serde(rename = "day_short")]
-    pub day_short: String,
-    #[serde(rename = "day_full")]
-    pub day_full: String,
+    /// IANA timezone name.
     #[serde(rename = "timezone")]
     pub timezone: String,
-    #[serde(rename = "formatted", skip_serializing_if = "Option::is_none")]
-    pub formatted: Option<String>,
+    /// Current UTC offset of the zone in minutes.
     #[serde(rename = "offset")]
     pub offset: i32,
+    /// Whether daylight saving time is currently in effect in the zone.
     #[serde(rename = "dst")]
     pub dst: bool,
 }
 
 impl TimezoneMatch {
-    pub fn new(unix: i64, unix_ms: i64, utc: String, iso_local: Option<String>, rfc2822: String, human: String, day_number: i32, day_short: String, day_full: String, timezone: String, offset: i32, dst: bool) -> TimezoneMatch {
+    /// One geographic zone whose current offset equals the requested offset.
+    pub fn new(timezone: String, offset: i32, dst: bool) -> TimezoneMatch {
         TimezoneMatch {
-            unix,
-            unix_ms,
-            utc,
-            iso_local,
-            rfc2822,
-            human,
-            day_number,
-            day_short,
-            day_full,
             timezone,
-            formatted: None,
             offset,
             dst,
         }

@@ -20,8 +20,8 @@ import com.timelogic.direct.model.DstResponse;
 import com.timelogic.direct.model.ElapsedResponse;
 import com.timelogic.direct.model.ErrorResponse;
 import com.timelogic.direct.model.GetCurrentTime200Response;
-import com.timelogic.direct.model.GetTimezone200Response;
 import com.timelogic.direct.model.TimePayload;
+import com.timelogic.direct.model.TimezoneResponse;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -289,7 +289,8 @@ public class TimeApiTest {
         String offset = null;
         Boolean autoTz = null;
         Boolean sign = null;
-        GetTimezone200Response response = api.getTimezone(tz, ip, lat, lon, offset, autoTz, sign);
+        String format = null;
+        TimezoneResponse response = api.getTimezone(tz, ip, lat, lon, offset, autoTz, sign, format);
         // TODO: test validations
     }
 

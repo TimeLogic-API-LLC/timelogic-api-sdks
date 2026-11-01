@@ -27,6 +27,10 @@ type JwkKey struct {
 	Use string `json:"use"`
 	Kid string `json:"kid"`
 	X string `json:"x"`
+	// Permitted key operations; published keys allow only `verify`.
+	KeyOps []string `json:"key_ops,omitempty"`
+	// JWK extractable flag as exported by the signing worker; always `true`.
+	Ext *bool `json:"ext,omitempty"`
 }
 
 type _JwkKey JwkKey
@@ -198,6 +202,70 @@ func (o *JwkKey) SetX(v string) {
 	o.X = v
 }
 
+// GetKeyOps returns the KeyOps field value if set, zero value otherwise.
+func (o *JwkKey) GetKeyOps() []string {
+	if o == nil || IsNil(o.KeyOps) {
+		var ret []string
+		return ret
+	}
+	return o.KeyOps
+}
+
+// GetKeyOpsOk returns a tuple with the KeyOps field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *JwkKey) GetKeyOpsOk() ([]string, bool) {
+	if o == nil || IsNil(o.KeyOps) {
+		return nil, false
+	}
+	return o.KeyOps, true
+}
+
+// HasKeyOps returns a boolean if a field has been set.
+func (o *JwkKey) HasKeyOps() bool {
+	if o != nil && !IsNil(o.KeyOps) {
+		return true
+	}
+
+	return false
+}
+
+// SetKeyOps gets a reference to the given []string and assigns it to the KeyOps field.
+func (o *JwkKey) SetKeyOps(v []string) {
+	o.KeyOps = v
+}
+
+// GetExt returns the Ext field value if set, zero value otherwise.
+func (o *JwkKey) GetExt() bool {
+	if o == nil || IsNil(o.Ext) {
+		var ret bool
+		return ret
+	}
+	return *o.Ext
+}
+
+// GetExtOk returns a tuple with the Ext field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *JwkKey) GetExtOk() (*bool, bool) {
+	if o == nil || IsNil(o.Ext) {
+		return nil, false
+	}
+	return o.Ext, true
+}
+
+// HasExt returns a boolean if a field has been set.
+func (o *JwkKey) HasExt() bool {
+	if o != nil && !IsNil(o.Ext) {
+		return true
+	}
+
+	return false
+}
+
+// SetExt gets a reference to the given bool and assigns it to the Ext field.
+func (o *JwkKey) SetExt(v bool) {
+	o.Ext = &v
+}
+
 func (o JwkKey) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -214,6 +282,12 @@ func (o JwkKey) ToMap() (map[string]interface{}, error) {
 	toSerialize["use"] = o.Use
 	toSerialize["kid"] = o.Kid
 	toSerialize["x"] = o.X
+	if !IsNil(o.KeyOps) {
+		toSerialize["key_ops"] = o.KeyOps
+	}
+	if !IsNil(o.Ext) {
+		toSerialize["ext"] = o.Ext
+	}
 	return toSerialize, nil
 }
 

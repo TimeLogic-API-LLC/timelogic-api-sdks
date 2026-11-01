@@ -470,9 +470,10 @@ namespace TimeLogic.Api.Api
         /// <param name="offset">Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format only (&#x60;+0530&#x60; and &#x60;+5&#x60; are rejected); URL-encode &#x60;+&#x60; as &#x60;%2B&#x60;, since an unencoded &#x60;+&#x60; is read as a space. An offset target returns &#x60;timezone&#x3D;null&#x60;. On bulk-capable routes, a comma-separated list enables bulk mode with at most 10 values; request URLs are limited to 8192 characters. (optional)</param>
         /// <param name="autoTz">Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. Counts as a selector family, so it cannot be combined with &#x60;tz&#x60;, &#x60;ip&#x60;, &#x60;lat&#x60;/&#x60;lon&#x60; or &#x60;offset&#x60;. Not supported on &#x60;/v1/time/clock&#x60;. Enabled by &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive); any other value leaves it off without an error. (optional)</param>
         /// <param name="sign">Set to &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive) to ask the gateway to sign the final JSON response. Any other value, a bare &#x60;sign&#x60;, or repeated &#x60;sign&#x60; values leave the response unsigned. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. (optional)</param>
+        /// <param name="format">Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Supported directives: &#x60;%a %A %b %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x %X %y %Y %z %:z %Z %%&#x60;, with the &#x60;-&#x60;, &#x60;_&#x60; and &#x60;0&#x60; padding flags on numeric directives. &#x60;%Z&#x60; prints the IANA zone name (or &#x60;UTC+HH:MM&#x60; for an offset target, &#x60;UTC&#x60; with no target), not an abbreviation. Any other directive (for example &#x60;%U&#x60;, &#x60;%f&#x60;, &#x60;%Q&#x60;) or a trailing &#x60;%&#x60; returns 400 INVALID_PARAMETER naming the directive. (optional)</param>
         /// <param name="operationIndex">Index associated with the operation.</param>
-        /// <returns>GetTimezone200Response</returns>
-        GetTimezone200Response GetTimezone(string? tz = default(string?), string? ip = default(string?), double? lat = default(double?), double? lon = default(double?), string? offset = default(string?), bool? autoTz = default(bool?), bool? sign = default(bool?), int operationIndex = 0);
+        /// <returns>TimezoneResponse</returns>
+        TimezoneResponse GetTimezone(string? tz = default(string?), string? ip = default(string?), double? lat = default(double?), double? lon = default(double?), string? offset = default(string?), bool? autoTz = default(bool?), bool? sign = default(bool?), string? format = default(string?), int operationIndex = 0);
 
         /// <summary>
         /// Resolve timezone information for a target
@@ -488,9 +489,10 @@ namespace TimeLogic.Api.Api
         /// <param name="offset">Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format only (&#x60;+0530&#x60; and &#x60;+5&#x60; are rejected); URL-encode &#x60;+&#x60; as &#x60;%2B&#x60;, since an unencoded &#x60;+&#x60; is read as a space. An offset target returns &#x60;timezone&#x3D;null&#x60;. On bulk-capable routes, a comma-separated list enables bulk mode with at most 10 values; request URLs are limited to 8192 characters. (optional)</param>
         /// <param name="autoTz">Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. Counts as a selector family, so it cannot be combined with &#x60;tz&#x60;, &#x60;ip&#x60;, &#x60;lat&#x60;/&#x60;lon&#x60; or &#x60;offset&#x60;. Not supported on &#x60;/v1/time/clock&#x60;. Enabled by &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive); any other value leaves it off without an error. (optional)</param>
         /// <param name="sign">Set to &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive) to ask the gateway to sign the final JSON response. Any other value, a bare &#x60;sign&#x60;, or repeated &#x60;sign&#x60; values leave the response unsigned. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. (optional)</param>
+        /// <param name="format">Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Supported directives: &#x60;%a %A %b %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x %X %y %Y %z %:z %Z %%&#x60;, with the &#x60;-&#x60;, &#x60;_&#x60; and &#x60;0&#x60; padding flags on numeric directives. &#x60;%Z&#x60; prints the IANA zone name (or &#x60;UTC+HH:MM&#x60; for an offset target, &#x60;UTC&#x60; with no target), not an abbreviation. Any other directive (for example &#x60;%U&#x60;, &#x60;%f&#x60;, &#x60;%Q&#x60;) or a trailing &#x60;%&#x60; returns 400 INVALID_PARAMETER naming the directive. (optional)</param>
         /// <param name="operationIndex">Index associated with the operation.</param>
-        /// <returns>ApiResponse of GetTimezone200Response</returns>
-        ApiResponse<GetTimezone200Response> GetTimezoneWithHttpInfo(string? tz = default(string?), string? ip = default(string?), double? lat = default(double?), double? lon = default(double?), string? offset = default(string?), bool? autoTz = default(bool?), bool? sign = default(bool?), int operationIndex = 0);
+        /// <returns>ApiResponse of TimezoneResponse</returns>
+        ApiResponse<TimezoneResponse> GetTimezoneWithHttpInfo(string? tz = default(string?), string? ip = default(string?), double? lat = default(double?), double? lon = default(double?), string? offset = default(string?), bool? autoTz = default(bool?), bool? sign = default(bool?), string? format = default(string?), int operationIndex = 0);
         #endregion Synchronous Operations
     }
 
@@ -960,10 +962,11 @@ namespace TimeLogic.Api.Api
         /// <param name="offset">Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format only (&#x60;+0530&#x60; and &#x60;+5&#x60; are rejected); URL-encode &#x60;+&#x60; as &#x60;%2B&#x60;, since an unencoded &#x60;+&#x60; is read as a space. An offset target returns &#x60;timezone&#x3D;null&#x60;. On bulk-capable routes, a comma-separated list enables bulk mode with at most 10 values; request URLs are limited to 8192 characters. (optional)</param>
         /// <param name="autoTz">Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. Counts as a selector family, so it cannot be combined with &#x60;tz&#x60;, &#x60;ip&#x60;, &#x60;lat&#x60;/&#x60;lon&#x60; or &#x60;offset&#x60;. Not supported on &#x60;/v1/time/clock&#x60;. Enabled by &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive); any other value leaves it off without an error. (optional)</param>
         /// <param name="sign">Set to &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive) to ask the gateway to sign the final JSON response. Any other value, a bare &#x60;sign&#x60;, or repeated &#x60;sign&#x60; values leave the response unsigned. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. (optional)</param>
+        /// <param name="format">Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Supported directives: &#x60;%a %A %b %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x %X %y %Y %z %:z %Z %%&#x60;, with the &#x60;-&#x60;, &#x60;_&#x60; and &#x60;0&#x60; padding flags on numeric directives. &#x60;%Z&#x60; prints the IANA zone name (or &#x60;UTC+HH:MM&#x60; for an offset target, &#x60;UTC&#x60; with no target), not an abbreviation. Any other directive (for example &#x60;%U&#x60;, &#x60;%f&#x60;, &#x60;%Q&#x60;) or a trailing &#x60;%&#x60; returns 400 INVALID_PARAMETER naming the directive. (optional)</param>
         /// <param name="operationIndex">Index associated with the operation.</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
-        /// <returns>Task of GetTimezone200Response</returns>
-        System.Threading.Tasks.Task<GetTimezone200Response> GetTimezoneAsync(string? tz = default(string?), string? ip = default(string?), double? lat = default(double?), double? lon = default(double?), string? offset = default(string?), bool? autoTz = default(bool?), bool? sign = default(bool?), int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken));
+        /// <returns>Task of TimezoneResponse</returns>
+        System.Threading.Tasks.Task<TimezoneResponse> GetTimezoneAsync(string? tz = default(string?), string? ip = default(string?), double? lat = default(double?), double? lon = default(double?), string? offset = default(string?), bool? autoTz = default(bool?), bool? sign = default(bool?), string? format = default(string?), int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken));
 
         /// <summary>
         /// Resolve timezone information for a target
@@ -979,10 +982,11 @@ namespace TimeLogic.Api.Api
         /// <param name="offset">Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format only (&#x60;+0530&#x60; and &#x60;+5&#x60; are rejected); URL-encode &#x60;+&#x60; as &#x60;%2B&#x60;, since an unencoded &#x60;+&#x60; is read as a space. An offset target returns &#x60;timezone&#x3D;null&#x60;. On bulk-capable routes, a comma-separated list enables bulk mode with at most 10 values; request URLs are limited to 8192 characters. (optional)</param>
         /// <param name="autoTz">Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. Counts as a selector family, so it cannot be combined with &#x60;tz&#x60;, &#x60;ip&#x60;, &#x60;lat&#x60;/&#x60;lon&#x60; or &#x60;offset&#x60;. Not supported on &#x60;/v1/time/clock&#x60;. Enabled by &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive); any other value leaves it off without an error. (optional)</param>
         /// <param name="sign">Set to &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive) to ask the gateway to sign the final JSON response. Any other value, a bare &#x60;sign&#x60;, or repeated &#x60;sign&#x60; values leave the response unsigned. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. (optional)</param>
+        /// <param name="format">Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Supported directives: &#x60;%a %A %b %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x %X %y %Y %z %:z %Z %%&#x60;, with the &#x60;-&#x60;, &#x60;_&#x60; and &#x60;0&#x60; padding flags on numeric directives. &#x60;%Z&#x60; prints the IANA zone name (or &#x60;UTC+HH:MM&#x60; for an offset target, &#x60;UTC&#x60; with no target), not an abbreviation. Any other directive (for example &#x60;%U&#x60;, &#x60;%f&#x60;, &#x60;%Q&#x60;) or a trailing &#x60;%&#x60; returns 400 INVALID_PARAMETER naming the directive. (optional)</param>
         /// <param name="operationIndex">Index associated with the operation.</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
-        /// <returns>Task of ApiResponse (GetTimezone200Response)</returns>
-        System.Threading.Tasks.Task<ApiResponse<GetTimezone200Response>> GetTimezoneWithHttpInfoAsync(string? tz = default(string?), string? ip = default(string?), double? lat = default(double?), double? lon = default(double?), string? offset = default(string?), bool? autoTz = default(bool?), bool? sign = default(bool?), int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken));
+        /// <returns>Task of ApiResponse (TimezoneResponse)</returns>
+        System.Threading.Tasks.Task<ApiResponse<TimezoneResponse>> GetTimezoneWithHttpInfoAsync(string? tz = default(string?), string? ip = default(string?), double? lat = default(double?), double? lon = default(double?), string? offset = default(string?), bool? autoTz = default(bool?), bool? sign = default(bool?), string? format = default(string?), int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken));
         #endregion Asynchronous Operations
     }
 
@@ -4130,11 +4134,12 @@ namespace TimeLogic.Api.Api
         /// <param name="offset">Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format only (&#x60;+0530&#x60; and &#x60;+5&#x60; are rejected); URL-encode &#x60;+&#x60; as &#x60;%2B&#x60;, since an unencoded &#x60;+&#x60; is read as a space. An offset target returns &#x60;timezone&#x3D;null&#x60;. On bulk-capable routes, a comma-separated list enables bulk mode with at most 10 values; request URLs are limited to 8192 characters. (optional)</param>
         /// <param name="autoTz">Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. Counts as a selector family, so it cannot be combined with &#x60;tz&#x60;, &#x60;ip&#x60;, &#x60;lat&#x60;/&#x60;lon&#x60; or &#x60;offset&#x60;. Not supported on &#x60;/v1/time/clock&#x60;. Enabled by &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive); any other value leaves it off without an error. (optional)</param>
         /// <param name="sign">Set to &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive) to ask the gateway to sign the final JSON response. Any other value, a bare &#x60;sign&#x60;, or repeated &#x60;sign&#x60; values leave the response unsigned. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. (optional)</param>
+        /// <param name="format">Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Supported directives: &#x60;%a %A %b %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x %X %y %Y %z %:z %Z %%&#x60;, with the &#x60;-&#x60;, &#x60;_&#x60; and &#x60;0&#x60; padding flags on numeric directives. &#x60;%Z&#x60; prints the IANA zone name (or &#x60;UTC+HH:MM&#x60; for an offset target, &#x60;UTC&#x60; with no target), not an abbreviation. Any other directive (for example &#x60;%U&#x60;, &#x60;%f&#x60;, &#x60;%Q&#x60;) or a trailing &#x60;%&#x60; returns 400 INVALID_PARAMETER naming the directive. (optional)</param>
         /// <param name="operationIndex">Index associated with the operation.</param>
-        /// <returns>GetTimezone200Response</returns>
-        public GetTimezone200Response GetTimezone(string? tz = default(string?), string? ip = default(string?), double? lat = default(double?), double? lon = default(double?), string? offset = default(string?), bool? autoTz = default(bool?), bool? sign = default(bool?), int operationIndex = 0)
+        /// <returns>TimezoneResponse</returns>
+        public TimezoneResponse GetTimezone(string? tz = default(string?), string? ip = default(string?), double? lat = default(double?), double? lon = default(double?), string? offset = default(string?), bool? autoTz = default(bool?), bool? sign = default(bool?), string? format = default(string?), int operationIndex = 0)
         {
-            TimeLogic.Api.Client.ApiResponse<GetTimezone200Response> localVarResponse = GetTimezoneWithHttpInfo(tz, ip, lat, lon, offset, autoTz, sign);
+            TimeLogic.Api.Client.ApiResponse<TimezoneResponse> localVarResponse = GetTimezoneWithHttpInfo(tz, ip, lat, lon, offset, autoTz, sign, format);
             return localVarResponse.Data;
         }
 
@@ -4149,9 +4154,10 @@ namespace TimeLogic.Api.Api
         /// <param name="offset">Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format only (&#x60;+0530&#x60; and &#x60;+5&#x60; are rejected); URL-encode &#x60;+&#x60; as &#x60;%2B&#x60;, since an unencoded &#x60;+&#x60; is read as a space. An offset target returns &#x60;timezone&#x3D;null&#x60;. On bulk-capable routes, a comma-separated list enables bulk mode with at most 10 values; request URLs are limited to 8192 characters. (optional)</param>
         /// <param name="autoTz">Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. Counts as a selector family, so it cannot be combined with &#x60;tz&#x60;, &#x60;ip&#x60;, &#x60;lat&#x60;/&#x60;lon&#x60; or &#x60;offset&#x60;. Not supported on &#x60;/v1/time/clock&#x60;. Enabled by &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive); any other value leaves it off without an error. (optional)</param>
         /// <param name="sign">Set to &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive) to ask the gateway to sign the final JSON response. Any other value, a bare &#x60;sign&#x60;, or repeated &#x60;sign&#x60; values leave the response unsigned. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. (optional)</param>
+        /// <param name="format">Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Supported directives: &#x60;%a %A %b %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x %X %y %Y %z %:z %Z %%&#x60;, with the &#x60;-&#x60;, &#x60;_&#x60; and &#x60;0&#x60; padding flags on numeric directives. &#x60;%Z&#x60; prints the IANA zone name (or &#x60;UTC+HH:MM&#x60; for an offset target, &#x60;UTC&#x60; with no target), not an abbreviation. Any other directive (for example &#x60;%U&#x60;, &#x60;%f&#x60;, &#x60;%Q&#x60;) or a trailing &#x60;%&#x60; returns 400 INVALID_PARAMETER naming the directive. (optional)</param>
         /// <param name="operationIndex">Index associated with the operation.</param>
-        /// <returns>ApiResponse of GetTimezone200Response</returns>
-        public TimeLogic.Api.Client.ApiResponse<GetTimezone200Response> GetTimezoneWithHttpInfo(string? tz = default(string?), string? ip = default(string?), double? lat = default(double?), double? lon = default(double?), string? offset = default(string?), bool? autoTz = default(bool?), bool? sign = default(bool?), int operationIndex = 0)
+        /// <returns>ApiResponse of TimezoneResponse</returns>
+        public TimeLogic.Api.Client.ApiResponse<TimezoneResponse> GetTimezoneWithHttpInfo(string? tz = default(string?), string? ip = default(string?), double? lat = default(double?), double? lon = default(double?), string? offset = default(string?), bool? autoTz = default(bool?), bool? sign = default(bool?), string? format = default(string?), int operationIndex = 0)
         {
             TimeLogic.Api.Client.RequestOptions localVarRequestOptions = new TimeLogic.Api.Client.RequestOptions();
 
@@ -4203,6 +4209,10 @@ namespace TimeLogic.Api.Api
             {
                 localVarRequestOptions.QueryParameters.Add(TimeLogic.Api.Client.ClientUtils.ParameterToMultiMap("", "sign", sign));
             }
+            if (format != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(TimeLogic.Api.Client.ClientUtils.ParameterToMultiMap("", "format", format));
+            }
 
             localVarRequestOptions.Operation = "TimeApi.GetTimezone";
             localVarRequestOptions.OperationIndex = operationIndex;
@@ -4235,7 +4245,7 @@ namespace TimeLogic.Api.Api
             }
 
             // make the HTTP request
-            var localVarResponse = this.Client.Get<GetTimezone200Response>("/v1/timezone", localVarRequestOptions, this.Configuration);
+            var localVarResponse = this.Client.Get<TimezoneResponse>("/v1/timezone", localVarRequestOptions, this.Configuration);
             if (this.ExceptionFactory != null)
             {
                 Exception _exception = this.ExceptionFactory("GetTimezone", localVarResponse);
@@ -4259,12 +4269,13 @@ namespace TimeLogic.Api.Api
         /// <param name="offset">Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format only (&#x60;+0530&#x60; and &#x60;+5&#x60; are rejected); URL-encode &#x60;+&#x60; as &#x60;%2B&#x60;, since an unencoded &#x60;+&#x60; is read as a space. An offset target returns &#x60;timezone&#x3D;null&#x60;. On bulk-capable routes, a comma-separated list enables bulk mode with at most 10 values; request URLs are limited to 8192 characters. (optional)</param>
         /// <param name="autoTz">Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. Counts as a selector family, so it cannot be combined with &#x60;tz&#x60;, &#x60;ip&#x60;, &#x60;lat&#x60;/&#x60;lon&#x60; or &#x60;offset&#x60;. Not supported on &#x60;/v1/time/clock&#x60;. Enabled by &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive); any other value leaves it off without an error. (optional)</param>
         /// <param name="sign">Set to &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive) to ask the gateway to sign the final JSON response. Any other value, a bare &#x60;sign&#x60;, or repeated &#x60;sign&#x60; values leave the response unsigned. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. (optional)</param>
+        /// <param name="format">Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Supported directives: &#x60;%a %A %b %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x %X %y %Y %z %:z %Z %%&#x60;, with the &#x60;-&#x60;, &#x60;_&#x60; and &#x60;0&#x60; padding flags on numeric directives. &#x60;%Z&#x60; prints the IANA zone name (or &#x60;UTC+HH:MM&#x60; for an offset target, &#x60;UTC&#x60; with no target), not an abbreviation. Any other directive (for example &#x60;%U&#x60;, &#x60;%f&#x60;, &#x60;%Q&#x60;) or a trailing &#x60;%&#x60; returns 400 INVALID_PARAMETER naming the directive. (optional)</param>
         /// <param name="operationIndex">Index associated with the operation.</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
-        /// <returns>Task of GetTimezone200Response</returns>
-        public async System.Threading.Tasks.Task<GetTimezone200Response> GetTimezoneAsync(string? tz = default(string?), string? ip = default(string?), double? lat = default(double?), double? lon = default(double?), string? offset = default(string?), bool? autoTz = default(bool?), bool? sign = default(bool?), int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+        /// <returns>Task of TimezoneResponse</returns>
+        public async System.Threading.Tasks.Task<TimezoneResponse> GetTimezoneAsync(string? tz = default(string?), string? ip = default(string?), double? lat = default(double?), double? lon = default(double?), string? offset = default(string?), bool? autoTz = default(bool?), bool? sign = default(bool?), string? format = default(string?), int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
         {
-            TimeLogic.Api.Client.ApiResponse<GetTimezone200Response> localVarResponse = await GetTimezoneWithHttpInfoAsync(tz, ip, lat, lon, offset, autoTz, sign, operationIndex, cancellationToken).ConfigureAwait(false);
+            TimeLogic.Api.Client.ApiResponse<TimezoneResponse> localVarResponse = await GetTimezoneWithHttpInfoAsync(tz, ip, lat, lon, offset, autoTz, sign, format, operationIndex, cancellationToken).ConfigureAwait(false);
             return localVarResponse.Data;
         }
 
@@ -4279,10 +4290,11 @@ namespace TimeLogic.Api.Api
         /// <param name="offset">Fixed UTC offset in &#x60;+HH:MM&#x60; or &#x60;-HH:MM&#x60; format only (&#x60;+0530&#x60; and &#x60;+5&#x60; are rejected); URL-encode &#x60;+&#x60; as &#x60;%2B&#x60;, since an unencoded &#x60;+&#x60; is read as a space. An offset target returns &#x60;timezone&#x3D;null&#x60;. On bulk-capable routes, a comma-separated list enables bulk mode with at most 10 values; request URLs are limited to 8192 characters. (optional)</param>
         /// <param name="autoTz">Set to &#x60;true&#x60; to resolve using the caller IP from Cloudflare headers. Counts as a selector family, so it cannot be combined with &#x60;tz&#x60;, &#x60;ip&#x60;, &#x60;lat&#x60;/&#x60;lon&#x60; or &#x60;offset&#x60;. Not supported on &#x60;/v1/time/clock&#x60;. Enabled by &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive); any other value leaves it off without an error. (optional)</param>
         /// <param name="sign">Set to &#x60;true&#x60;, &#x60;1&#x60; or &#x60;yes&#x60; (case-insensitive) to ask the gateway to sign the final JSON response. Any other value, a bare &#x60;sign&#x60;, or repeated &#x60;sign&#x60; values leave the response unsigned. Every authenticated JSON response, including errors, then includes signing headers. Not supported on &#x60;/v1/time/clock&#x60;. (optional)</param>
+        /// <param name="format">Custom date/time format template using supported &#x60;strftime&#x60;-style directives such as &#x60;%Y-%m-%d %H:%M:%S&#x60;. Supported directives: &#x60;%a %A %b %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x %X %y %Y %z %:z %Z %%&#x60;, with the &#x60;-&#x60;, &#x60;_&#x60; and &#x60;0&#x60; padding flags on numeric directives. &#x60;%Z&#x60; prints the IANA zone name (or &#x60;UTC+HH:MM&#x60; for an offset target, &#x60;UTC&#x60; with no target), not an abbreviation. Any other directive (for example &#x60;%U&#x60;, &#x60;%f&#x60;, &#x60;%Q&#x60;) or a trailing &#x60;%&#x60; returns 400 INVALID_PARAMETER naming the directive. (optional)</param>
         /// <param name="operationIndex">Index associated with the operation.</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
-        /// <returns>Task of ApiResponse (GetTimezone200Response)</returns>
-        public async System.Threading.Tasks.Task<TimeLogic.Api.Client.ApiResponse<GetTimezone200Response>> GetTimezoneWithHttpInfoAsync(string? tz = default(string?), string? ip = default(string?), double? lat = default(double?), double? lon = default(double?), string? offset = default(string?), bool? autoTz = default(bool?), bool? sign = default(bool?), int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+        /// <returns>Task of ApiResponse (TimezoneResponse)</returns>
+        public async System.Threading.Tasks.Task<TimeLogic.Api.Client.ApiResponse<TimezoneResponse>> GetTimezoneWithHttpInfoAsync(string? tz = default(string?), string? ip = default(string?), double? lat = default(double?), double? lon = default(double?), string? offset = default(string?), bool? autoTz = default(bool?), bool? sign = default(bool?), string? format = default(string?), int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
         {
 
             TimeLogic.Api.Client.RequestOptions localVarRequestOptions = new TimeLogic.Api.Client.RequestOptions();
@@ -4335,6 +4347,10 @@ namespace TimeLogic.Api.Api
             {
                 localVarRequestOptions.QueryParameters.Add(TimeLogic.Api.Client.ClientUtils.ParameterToMultiMap("", "sign", sign));
             }
+            if (format != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(TimeLogic.Api.Client.ClientUtils.ParameterToMultiMap("", "format", format));
+            }
 
             localVarRequestOptions.Operation = "TimeApi.GetTimezone";
             localVarRequestOptions.OperationIndex = operationIndex;
@@ -4367,7 +4383,7 @@ namespace TimeLogic.Api.Api
             }
 
             // make the HTTP request
-            var localVarResponse = await this.AsynchronousClient.GetAsync<GetTimezone200Response>("/v1/timezone", localVarRequestOptions, this.Configuration, cancellationToken).ConfigureAwait(false);
+            var localVarResponse = await this.AsynchronousClient.GetAsync<TimezoneResponse>("/v1/timezone", localVarRequestOptions, this.Configuration, cancellationToken).ConfigureAwait(false);
 
             if (this.ExceptionFactory != null)
             {

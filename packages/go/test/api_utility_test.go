@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
-	openapiclient "github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go"
+	openapiclient "github.com/TimeLogic-API-LLC/timelogic-api-sdks/packages/go/v2"
 )
 
 func Test_timelogicapi_UtilityAPIService(t *testing.T) {

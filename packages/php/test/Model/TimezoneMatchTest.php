@@ -34,7 +34,7 @@ use PHPUnit\Framework\TestCase;
  * TimezoneMatchTest Class Doc Comment
  *
  * @category    Class
- * @description TimezoneMatch
+ * @description One geographic zone whose current offset equals the requested offset.
  * @package     TimeLogic\Api
  * @author      TimeLogic API LLC
  * @link        https://github.com/TimeLogic-API-LLC/timelogic-api-sdks
@@ -80,99 +80,9 @@ class TimezoneMatchTest extends TestCase
     }
 
     /**
-     * Test attribute "unix"
-     */
-    public function testPropertyUnix()
-    {
-        // TODO: implement
-        self::markTestIncomplete('Not implemented');
-    }
-
-    /**
-     * Test attribute "unixMs"
-     */
-    public function testPropertyUnixMs()
-    {
-        // TODO: implement
-        self::markTestIncomplete('Not implemented');
-    }
-
-    /**
-     * Test attribute "utc"
-     */
-    public function testPropertyUtc()
-    {
-        // TODO: implement
-        self::markTestIncomplete('Not implemented');
-    }
-
-    /**
-     * Test attribute "isoLocal"
-     */
-    public function testPropertyIsoLocal()
-    {
-        // TODO: implement
-        self::markTestIncomplete('Not implemented');
-    }
-
-    /**
-     * Test attribute "rfc2822"
-     */
-    public function testPropertyRfc2822()
-    {
-        // TODO: implement
-        self::markTestIncomplete('Not implemented');
-    }
-
-    /**
-     * Test attribute "human"
-     */
-    public function testPropertyHuman()
-    {
-        // TODO: implement
-        self::markTestIncomplete('Not implemented');
-    }
-
-    /**
-     * Test attribute "dayNumber"
-     */
-    public function testPropertyDayNumber()
-    {
-        // TODO: implement
-        self::markTestIncomplete('Not implemented');
-    }
-
-    /**
-     * Test attribute "dayShort"
-     */
-    public function testPropertyDayShort()
-    {
-        // TODO: implement
-        self::markTestIncomplete('Not implemented');
-    }
-
-    /**
-     * Test attribute "dayFull"
-     */
-    public function testPropertyDayFull()
-    {
-        // TODO: implement
-        self::markTestIncomplete('Not implemented');
-    }
-
-    /**
      * Test attribute "timezone"
      */
     public function testPropertyTimezone()
-    {
-        // TODO: implement
-        self::markTestIncomplete('Not implemented');
-    }
-
-    /**
-     * Test attribute "formatted"
-     */
-    public function testPropertyFormatted()
     {
         // TODO: implement
         self::markTestIncomplete('Not implemented');

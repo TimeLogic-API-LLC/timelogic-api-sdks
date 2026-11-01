@@ -3,28 +3,43 @@
 
 from __future__ import annotations
 
-import json
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterator, List, Optional
 
-from pydantic import RootModel, model_validator
+from pydantic import RootModel, field_validator
 from typing_extensions import Self
 
 from timelogic_direct_api.models.time_payload_bulk_item import TimePayloadBulkItem
 
 
 class TimePayloadBulkResponse(RootModel[List[TimePayloadBulkItem]]):
-    """Bulk response array returned by current and convert operations."""
+    """Bulk response array returned by current and convert operations.
 
-    @model_validator(mode="before")
+    Each item is a TimePayloadBulkItem whose actual_instance is either a
+    TimePayload or a BulkError, in the order of the requested selectors.
+    """
+
+    @field_validator('root', mode='before')
     @classmethod
-    def _decode_items(cls, data: Any) -> Any:
-        if isinstance(data, list):
-            return [TimePayloadBulkItem.from_dict(item) if isinstance(item, dict) else item for item in data]
-        return data
+    def _decode_items(cls, value: Any) -> Any:
+        if isinstance(value, list):
+            return [
+                item if isinstance(item, TimePayloadBulkItem) else TimePayloadBulkItem.from_dict(item)
+                for item in value
+            ]
+        return value
+
+    def __iter__(self) -> Iterator[TimePayloadBulkItem]:  # type: ignore[override]
+        return iter(self.root)
+
+    def __len__(self) -> int:
+        return len(self.root)
+
+    def __getitem__(self, index: int) -> TimePayloadBulkItem:
+        return self.root[index]
 
     @classmethod
     def from_json(cls, json_str: str) -> Self:
-        return cls.model_validate(json.loads(json_str))
+        return cls.model_validate_json(json_str)
 
     @classmethod
     def from_dict(cls, obj: Optional[List[Dict[str, Any]]]) -> Self:
@@ -34,4 +49,4 @@ class TimePayloadBulkResponse(RootModel[List[TimePayloadBulkItem]]):
         return self.model_dump_json()
 
     def to_dict(self) -> List[Dict[str, Any]]:
-        return self.model_dump(mode='json')
+        return [item.to_dict() for item in self.root]

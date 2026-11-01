@@ -108,7 +108,7 @@ async fn examples() -> Result<(), Box<dyn std::error::Error>> {
     let left = time_api::get_elapsed(&config, None, None, Some("2027-01-01T00:00:00Z"), None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None).await?;
 
     // Zone details, DST status with the next transition, ISO week number
-    let berlin = time_api::get_timezone(&config, Some("Europe/Berlin"), None, None, None, None, None, None).await?;
+    let berlin = time_api::get_timezone(&config, Some("Europe/Berlin"), None, None, None, None, None, None, None).await?;
     let dst = time_api::get_dst(&config, Some("America/New_York"), None, None, None, None, None, None, Some(true), None).await?;
     let calendar = time_api::get_calendar(&config, None, None, None, None, None, None, None, None, Some("Europe/London"), None, None, None, None, None, None, Some(true), None).await?;
 
@@ -183,34 +183,56 @@ async fn wta() -> Result<(), Box<dyn std::error::Error>> {
 
 Routes, fields and errors: [WorldTimeAPI-compatible routes](#worldtimeapi-compatible-routes).
 
-## Known issues
+## Migrating from 1.x to 2.0
 
-Checked against the live API for this release. All other operations, including single-target `current`, `convert` and `timezone` calls, decode normally.
+2.0 changes the `/v1` response types so that every response decodes into a typed model. The API itself is unchanged. What changed in the contract, for every language:
 
-- Bulk `get_current_time` / `convert_time` calls (comma-separated selectors) return `Error::Serde`.
-- An `offset` lookup with `get_timezone` decodes to `TimezoneResolvedResponse` and drops `matching_zones`.
+- `timezone` returns one model, `TimezoneResponse`: the time payload plus `offset`, `dst`, and `matching_zones` (present only for `offset` lookups). The `oneOf` wrapper `GetTimezone200Response` and its members `TimezoneResolvedResponse` and `TimezoneOffsetResponse` are removed.
+- `TimezoneMatch` (the `matching_zones` item) is `timezone`, `offset` and `dst`, as the API returns it. It previously described a full time payload.
+- `timezone` takes the `format` parameter, after `sign`.
+- `JwkKey` lists the optional `key_ops` and `ext` members.
+- `current` and `convert` no longer reject a comma-separated `tz` list longer than 64 characters or an `offset` list before sending it; an invalid value in a list comes back as a `BulkError` item.
 
-Read those responses as JSON with the configured HTTP client (this uses `reqwest` with the `json` feature and `serde_json`):
+In this package:
+
+- `TimePayloadBulkResponse` is `Vec<TimePayloadBulkItem>`; bulk `get_current_time` / `convert_time` calls return `GetCurrentTime200Response::TimePayloadBulkResponse(items)` with `TimePayloadBulkItem::TimePayload` and `TimePayloadBulkItem::BulkError` items. In 1.x they returned `Error::Serde`.
+- `get_timezone` returns `TimezoneResponse` and takes a trailing `format: Option<&str>` argument. 1.x returned `GetTimezone200Response` and dropped `matching_zones`.
+
+Before (1.x):
 
 ```rust
-use timelogic_api::apis::configuration::Configuration;
+let berlin = time_api::get_timezone(&config, Some("Europe/Berlin"), None, None, None, None, None, None, None).await?;
+// GetTimezone200Response::TimezoneResolvedResponse(..)
+```
 
-// Bulk current/convert and offset timezone lookups: read the JSON directly with the
-// configured HTTP client until the typed decoders handle these answers.
-async fn raw_json(config: &Configuration, path_and_query: &str) -> Result<serde_json::Value, reqwest::Error> {
-    let url = format!("{}{}", config.base_path, path_and_query);
-    let token = config.bearer_access_token.clone().unwrap_or_default();
-    config.client.get(url).bearer_auth(token).send().await?.error_for_status()?.json().await
+After (2.0):
+
+```rust
+use timelogic_api::models::{GetCurrentTime200Response, TimePayloadBulkItem};
+
+let berlin = time_api::get_timezone(&config, Some("Europe/Berlin"), None, None, None, None, None, None, None).await?;
+println!("{:?} {}", berlin.timezone, berlin.offset);
+
+let ist = time_api::get_timezone(&config, None, None, None, None, Some("+05:30"), None, None, None).await?;
+for zone in ist.matching_zones.unwrap_or_default() {
+    println!("{} {}", zone.timezone, zone.offset);
 }
 
-async fn known() -> Result<(), Box<dyn std::error::Error>> {
-    let config = Configuration::with_api_key(std::env::var("TIMELOGIC_API_KEY")?, false, None, None);
-    let many = raw_json(&config, "/v1/time/current?tz=Europe/London,Asia/Tokyo").await?;
-    let offset = raw_json(&config, "/v1/timezone?offset=%2B05:30").await?;
-    println!("{} {}", many[1]["timezone"], offset["matching_zones"][0]["timezone"]); // "Asia/Tokyo" "Asia/Colombo"
-    Ok(())
+if let GetCurrentTime200Response::TimePayloadBulkResponse(items) =
+    time_api::get_current_time(&config, Some("Europe/London,Nope/Zone"), None, None, None, None, None, None, None).await?
+{
+    for item in items {
+        match item {
+            TimePayloadBulkItem::TimePayload(payload) => println!("{:?}", payload.iso_local),
+            TimePayloadBulkItem::BulkError(error) => println!("{}: {:?}", error.item, error.error.code),
+        }
+    }
 }
 ```
+
+## Known issues
+
+Checked against the live API for this release: every `/v1` operation, including bulk `current` / `convert` calls and `offset` lookups with `timezone`, decodes into the typed models. There are no known issues.
 
 ## How the API works
 

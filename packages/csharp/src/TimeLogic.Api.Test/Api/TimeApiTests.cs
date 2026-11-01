@@ -287,8 +287,9 @@ namespace TimeLogic.Api.Test.Api
             //string? offset = null;
             //bool? autoTz = null;
             //bool? sign = null;
-            //var response = instance.GetTimezone(tz, ip, lat, lon, offset, autoTz, sign);
-            //Assert.IsType<GetTimezone200Response>(response);
+            //string? format = null;
+            //var response = instance.GetTimezone(tz, ip, lat, lon, offset, autoTz, sign, format);
+            //Assert.IsType<TimezoneResponse>(response);
         }
     }
 }
