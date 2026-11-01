@@ -168,7 +168,7 @@ public class ApiClient {
         json = new JSON();
 
         // Set default User-Agent.
-        setUserAgent("TimeLogicAPI/1.1.0/java");
+        setUserAgent("TimeLogicAPI/2.0.0/java");
 
         authentications = new HashMap<String, Authentication>();
     }

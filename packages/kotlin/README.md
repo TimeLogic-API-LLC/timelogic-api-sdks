@@ -5,14 +5,14 @@ Official Kotlin client for [TimeLogic API](https://api.timelogicapi.com): curren
 - the `/v1` client, generated from the [TimeLogic API contract](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/openapi/openapi.yaml), with direct and RapidAPI transports;
 - a [WorldTimeAPI-compatible client](#worldtimeapi-compatible-client) for the `/api/timezone` and `/api/ip` routes, which use worldtimeapi.org's paths, fields and plain-text format.
 
-Package: [`com.timelogicapi:timelogic-api-kotlin`](https://central.sonatype.com/artifact/com.timelogicapi/timelogic-api-kotlin), version 1.1.0. Changes are listed in the [changelog](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/CHANGELOG.md).
+Package: [`com.timelogicapi:timelogic-api-kotlin`](https://central.sonatype.com/artifact/com.timelogicapi/timelogic-api-kotlin), version 2.0.0. Changes are listed in the [changelog](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/CHANGELOG.md).
 
 ## Install
 
 Gradle:
 
 ```kotlin
-implementation("com.timelogicapi:timelogic-api-kotlin:1.1.0")
+implementation("com.timelogicapi:timelogic-api-kotlin:2.0.0")
 ```
 
 Requires JVM 8+ (OkHttp and Moshi).

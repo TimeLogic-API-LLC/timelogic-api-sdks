@@ -5,7 +5,7 @@ Official Java client for [TimeLogic API](https://api.timelogicapi.com): current 
 - the `/v1` client, generated from the [TimeLogic API contract](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/openapi/openapi.yaml), with direct and RapidAPI transports;
 - a [WorldTimeAPI-compatible client](#worldtimeapi-compatible-client) for the `/api/timezone` and `/api/ip` routes, which use worldtimeapi.org's paths, fields and plain-text format.
 
-Package: [`com.timelogicapi:timelogic-api`](https://central.sonatype.com/artifact/com.timelogicapi/timelogic-api), version 1.1.0. Changes are listed in the [changelog](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/CHANGELOG.md).
+Package: [`com.timelogicapi:timelogic-api`](https://central.sonatype.com/artifact/com.timelogicapi/timelogic-api), version 2.0.0. Changes are listed in the [changelog](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/CHANGELOG.md).
 
 ## Install
 
@@ -15,11 +15,11 @@ Maven:
 <dependency>
   <groupId>com.timelogicapi</groupId>
   <artifactId>timelogic-api</artifactId>
-  <version>1.1.0</version>
+  <version>2.0.0</version>
 </dependency>
 ```
 
-Gradle: `implementation("com.timelogicapi:timelogic-api:1.1.0")`. Requires Java 8+ (OkHttp and Gson).
+Gradle: `implementation("com.timelogicapi:timelogic-api:2.0.0")`. Requires Java 8+ (OkHttp and Gson).
 
 ## Quick start
 

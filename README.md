@@ -150,7 +150,7 @@ Swift Package Manager consumes the repository directly:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git", from: "1.1.0")
+    .package(url: "https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git", from: "2.0.0")
 ]
 ```
 

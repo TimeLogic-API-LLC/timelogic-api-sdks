@@ -5,12 +5,12 @@ Official PHP client for [TimeLogic API](https://api.timelogicapi.com): current t
 - the `/v1` client, generated from the [TimeLogic API contract](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/openapi/openapi.yaml), with direct and RapidAPI transports;
 - a [WorldTimeAPI-compatible client](#worldtimeapi-compatible-client) for the `/api/timezone` and `/api/ip` routes, which use worldtimeapi.org's paths, fields and plain-text format.
 
-Package: [`timelogic-api/php-sdk`](https://packagist.org/packages/timelogic-api/php-sdk), version 1.1.0. Changes are listed in the [changelog](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/CHANGELOG.md).
+Package: [`timelogic-api/php-sdk`](https://packagist.org/packages/timelogic-api/php-sdk), version 2.0.0. Changes are listed in the [changelog](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/CHANGELOG.md).
 
 ## Install
 
 ```bash
-composer require timelogic-api/php-sdk:1.1.0
+composer require timelogic-api/php-sdk:2.0.0
 ```
 
 Requires PHP 7.4+ with `ext-curl`, `ext-json` and `ext-mbstring`, and Guzzle 7.16.1+ or 8.3.1+. The examples use named arguments (PHP 8.0+); on PHP 7.4 pass the parameters positionally.
