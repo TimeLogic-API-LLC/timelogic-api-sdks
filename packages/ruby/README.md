@@ -1,188 +1,348 @@
-# TimeLogic API | A World Time API
+# TimeLogic API SDK for Ruby
 
-Official Ruby SDK for TimeLogic API, providing world time, timezone, calendar, and signed response operations.
+Official Ruby client for [TimeLogic API](https://api.timelogicapi.com): current time, time zone lookups, conversions, date arithmetic, business-day counts, DST status, calendars, embeddable clocks and signed responses. The package contains two clients:
 
-## Installation
+- the `/v1` client, generated from the [TimeLogic API contract](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/openapi/openapi.yaml), with direct and RapidAPI transports;
+- a [WorldTimeAPI-compatible client](#worldtimeapi-compatible-client) for the `/api/timezone` and `/api/ip` routes, which use worldtimeapi.org's paths, fields and plain-text format.
 
-### Build a gem
+Package: [`timelogic-api`](https://rubygems.org/gems/timelogic-api), version 1.0.3. Changes are listed in the [changelog](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/CHANGELOG.md).
 
-To build the Ruby code into a gem:
+## Install
 
-```shell
-gem build timelogic-api.gemspec
+```bash
+gem install timelogic-api -v 1.0.3
 ```
 
-Then either install the gem locally:
+Or in a Gemfile: `gem 'timelogic-api', '1.0.3'`. Requires Ruby 2.7+.
 
-```shell
-gem install ./timelogic-api-1.0.3.gem
-```
+## Quick start
 
-(for development, run `gem install --dev ./timelogic-api-1.0.3.gem` to install the development dependencies)
-
-or publish the gem to a gem hosting service, e.g. [RubyGems](https://rubygems.org/).
-
-Finally add this to the Gemfile:
-
-    gem 'timelogic-api', '~> 1.0.3'
-
-### Install from Git
-
-If the Ruby gem is hosted at a git repository: https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git, then add the following in the Gemfile:
-
-    gem 'timelogic-api', :git => 'https://github.com/TimeLogic-API-LLC/timelogic-api-sdks.git'
-
-### Include the Ruby code directly
-
-Include the Ruby code directly using `-I` as follows:
-
-```shell
-ruby -Ilib script.rb
-```
-
-## Getting Started
-
-Please follow the [installation](#installation) procedure and then run the following code:
+Get an API key, export it as `TIMELOGIC_API_KEY`, and run:
 
 ```ruby
-# Load the gem
 require 'timelogic-api'
 
-# Setup authorization
-TimeLogic::Api.configure do |config|
-  # Configure API key authorization: apiKeyHeader
-  config.api_key['X-API-Key'] = 'YOUR API KEY'
-  # Uncomment the following line to set a prefix for the API key, e.g. 'Bearer' (defaults to nil)
-  # config.api_key_prefix['X-API-Key'] = 'Bearer'
+config = TimeLogic::Api::TransportConfiguration.build(api_key: ENV.fetch('TIMELOGIC_API_KEY'))
+time = TimeLogic::Api::TimeApi.new(TimeLogic::Api::ApiClient.new(config))
 
-  # Configure Bearer authorization (TimeLogic API key): bearerAuth
-  config.access_token = 'YOUR_BEARER_TOKEN'
-  # Configure a proc to get access tokens in lieu of the static access_token configuration
-  config.access_token_getter = -> { 'YOUR TOKEN GETTER PROC' }
-
-  # Configure API key authorization: apiKeyQuery
-  config.api_key['api_key'] = 'YOUR API KEY'
-  # Uncomment the following line to set a prefix for the API key, e.g. 'Bearer' (defaults to nil)
-  # config.api_key_prefix['api_key'] = 'Bearer'
-
-  # Configure API key authorization: rapidApiKey
-  config.api_key['X-RapidAPI-Key'] = 'YOUR API KEY'
-  # Uncomment the following line to set a prefix for the API key, e.g. 'Bearer' (defaults to nil)
-  # config.api_key_prefix['X-RapidAPI-Key'] = 'Bearer'
-
-  # Configure API key authorization: rapidApiHost
-  config.api_key['X-RapidAPI-Host'] = 'YOUR API KEY'
-  # Uncomment the following line to set a prefix for the API key, e.g. 'Bearer' (defaults to nil)
-  # config.api_key_prefix['X-RapidAPI-Host'] = 'Bearer'
-end
-
-api_instance = TimeLogic::Api::TimeApi.new
-opts = {
-  unix: 1711300000, # Integer |
-  unix_ms: 1711300000000, # Integer |
-  iso: '2024-03-24T15:00:00', # String | ISO-8601 timestamp. To supply a local wall-clock time without an explicit offset, pair it with one of `source_tz=Area/City`, `source_ip=...`, `source_lat=...&source_lon=...`, or `source_offset=±HH:MM`.
-  source_tz: 'America/New_York', # String | Used only with `iso=...` when the ISO value has no explicit offset.
-  source_ip: '8.8.8.8', # String | Used only with `iso=...` when the ISO value has no explicit offset. Resolves that local wall-clock time through the timezone mapped from this IP address.
-  source_lat: 40.7128, # Float | Used only with `iso=...` when the ISO value has no explicit offset. Provide together with `source_lon` to resolve that local wall-clock time through the timezone mapped from these coordinates.
-  source_lon: -74.006, # Float | Used only with `iso=...` when the ISO value has no explicit offset. Provide together with `source_lat`.
-  source_offset: '-05:00', # String | Used only with `iso=...` when the ISO value has no explicit offset. Interprets that local wall-clock time at this fixed UTC offset.
-  seconds: 30, # Integer |
-  minutes: 15, # Integer |
-  hours: 2, # Integer |
-  days: 7, # Integer |
-  tz: 'America/New_York', # String | IANA timezone name. On bulk-capable routes, a comma-separated list enables bulk mode.
-  ip: '8.8.8.8', # String | IP address. On bulk-capable routes, a comma-separated list enables bulk mode.
-  lat: 40.7128, # Float | Latitude. Must be provided together with `lon`.
-  lon: -74.006, # Float | Longitude. Must be provided together with `lat`.
-  offset: '-04:00', # String | Fixed UTC offset in `+HH:MM` or `-HH:MM` format. On bulk-capable routes, a comma-separated list enables bulk mode.
-  auto_tz: true, # Boolean | Set to `true` to resolve using the caller IP from Cloudflare headers.
-  utc: true, # Boolean | Set to `true` to force UTC on routes that support it.
-  format: '%Y-%m-%d %H:%M:%S', # String | Custom date/time format template using supported `strftime`-style directives such as `%Y-%m-%d %H:%M:%S`. Reference: [strftime](https://strftime.net/).
-  sign: true # Boolean | Set to exactly `true` to ask the gateway to sign the final JSON response. Every authenticated JSON response, including errors, then includes signing headers. Not supported on `/v1/time/clock`.
-}
-
-begin
-  #Add modifiers to a timestamp
-  result = api_instance.add_time(opts)
-  p result
-rescue TimeLogic::Api::ApiError => e
-  puts "Exception when calling TimeApi->add_time: #{e}"
-end
-
+now = time.get_current_time(tz: 'America/New_York')
+puts "#{now.iso_local} #{now.timezone}"
 ```
 
-## Documentation for API Endpoints
+## Configuration
 
-All URIs are relative to *https://api.timelogicapi.com*
+The transport helper sets the host and credentials for the `/v1` client. Pass a TimeLogic key for the direct API, or a RapidAPI key with the RapidAPI option; the SDK then sends `X-RapidAPI-Key` and `X-RapidAPI-Host` (default host `timelogic-api-world-time-timezones-time-calculations.p.rapidapi.com`, overridable). Keep keys in environment variables or a secret store, not in source control.
 
-Class | Method | HTTP request | Description
------------- | ------------- | ------------- | -------------
-*TimeLogic::Api::TimeApi* | [**add_time**](docs/TimeApi.md#add_time) | **GET** /v1/time/add | Add modifiers to a timestamp
-*TimeLogic::Api::TimeApi* | [**convert_time**](docs/TimeApi.md#convert_time) | **GET** /v1/time/convert | Convert a timestamp into a target timezone or offset
-*TimeLogic::Api::TimeApi* | [**diff_time**](docs/TimeApi.md#diff_time) | **GET** /v1/time/diff | Difference between two instants
-*TimeLogic::Api::TimeApi* | [**get_calendar**](docs/TimeApi.md#get_calendar) | **GET** /v1/time/calendar | Calendar projection for a target instant
-*TimeLogic::Api::TimeApi* | [**get_clock**](docs/TimeApi.md#get_clock) | **GET** /v1/time/clock | Render a live HTML clock
-*TimeLogic::Api::TimeApi* | [**get_current_time**](docs/TimeApi.md#get_current_time) | **GET** /v1/time/current | Get the current time for a target
-*TimeLogic::Api::TimeApi* | [**get_dst**](docs/TimeApi.md#get_dst) | **GET** /v1/time/dst | Daylight-saving status for a target
-*TimeLogic::Api::TimeApi* | [**get_elapsed**](docs/TimeApi.md#get_elapsed) | **GET** /v1/time/elapsed | Time elapsed since or remaining until a reference instant
-*TimeLogic::Api::TimeApi* | [**get_timezone**](docs/TimeApi.md#get_timezone) | **GET** /v1/timezone | Resolve timezone information for a target
-*TimeLogic::Api::UtilityApi* | [**get_public_signing_key**](docs/UtilityApi.md#get_public_signing_key) | **GET** /.well-known/time-api-public-key | Public signing key set
+```ruby
+require 'timelogic-api'
 
+# Direct API (default host https://api.timelogicapi.com, sends Authorization: Bearer <key>)
+direct = TimeLogic::Api::TransportConfiguration.build(api_key: ENV.fetch('TIMELOGIC_API_KEY'))
 
-## Documentation for Models
+# RapidAPI: pass only your RapidAPI key; the SDK sets X-RapidAPI-Key and X-RapidAPI-Host
+rapid = TimeLogic::Api::TransportConfiguration.build(api_key: ENV.fetch('RAPIDAPI_KEY'), rapid_api: true)
 
- - [TimeLogic::Api::ApiError](docs/ApiError.md)
- - [TimeLogic::Api::BulkError](docs/BulkError.md)
- - [TimeLogic::Api::CalendarResponse](docs/CalendarResponse.md)
- - [TimeLogic::Api::DiffEndpointRef](docs/DiffEndpointRef.md)
- - [TimeLogic::Api::DiffResponse](docs/DiffResponse.md)
- - [TimeLogic::Api::DstResponse](docs/DstResponse.md)
- - [TimeLogic::Api::ElapsedResponse](docs/ElapsedResponse.md)
- - [TimeLogic::Api::ErrorResponse](docs/ErrorResponse.md)
- - [TimeLogic::Api::GetCurrentTime200Response](docs/GetCurrentTime200Response.md)
- - [TimeLogic::Api::GetTimezone200Response](docs/GetTimezone200Response.md)
- - [TimeLogic::Api::JwkKey](docs/JwkKey.md)
- - [TimeLogic::Api::JwksResponse](docs/JwksResponse.md)
- - [TimeLogic::Api::TimePayload](docs/TimePayload.md)
- - [TimeLogic::Api::TimePayloadBulkItem](docs/TimePayloadBulkItem.md)
- - [TimeLogic::Api::TimePayloadBulkResponse](docs/TimePayloadBulkResponse.md)
- - [TimeLogic::Api::TimezoneMatch](docs/TimezoneMatch.md)
- - [TimeLogic::Api::TimezoneOffsetResponse](docs/TimezoneOffsetResponse.md)
- - [TimeLogic::Api::TimezoneResolvedResponse](docs/TimezoneResolvedResponse.md)
+# A different host (for example a compatible gateway or a test server)
+custom = TimeLogic::Api::TransportConfiguration.build(api_key: ENV.fetch('TIMELOGIC_API_KEY'), base_url: 'https://your-compatible-gateway.example')
 
+# Request timeout in seconds (default 0, meaning no timeout). The SDK does not retry.
+direct.timeout = 10
+```
 
-## Documentation for Authorization
+## Operations
 
+| Operation | Endpoint | Method |
+| --- | --- | --- |
+| Current time | `GET /v1/time/current` | `TimeApi#get_current_time` |
+| Convert | `GET /v1/time/convert` | `TimeApi#convert_time` |
+| Add | `GET /v1/time/add` | `TimeApi#add_time` |
+| Difference | `GET /v1/time/diff` | `TimeApi#diff_time` |
+| Elapsed | `GET /v1/time/elapsed` | `TimeApi#get_elapsed` |
+| Timezone | `GET /v1/timezone` | `TimeApi#get_timezone` |
+| Daylight saving | `GET /v1/time/dst` | `TimeApi#get_dst` |
+| Calendar | `GET /v1/time/calendar` | `TimeApi#get_calendar` |
+| Clock | `GET /v1/time/clock` | `TimeApi#get_clock` |
+| Signing keys | `GET /.well-known/time-api-public-key` | `UtilityApi#get_public_signing_key` |
 
-Authentication schemes defined for the API:
-### bearerAuth
+Operations take an options hash named after the query parameters in snake_case; `next` is a Ruby keyword, so `get_dst` takes `_next:`. Each operation has a `…_with_http_info` variant that returns `[data, status_code, headers]`. API errors raise `TimeLogic::Api::ApiException` with `code`, `response_headers` and `response_body`. Parameters, response fields and errors for every operation: [How the API works](#how-the-api-works). Generated reference: [TimeApi](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/packages/ruby/docs/TimeApi.md), [UtilityApi](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/packages/ruby/docs/UtilityApi.md) and the models in the same folder.
 
-- **Type**: Bearer authentication (TimeLogic API key)
+### Examples
 
-### apiKeyHeader
+```ruby
+require 'timelogic-api'
 
+client = TimeLogic::Api::ApiClient.new(TimeLogic::Api::TransportConfiguration.build(api_key: ENV.fetch('TIMELOGIC_API_KEY')))
+time = TimeLogic::Api::TimeApi.new(client)
 
-- **Type**: API key
-- **API key parameter name**: X-API-Key
-- **Location**: HTTP header
+# Convert a New York wall-clock time to Tokyo
+tokyo = time.convert_time(iso: '2026-03-01T09:00:00', source_tz: 'America/New_York', tz: 'Asia/Tokyo')
 
-### apiKeyQuery
+# Add 1 day and 2 hours, shown in New York time
+later = time.add_time(iso: '2026-03-07T12:00:00Z', days: 1, hours: 2, tz: 'America/New_York')
 
+# Duration and business days between two instants (Zurich holiday calendar)
+diff = time.diff_time('iso=2026-01-02T00:00:00Z', 'iso=2026-04-30T00:00:00Z', business_days: true, holiday_country: 'CH-ZH')
+puts "#{diff.days} #{diff.direction} #{diff.business_days}" # 118 forward 82
 
-- **Type**: API key
-- **API key parameter name**: api_key
-- **Location**: URL query string
+# Time left until a deadline
+left = time.get_elapsed(iso: '2027-01-01T00:00:00Z')
 
-### rapidApiKey
+# Zone details, DST status with the next transition, ISO week number
+berlin = time.get_timezone(tz: 'Europe/Berlin')
+dst = time.get_dst(tz: 'America/New_York', _next: true) # `next` is a Ruby keyword, so the option is _next
+calendar = time.get_calendar(tz: 'Europe/London', week: true)
 
+# Embeddable HTML clock
+html = time.get_clock('digital-dashboard', tz: 'Europe/London')
 
-- **Type**: API key
-- **API key parameter name**: X-RapidAPI-Key
-- **Location**: HTTP header
+# Public signing keys (no API key needed)
+keys = TimeLogic::Api::UtilityApi.new(client).get_public_signing_key
+```
 
-### rapidApiHost
+## Errors, headers and signed responses
 
+```ruby
+require 'timelogic-api'
 
-- **Type**: API key
-- **API key parameter name**: X-RapidAPI-Host
-- **Location**: HTTP header
+time = TimeLogic::Api::TimeApi.new(TimeLogic::Api::ApiClient.new(TimeLogic::Api::TransportConfiguration.build(api_key: ENV.fetch('TIMELOGIC_API_KEY'))))
+
+begin
+  time.get_current_time(tz: 'Bad/Zone')
+rescue TimeLogic::Api::ApiException => e
+  puts "#{e.code} #{e.response_body}"
+  # 400 {"error":{"code":"INVALID_PARAMETER","message":"Invalid timezone.",...},"request_id":"..."}
+end
+
+# *_with_http_info returns [data, status code, headers]
+dst, status, headers = time.get_dst_with_http_info(tz: 'Asia/Kolkata', sign: true)
+puts "#{status} #{headers['x-timelogic-quota-limit']} #{headers['x-timelogic-signature']}"
+```
+
+The SDK does not retry. A `429 QUOTA_EXCEEDED` carries no `Retry-After` header; quotas reset at 00:00 UTC on the 1st of each month. Status codes and error codes: [Errors](#errors).
+
+## WorldTimeAPI-compatible client
+
+A separate client for the WorldTimeAPI-compatible routes. Code written for worldtimeapi.org needs only the new host and an API key: paths, field names, types and the `.txt` format are the same. The client sends the key as `X-API-Key`, has a 30-second timeout, does not retry, and does not use or change the `/v1` configuration.
+
+```ruby
+require 'timelogic-api'
+
+wta = TimeLogic::Api::WorldTimeApi::Client.new(api_key: ENV.fetch('TIMELOGIC_API_KEY')) # timeout: 30 seconds
+
+zones = wta.list_timezones                  # ["Africa/Abidjan", ...]
+europe = wta.list_timezones_in_area('Europe') # ["Europe/Amsterdam", ...]
+london = wta.get_timezone('Europe/London')
+puts "#{london.datetime} #{london.utc_offset} #{london.dst}"
+text = wta.get_timezone_text('Europe/London') # "abbreviation: GMT\nclient_ip: ..."
+mine = wta.get_ip                             # the caller's address
+google = wta.get_ip('8.8.8.8')
+
+begin
+  wta.get_timezone('Nope/Zone')
+rescue TimeLogic::Api::WorldTimeApi::UnknownLocationError
+  puts 'unknown location' # 404 {"error":"unknown location"}
+rescue TimeLogic::Api::WorldTimeApi::Error => e
+  puts "#{e.status} #{e.error}"
+end
+
+# Signed responses: read the headers (lower-case names) through request_raw
+signed = TimeLogic::Api::WorldTimeApi::Client.new(api_key: ENV.fetch('TIMELOGIC_API_KEY'), sign: true)
+raw = signed.request_raw('/api/timezone/Europe/London')
+puts "#{raw.status} #{raw.headers['x-timelogic-signature']} #{raw.body}"
+```
+
+Routes, fields and errors: [WorldTimeAPI-compatible routes](#worldtimeapi-compatible-routes).
+
+## Known issues
+
+Checked against the live API for this release. All other operations, including single-target `current`, `convert` and `timezone` calls, decode normally.
+
+- Bulk `get_current_time` / `convert_time` calls (comma-separated selectors) and `offset` lookups with `get_timezone` return `nil`. Ask for the parsed JSON instead of a model:
+
+```ruby
+require 'timelogic-api'
+
+time = TimeLogic::Api::TimeApi.new(TimeLogic::Api::ApiClient.new(TimeLogic::Api::TransportConfiguration.build(api_key: ENV.fetch('TIMELOGIC_API_KEY'))))
+
+# Bulk current/convert and offset timezone lookups: ask for the parsed JSON instead of a model
+items = time.get_current_time(tz: 'Europe/London,Asia/Tokyo', debug_return_type: 'Object')
+puts items[1][:timezone] # Asia/Tokyo
+
+offset = time.get_timezone(offset: '+05:30', debug_return_type: 'Object')
+puts offset[:matching_zones].map { |zone| zone[:timezone] }.inspect # ["Asia/Colombo", "Asia/Kolkata"]
+```
+
+## How the API works
+
+### Base URLs
+
+| Transport | Base URL | Credentials the SDK sends |
+| --- | --- | --- |
+| Direct API (default) | `https://api.timelogicapi.com` | `Authorization: Bearer <your TimeLogic API key>` |
+| RapidAPI | `https://timelogic-api-world-time-timezones-time-calculations.p.rapidapi.com` | `X-RapidAPI-Key: <your RapidAPI key>` and `X-RapidAPI-Host: <RapidAPI host>` |
+
+The gateway accepts a direct key in three places, checked in this order: `Authorization: Bearer <key>`, the `X-API-Key` header, and the `api_key` query parameter. The `/v1` clients in this package send the bearer header; the WorldTimeAPI-compatible client sends `X-API-Key`. Sending two different keys in one request is rejected with `401 UNAUTHORIZED` ("Conflicting API key credentials."). All operations are `GET` requests (`HEAD` is answered like `GET` without a body).
+
+### Choosing a target (selector rules)
+
+Most time operations take one *target*, chosen with exactly one selector family:
+
+| Selector | Example | Notes |
+| --- | --- | --- |
+| `tz` | `America/New_York` | IANA zone, matched case-insensitively. Links and aliases resolve to their canonical zone (`Europe/Stockholm` returns `Europe/Berlin`, `UTC` returns `Etc/UTC`). `Etc/GMT+5` is UTC-05:00 (POSIX sign). |
+| `ip` | `8.8.8.8` | IPv4 or IPv6. Private, reserved and loopback addresses have no zone and return `404 NOT_FOUND`. |
+| `lat` + `lon` | `40.7128`, `-74.006` | Both are required together. |
+| `offset` | `-04:00` | Fixed offset, `+HH:MM` or `-HH:MM` only (`+0530` and `+5` are rejected). The response has `timezone: null`. |
+| `auto_tz` | `true` | Uses the caller's IP address as seen by the gateway. Not available on the clock route. |
+| `utc` | `true` | Forces UTC (convert and add only). The response has `iso_local: null` and `timezone: null`. |
+
+Combining two selector families returns `400 AMBIGUOUS_TARGET`. Where a target is optional and none is given, the response is in UTC with `timezone: null` and `iso_local: null`; `/v1/timezone` requires a target and returns `400 MISSING_TARGET` without one.
+
+**Bulk requests.** `current` and `convert` accept a comma-separated list in one `tz`, `ip` or `offset` selector (at most 10 values; any comma, even a trailing one, switches to bulk). The response is then an array in request order; each item is either a normal time payload or an item error `{ "item", "error": { "code", "message", "details" }, "request_id" }`, so one bad value does not fail the whole request. Every request URL is limited to 8192 characters.
+
+**Input timestamps.** `convert`, `add`, `calendar`, `elapsed` and `clock` take one input instant: `unix` (whole seconds, -62135596800 to 253402300799), `unix_ms` (whole milliseconds) or `iso` (ISO-8601). An `iso` value without an offset is a local wall-clock time; pair it with one hint (`source_tz`, `source_ip`, `source_lat` + `source_lon`, or `source_offset`), otherwise it is read as UTC. Dates must exist (`2027-02-29` returns `400 INVALID_TIMESTAMP`), a local time inside a spring-forward gap returns `400 INVALID_TIMESTAMP`, and an ambiguous fall-back time resolves to its first occurrence.
+
+**Custom formatting.** Every JSON time route accepts `format`, a `strftime`-style template that adds a `formatted` field. Supported directives: `%a %A %b %B %C %d %D %e %F %h %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %v %w %x %X %y %Y %z %:z %Z %%`, with the `-`, `_` and `0` padding flags on numeric directives. `%Z` prints the IANA zone name (or `UTC+HH:MM` for an offset target), not an abbreviation. Any other directive returns `400 INVALID_PARAMETER`. On `diff` and `elapsed`, `format` is a duration template instead, using `%days`, `%hours`, `%minutes` and `%seconds` (each a total in that unit, so 118 days renders `%days days %hours hours` as `118 days 2832 hours`).
+
+### Operations
+
+| Operation | Endpoint | What it returns |
+| --- | --- | --- |
+| Current time | `GET /v1/time/current` | The current time for one target, or an array for a bulk selector. |
+| Convert | `GET /v1/time/convert` | One input instant (`unix`, `unix_ms` or `iso`) expressed in a target zone or offset; bulk targets supported. |
+| Add | `GET /v1/time/add` | A base instant (default: now) plus `seconds`, `minutes`, `hours` and `days`, in a target zone. `days` are exact 24-hour days, so the wall-clock time shifts across a DST change. |
+| Difference | `GET /v1/time/diff` | The duration between `from` and `to`, with `direction` and optional business days. |
+| Elapsed | `GET /v1/time/elapsed` | Time elapsed since, or remaining until, a reference instant (compared with now or a `compare_*` instant), with optional business days. |
+| Timezone | `GET /v1/timezone` | Zone metadata for a target: current time plus `offset` (minutes) and `dst`. An `offset` lookup adds `matching_zones`. |
+| Daylight saving | `GET /v1/time/dst` | Whether DST is active for a target; `next=true` adds `next_transition`. |
+| Calendar | `GET /v1/time/calendar` | Calendar fields (`year`, `month`, `month_name`, `day`) for an instant and target; `week=true` adds the ISO `week_number`. |
+| Clock | `GET /v1/time/clock` | An embeddable HTML clock fragment (`text/html`). `style` is required (30 styles, for example `digital-dashboard` or `analog-station`); `auto_tz` and `sign` are not supported here. |
+| Signing keys | `GET /.well-known/time-api-public-key` | The public Ed25519 keys (JWKS) used to verify signed responses. No API key needed; `kid` filters to one key. |
+
+#### Time payload fields
+
+`current`, `convert`, `add`, `timezone`, `dst` and `calendar` all return these fields:
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `unix` | integer | Unix seconds. |
+| `unix_ms` | integer | Unix milliseconds. |
+| `utc` | string | UTC timestamp, for example `2026-11-01T13:16:03Z`. |
+| `iso_local` | string or null | Local ISO-8601 time with offset; `null` for UTC-only responses. |
+| `rfc2822` | string | RFC 2822 local time. |
+| `human` | string | Readable local time, for example `November 1, 2026, 8:16 AM America/New_York`. |
+| `day_number` | integer | Day of the week counted from Sunday (1 = Sunday ... 7 = Saturday). |
+| `day_short`, `day_full` | string | `Sun` / `Sunday`. |
+| `timezone` | string or null | Canonical IANA zone; `null` for offset and UTC targets. |
+| `formatted` | string | Present only when `format` was sent. |
+
+Extra fields per operation:
+
+- `/v1/timezone`: `offset` (minutes east of UTC) and `dst` (boolean); with an `offset` selector also `matching_zones`, the geographic zones currently at that offset (`UTC` and `Etc/*` excluded).
+- `/v1/time/dst`: `dst_active` and, with `next=true`, `next_transition` (the next UTC-offset change, or `null` if the zone has none).
+- `/v1/time/calendar`: `year`, `month`, `month_name`, `day`, and with `week=true` `week_number` (ISO 8601 week).
+- `/v1/time/diff`: `seconds`, `minutes`, `hours`, `days` (each a total, not a remainder), `direction` (`forward`, `backward` or `same`), `human` (always in hours, minutes and seconds), `from.unix_ms`, `to.unix_ms`, and `business_days` when requested.
+- `/v1/time/elapsed`: `seconds`, `minutes`, `hours`, `days`, `human`, `direction` (`left` while the reference is still ahead, `passed` once it is behind), and `business_days` when requested.
+
+#### Difference and elapsed
+
+`diff` takes two *time specifiers*, `from` and `to`: `now`, `unix=<seconds>`, `unix_ms=<milliseconds>`, `iso=<ISO-8601>`, `offset=±HH:MM`, `tz=<IANA zone>` or `ip=<address>`. The `tz=`, `ip=` and `offset=` forms mean "now" (they only choose the calendar date used for business days). A local `iso` can be placed with `from_tz`/`from_ip`/`from_lat`+`from_lon`/`from_offset` and the matching `to_*` hints.
+
+`elapsed` takes one reference instant (`unix`, `unix_ms` or `iso` with `source_*` hints) and compares it with now, with a `compare_unix`/`compare_unix_ms`/`compare_iso` instant (with `compare_source_*` hints), or with the current time at a target selector.
+
+**Business days.** Set `business_days=true` to add `business_days`. Days are counted by calendar date, start included and end excluded. Add `holiday_country` (ISO 3166-1 alpha-2, any letter case, optionally with a subdivision such as `US-CA` or `CH-ZH`) to skip that calendar's public holidays; `holiday_subdivision` (for example `ZH`, `ENG`, `01`) selects a region and requires `holiday_country`. Weekends follow the calendar's country (Friday/Saturday for `SA`, Saturday/Sunday when no calendar is given). Holiday coverage is 1900 to 2100. Example: from `2026-01-02T00:00:00Z` to `2026-04-30T00:00:00Z` gives `business_days: 83` with `holiday_country=FR`, `82` with `CH-ZH`, and `79` with `SA`.
+
+### Errors
+
+Every error has the same JSON body:
+
+```json
+{ "error": { "code": "INVALID_PARAMETER", "message": "Invalid timezone.", "details": { "tz": "Bad/Zone" } }, "request_id": "547f27d2-1acc-46e6-a9a6-686ec2ca99d9" }
+```
+
+| Status | Codes | When |
+| --- | --- | --- |
+| 400 | `INVALID_PARAMETER`, `INVALID_TIMESTAMP`, `AMBIGUOUS_TARGET`, `MISSING_TARGET` | A parameter is malformed or out of range, two selector families were combined, or a required target is missing. |
+| 401 | `UNAUTHORIZED` | Missing, invalid or conflicting API key credentials. |
+| 403 | `SUBSCRIPTION_INACTIVE` | The key or the customer subscription is not active. |
+| 404 | `NOT_FOUND` | Unknown route (including a trailing slash), or an `ip` with no timezone mapping. |
+| 405 | `METHOD_NOT_ALLOWED` | A method other than `GET`/`HEAD`; the response carries `Allow: GET, HEAD`. |
+| 429 | `QUOTA_EXCEEDED` | The plan's monthly quota is used up. |
+| 500 | `INTERNAL_ERROR` | Internal failure, including signing failures. |
+| 501 | `DEPENDENCY_NOT_READY` | A required resolver or dependency is not ready. |
+| 502 | `INTERNAL_ERROR` | The gateway could not reach the core service. |
+
+Quote `request_id` (also sent as the `X-Request-Id` header) when you contact support.
+
+### Response headers, quotas and limits
+
+| Header | Meaning |
+| --- | --- |
+| `X-Request-Id` | Request identifier, on every response. |
+| `X-Auth-Mode` | How the request was authenticated (`api_key`). |
+| `X-TimeLogic-Customer-ID` | Your customer identifier. |
+| `X-TimeLogic-Plan` | Your plan, for example `free`. |
+| `X-TimeLogic-Quota-Limit` | Requests included per month, or `unlimited`. |
+| `X-TimeLogic-Quota-State` | Cached quota state, for example `active`. |
+| `X-TimeLogic-Key-Id` | On unsigned responses, the ID of the API key that made the request; on signed responses, the signing key `kid`. |
+
+Header names are case-insensitive in HTTP. Some SDKs return headers as a plain map keyed by the name as received (most arrive in lower case, the signature headers as `X-TimeLogic-Signature…`), so compare names case-insensitively.
+
+Quotas are counted per UTC calendar month and reset at 00:00 UTC on the 1st. There is no remaining-requests or reset header, no `Retry-After` on `429`, and no published per-second limit. Bulk selectors take at most 10 values and every request URL is limited to 8192 characters.
+
+### Signed responses
+
+Pass `sign` (`true`) on any JSON route except the clock to receive a detached Ed25519 signature over the exact response body, in these headers: `X-TimeLogic-Signature` (Base64), `X-TimeLogic-Key-Id`, `X-TimeLogic-Signature-Alg` (`Ed25519`), `X-TimeLogic-Signature-Timestamp`, `X-TimeLogic-Content-SHA256` and `X-TimeLogic-Signature-Input`. To verify: decode `X-TimeLogic-Signature-Input` (Base64URL), check that its `content-sha256` line matches the SHA-256 of the body bytes, then verify the signature over the decoded input with the key whose `kid` matches, from `GET /.well-known/time-api-public-key`. The body is unchanged by signing. The headers are exposed to browsers through CORS.
+
+## WorldTimeAPI-compatible routes
+
+### Routes
+
+The client covers all 12 routes of the WorldTimeAPI-compatible contract ([`openapi/openapi-worldtimeapi.yaml`](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/openapi/openapi-worldtimeapi.yaml)). Each JSON route has a plain-text twin ending in `.txt`.
+
+| Route | Returns |
+| --- | --- |
+| `GET /api/timezone`, `/api/timezone.txt` | Every zone name. |
+| `GET /api/timezone/{area}`, `.txt` | The zone names in an area such as `Europe`, or the time object for a one-word zone such as `UTC`. |
+| `GET /api/timezone/{area}/{location}`, `.txt` | The time object for a zone such as `Europe/London`. |
+| `GET /api/timezone/{area}/{location}/{region}`, `.txt` | The time object for a three-part zone such as `America/Argentina/Salta`. |
+| `GET /api/ip`, `/api/ip.txt` | The time object for the caller's IP address. |
+| `GET /api/ip/{ip}`, `.txt` | The time object for an IPv4 or IPv6 address. |
+
+Zone names match in any letter case. Query parameters other than `api_key` and `sign` are ignored.
+
+### Time object fields
+
+| Field | Example | Meaning |
+| --- | --- | --- |
+| `abbreviation` | `GMT` | Zone abbreviation. |
+| `client_ip` | `203.0.113.7` | The caller's IP address. |
+| `datetime` | `2026-11-01T13:18:00.721000+00:00` | Local time with six fractional digits (millisecond resolution, so the last three are `000`). |
+| `day_of_week` | `0` | 0 = Sunday ... 6 = Saturday. |
+| `day_of_year` | `305` | 1-366. |
+| `dst` | `false` | Whether DST is in effect. |
+| `dst_from` | `null` | Start of the current DST period, or `null`. |
+| `dst_offset` | `0` | DST offset in seconds. |
+| `dst_until` | `null` | End of the current DST period, or `null`. |
+| `raw_offset` | `0` | Standard offset in seconds. |
+| `timezone` | `Europe/London` | Zone name. |
+| `unixtime` | `1793539080` | Unix seconds. |
+| `utc_datetime` | `2026-11-01T13:18:00.721000+00:00` | UTC time. |
+| `utc_offset` | `+00:00` | Current total offset. |
+| `week_number` | `44` | ISO 8601 week number. |
+
+The `.txt` variants return the same fields as `key: value` lines in alphabetical order.
+
+### Errors and authentication
+
+Unknown zones and malformed addresses return `404` with worldtimeapi.org's bodies: `{"error":"unknown location"}`, `{"error":"malformed ip"}` or `{"error":"not found"}` (on `.txt` routes, a line starting with `Error:`). Authentication and quota errors (`401`, `403`, `429`) use the TimeLogic error body shown in [Errors](#errors). Every route requires a TimeLogic API key, which the client sends as the `X-API-Key` header, and successful calls count toward the monthly quota like `/v1` calls. The client connects to the direct API (`https://api.timelogicapi.com` by default); it does not use the RapidAPI transport.
+
+With signing enabled, the client adds `sign=true` and responses carry the same detached signature headers as `/v1` ([Signed responses](#signed-responses)); the body is byte-identical to the unsigned body. Use the raw request method to read those headers.
+
+## Support
+
+Questions and problem reports: [issue tracker](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/issues). Security issues: see [SECURITY.md](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/SECURITY.md). Service status: [status.timelogicapi.com](https://status.timelogicapi.com).
+
+## License
+
+[Unlicense](https://github.com/TimeLogic-API-LLC/timelogic-api-sdks/blob/main/LICENSE).

@@ -9,7 +9,7 @@ Name | Type | Description | Notes
 **hours** | **i32** |  |
 **days** | **i32** |  |
 **human** | **String** |  |
-**direction** | **String** | `left` means the target instant is still in the future. `passed` means the target instant is already in the past. |
+**direction** | **String** | `left` means the reference instant is after the compared instant (now, or `compare_*`). `passed` means it is before it, or equal to it. |
 **formatted** | Option<**String**> |  | [optional]
 **business_days** | Option<**i32**> |  | [optional]
 

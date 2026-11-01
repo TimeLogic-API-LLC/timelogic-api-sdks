@@ -12,14 +12,14 @@ Name | Type | Description | Notes
 **iso_local** | **str** |  |
 **rfc2822** | **str** |  |
 **human** | **str** |  |
-**day_number** | **int** |  |
+**day_number** | **int** | Day of the week counted from Sunday (1 &#x3D; Sunday, 2 &#x3D; Monday ... 7 &#x3D; Saturday). |
 **day_short** | **str** |  |
 **day_full** | **str** |  |
 **timezone** | **str** |  |
 **formatted** | **str** |  | [optional]
 **error** | [**ApiError**](ApiError.md) |  |
 **request_id** | **str** |  |
-**timestamp** | **datetime** | Intentionally omitted from public API error responses to avoid exposing request timing; use request_id for support correlation. | [optional]
+**timestamp** | **datetime** | Intentionally omitted from public API error responses, including per-item errors inside bulk arrays, to avoid exposing request timing; use request_id for support correlation. | [optional]
 **item** | **str** |  |
 
 ## Example

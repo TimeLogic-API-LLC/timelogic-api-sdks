@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 **iso_local** | **str** |  |
 **rfc2822** | **str** |  |
 **human** | **str** |  |
-**day_number** | **int** |  |
+**day_number** | **int** | Day of the week counted from Sunday (1 &#x3D; Sunday, 2 &#x3D; Monday ... 7 &#x3D; Saturday). |
 **day_short** | **str** |  |
 **day_full** | **str** |  |
 **timezone** | **str** |  |

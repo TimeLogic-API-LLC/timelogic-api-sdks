@@ -1,7 +1,7 @@
 /*
 TimeLogic API | A World Time API
 
-TimeLogic API | A World Time API. World time, timezone, calendar, duration, and signed response operations.
+Direct API contract for client integrations. It documents authentication, endpoint parameters, response shapes, public signing keys, and signed JSON controls.  Authentication: - the API supports `Authorization: Bearer <token>`, `X-API-Key`, and `api_key` query credentials - RapidAPI access uses `X-RapidAPI-Key` and `X-RapidAPI-Host`; the SDKs expose this as a `rapidApi` transport option that accepts only the RapidAPI key  Behavioral notes: - all documented operations are `GET` - only one selector family may be used at a time - current and convert support bulk only through one comma-separated `tz`, `ip`, or `offset` selector - bulk selectors accept at most 10 values, and every request URL is limited to 8192 characters - add, diff, calendar, dst, elapsed, timezone, and clock are single-target routes - credentials are extracted in Authorization, X-API-Key, then api_key query order; conflicting values are rejected - the first server is the default API host. The second server is the RapidAPI gateway and can be selected or overridden by SDK configuration - `sign` is available on supported JSON routes and is not supported on `/v1/time/clock`
 
 API version: 1.0.0
 */
@@ -26,7 +26,7 @@ type ElapsedResponse struct {
 	Hours int32 `json:"hours"`
 	Days int32 `json:"days"`
 	Human string `json:"human"`
-	// `left` means the target instant is still in the future. `passed` means the target instant is already in the past.
+	// `left` means the reference instant is after the compared instant (now, or `compare_*`). `passed` means it is before it, or equal to it.
 	Direction string `json:"direction"`
 	Formatted *string `json:"formatted,omitempty"`
 	BusinessDays *int32 `json:"business_days,omitempty"`

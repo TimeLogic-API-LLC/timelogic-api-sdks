@@ -29,13 +29,13 @@ import com.squareup.moshi.JsonClass
  * @param isoLocal
  * @param rfc2822
  * @param human
- * @param dayNumber
+ * @param dayNumber Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday).
  * @param dayShort
  * @param dayFull
  * @param timezone
  * @param offset
  * @param dst
- * @param matchingZones
+ * @param matchingZones For `offset=` lookups, the geographic zones whose current offset equals the requested one. `UTC` and `Etc/_*` zones are intentionally excluded; use `tz=UTC` for UTC.
  * @param formatted
  */
 
@@ -60,6 +60,7 @@ data class TimezoneOffsetResponse (
     @Json(name = "human")
     val human: kotlin.String,
 
+    /* Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday). */
     @Json(name = "day_number")
     val dayNumber: kotlin.Int,
 
@@ -78,6 +79,7 @@ data class TimezoneOffsetResponse (
     @Json(name = "dst")
     val dst: kotlin.Boolean,
 
+    /* For `offset=` lookups, the geographic zones whose current offset equals the requested one. `UTC` and `Etc/_*` zones are intentionally excluded; use `tz=UTC` for UTC. */
     @Json(name = "matching_zones")
     val matchingZones: kotlin.collections.List<TimezoneMatch>,
 

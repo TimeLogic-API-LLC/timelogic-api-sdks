@@ -9,7 +9,7 @@ Name | Type | Description | Notes
 **Hours** | **int** |  |
 **Days** | **int** |  |
 **Human** | **string** |  |
-**Direction** | **string** | &#x60;left&#x60; means the target instant is still in the future. &#x60;passed&#x60; means the target instant is already in the past. |
+**Direction** | **string** | &#x60;left&#x60; means the reference instant is after the compared instant (now, or &#x60;compare_*&#x60;). &#x60;passed&#x60; means it is before it, or equal to it. |
 **Formatted** | **string** |  | [optional]
 **BusinessDays** | **int** |  | [optional]
 

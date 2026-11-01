@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 **iso_local** | Option<**String**> |  |
 **rfc2822** | **String** |  |
 **human** | **String** |  |
-**day_number** | **i32** |  |
+**day_number** | **i32** | Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday). |
 **day_short** | **String** |  |
 **day_full** | **String** |  |
 **timezone** | **String** |  |

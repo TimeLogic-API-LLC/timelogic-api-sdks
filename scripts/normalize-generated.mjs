@@ -297,11 +297,13 @@ const phpComposerManifest = (libraryPath, testPath) => `${JSON.stringify({
     'ext-curl': '*',
     'ext-json': '*',
     'ext-mbstring': '*',
-    'guzzlehttp/guzzle': '^7.3',
-    'guzzlehttp/psr7': '^1.7 || ^2.0'
+    // Floors are the first releases free of every published Guzzle/PSR-7
+    // security advisory, so Composer can never pick a known-vulnerable version.
+    'guzzlehttp/guzzle': '^7.16.1 || ^8.3.1',
+    'guzzlehttp/psr7': '^2.13.2 || ^3.2'
   },
   'require-dev': {
-    'phpunit/phpunit': '^8.0 || ^9.0',
+    'phpunit/phpunit': '^9.6.33',
     'friendsofphp/php-cs-fixer': '^3.5'
   },
   autoload: { 'psr-4': { 'TimeLogic\\Api\\': libraryPath } },

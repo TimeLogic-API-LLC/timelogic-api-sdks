@@ -56,6 +56,6 @@ open class UtilityAPI {
 
         let localVariableRequestBuilder: RequestBuilder<JwksResponse>.Type = TimeLogicAPIClient.requestBuilderFactory.getBuilder()
 
-        return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: false)
+        return localVariableRequestBuilder.init(method: "GET", URLString: (localVariableUrlComponents?.string?.replacingOccurrences(of: "+", with: "%2B") ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: false)
     }
 }

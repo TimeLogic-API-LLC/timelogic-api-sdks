@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 **IsoLocal** | **string** |  |
 **Rfc2822** | **string** |  |
 **Human** | **string** |  |
-**DayNumber** | **int** |  |
+**DayNumber** | **int** | Day of the week counted from Sunday (1 &#x3D; Sunday, 2 &#x3D; Monday ... 7 &#x3D; Saturday). |
 **DayShort** | **string** |  |
 **DayFull** | **string** |  |
 **Timezone** | **string** |  |

@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 **iso_local** | **str** |  |
 **rfc2822** | **str** |  |
 **human** | **str** |  |
-**day_number** | **int** |  |
+**day_number** | **int** | Day of the week counted from Sunday (1 &#x3D; Sunday, 2 &#x3D; Monday ... 7 &#x3D; Saturday). |
 **day_short** | **str** |  |
 **day_full** | **str** |  |
 **timezone** | **str** |  |
@@ -20,7 +20,7 @@ Name | Type | Description | Notes
 **month** | **int** |  |
 **month_name** | **str** |  |
 **day** | **int** |  |
-**week_number** | **int** |  | [optional]
+**week_number** | **int** | ISO 8601 week number (present with &#x60;week&#x3D;true&#x60;). It belongs to the ISO week-year, which is not returned and can differ from &#x60;year&#x60; near January 1 (2027-01-01 is week 53 of 2026). | [optional]
 
 ## Example
 

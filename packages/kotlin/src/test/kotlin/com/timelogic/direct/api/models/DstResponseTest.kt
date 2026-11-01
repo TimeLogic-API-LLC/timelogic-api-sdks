@@ -61,7 +61,7 @@ class DstResponseTest : ShouldSpec() {
             //modelInstance.human shouldBe ("TODO")
         }
 
-        // to test the property `dayNumber`
+        // to test the property `dayNumber` - Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday).
         should("test dayNumber") {
             // uncomment below to test the property
             //modelInstance.dayNumber shouldBe ("TODO")
@@ -97,7 +97,7 @@ class DstResponseTest : ShouldSpec() {
             //modelInstance.formatted shouldBe ("TODO")
         }
 
-        // to test the property `nextTransition`
+        // to test the property `nextTransition` - Present only with `next=true`. The instant of the next UTC offset change, written in the offset in force before it (e.g. `2026-11-01T02:00:00-04:00`); the new offset is not returned. `null` when no change is scheduled, for offset targets and with no selector. Tracks offset changes only, so `dst_active` can change without one.
         should("test nextTransition") {
             // uncomment below to test the property
             //modelInstance.nextTransition shouldBe ("TODO")

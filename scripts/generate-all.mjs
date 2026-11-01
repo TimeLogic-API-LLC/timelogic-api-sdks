@@ -64,4 +64,7 @@ for (const target of targets) {
 }
 
 await import('./normalize-generated.mjs');
+await import('./normalize-response-decoding.mjs');
+await import('./add-worldtimeapi.mjs');
+await import('./write-readmes.mjs');
 console.log(`Generated ${targets.length} SDK targets.`);

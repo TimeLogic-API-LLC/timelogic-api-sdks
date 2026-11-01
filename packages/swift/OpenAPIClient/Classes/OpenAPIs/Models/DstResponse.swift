@@ -19,12 +19,14 @@ public struct DstResponse: Codable, JSONEncodable, Hashable {
     public var isoLocal: String?
     public var rfc2822: String
     public var human: String
+    /** Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday). */
     public var dayNumber: Int
     public var dayShort: String
     public var dayFull: String
     public var timezone: String?
     public var formatted: String?
     public var dstActive: Bool
+    /** Present only with `next=true`. The instant of the next UTC offset change, written in the offset in force before it (e.g. `2026-11-01T02:00:00-04:00`); the new offset is not returned. `null` when no change is scheduled, for offset targets and with no selector. Tracks offset changes only, so `dst_active` can change without one. */
     public var nextTransition: Date?
 
     public init(unix: Int64, unixMs: Int64, utc: Date, isoLocal: String?, rfc2822: String, human: String, dayNumber: Int, dayShort: String, dayFull: String, timezone: String?, formatted: String? = nil, dstActive: Bool, nextTransition: Date? = nil) {

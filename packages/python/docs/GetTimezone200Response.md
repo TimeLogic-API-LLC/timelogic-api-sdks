@@ -11,14 +11,14 @@ Name | Type | Description | Notes
 **iso_local** | **str** |  |
 **rfc2822** | **str** |  |
 **human** | **str** |  |
-**day_number** | **int** |  |
+**day_number** | **int** | Day of the week counted from Sunday (1 &#x3D; Sunday, 2 &#x3D; Monday ... 7 &#x3D; Saturday). |
 **day_short** | **str** |  |
 **day_full** | **str** |  |
 **timezone** | **str** |  |
 **formatted** | **str** |  | [optional]
 **offset** | **int** |  |
 **dst** | **bool** |  |
-**matching_zones** | [**List[TimezoneMatch]**](TimezoneMatch.md) |  |
+**matching_zones** | [**List[TimezoneMatch]**](TimezoneMatch.md) | For &#x60;offset&#x3D;&#x60; lookups, the geographic zones whose current offset equals the requested one. &#x60;UTC&#x60; and &#x60;Etc/*&#x60; zones are intentionally excluded; use &#x60;tz&#x3D;UTC&#x60; for UTC. |
 
 ## Example
 

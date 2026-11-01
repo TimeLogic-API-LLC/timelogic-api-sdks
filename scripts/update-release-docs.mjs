@@ -21,6 +21,8 @@ function markdownFiles(directory) {
       if (['.git', 'node_modules', 'vendor'].includes(entry.name)) return [];
       return markdownFiles(file);
     }
+    // CHANGELOG.md records past versions, which must keep their numbers.
+    if (entry.name === 'CHANGELOG.md') return [];
     return entry.isFile() && entry.name.toLowerCase().endsWith('.md') ? [file] : [];
   });
 }

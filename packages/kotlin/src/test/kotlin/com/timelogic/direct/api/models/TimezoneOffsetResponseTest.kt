@@ -62,7 +62,7 @@ class TimezoneOffsetResponseTest : ShouldSpec() {
             //modelInstance.human shouldBe ("TODO")
         }
 
-        // to test the property `dayNumber`
+        // to test the property `dayNumber` - Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday).
         should("test dayNumber") {
             // uncomment below to test the property
             //modelInstance.dayNumber shouldBe ("TODO")
@@ -98,7 +98,7 @@ class TimezoneOffsetResponseTest : ShouldSpec() {
             //modelInstance.dst shouldBe ("TODO")
         }
 
-        // to test the property `matchingZones`
+        // to test the property `matchingZones` - For `offset=` lookups, the geographic zones whose current offset equals the requested one. `UTC` and `Etc/_*` zones are intentionally excluded; use `tz=UTC` for UTC.
         should("test matchingZones") {
             // uncomment below to test the property
             //modelInstance.matchingZones shouldBe ("TODO")

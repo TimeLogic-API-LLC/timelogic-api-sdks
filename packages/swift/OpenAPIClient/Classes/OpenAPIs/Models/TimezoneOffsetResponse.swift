@@ -20,6 +20,7 @@ public struct TimezoneOffsetResponse: Codable, JSONEncodable, Hashable {
     public var isoLocal: String?
     public var rfc2822: String
     public var human: String
+    /** Day of the week counted from Sunday (1 = Sunday, 2 = Monday ... 7 = Saturday). */
     public var dayNumber: Int
     public var dayShort: String
     public var dayFull: String
@@ -27,6 +28,7 @@ public struct TimezoneOffsetResponse: Codable, JSONEncodable, Hashable {
     public var formatted: String?
     public var offset: Int
     public var dst: Bool
+    /** For `offset=` lookups, the geographic zones whose current offset equals the requested one. `UTC` and `Etc/_*` zones are intentionally excluded; use `tz=UTC` for UTC. */
     public var matchingZones: [TimezoneMatch]
 
     public init(unix: Int64, unixMs: Int64, utc: Date, isoLocal: String?, rfc2822: String, human: String, dayNumber: Int, dayShort: String, dayFull: String, timezone: String?, formatted: String? = nil, offset: Int, dst: Bool, matchingZones: [TimezoneMatch]) {
