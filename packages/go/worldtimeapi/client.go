@@ -171,7 +171,10 @@ func suffix(text bool) string {
 // ListTimezones calls GET /api/timezone.
 func (c *Client) ListTimezones(ctx context.Context) ([]string, error) {
 	var out []string
-	return out, c.getJSON(ctx, "/api/timezone", &out)
+	if err := c.getJSON(ctx, "/api/timezone", &out); err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 // ListTimezonesText calls GET /api/timezone.txt.

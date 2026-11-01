@@ -42,7 +42,7 @@ class WorldTimeApiClient
      * @param bool $sign adds sign=true so responses carry detached signature headers
      * @param ClientInterface|null $httpClient Guzzle client to use
      */
-    public function __construct($apiKey, $baseUrl = self::DEFAULT_BASE_URL, $sign = false, ClientInterface $httpClient = null)
+    public function __construct($apiKey, $baseUrl = self::DEFAULT_BASE_URL, $sign = false, ?ClientInterface $httpClient = null)
     {
         if (!is_string($apiKey) || $apiKey === '') {
             throw new \InvalidArgumentException('apiKey is required');
