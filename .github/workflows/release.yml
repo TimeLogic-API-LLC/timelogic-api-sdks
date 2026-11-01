@@ -73,6 +73,17 @@ jobs:
           name: generated-sdks
           path: packages/
           if-no-files-found: error
+      # The registry jobs publish from generated-sdks above, which leaves out hidden
+      # files (the upload-artifact default). The commit back to main needs the full
+      # generated tree, including each package's .gitignore, .npmignore and
+      # .openapi-generator-ignore, so it gets its own copy with hidden files kept.
+      # The root .gitignore still keeps .openapi-generator/ out of the commit.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: generated-sdks-tree
+          path: packages/
+          include-hidden-files: true
+          if-no-files-found: error
 
   update-release-docs:
     needs: [verify, github-release]
@@ -88,7 +99,7 @@ jobs:
         run: git rm -r --quiet packages
       - uses: actions/download-artifact@v4
         with:
-          name: generated-sdks
+          name: generated-sdks-tree
           path: packages/
       - name: Update documentation versions
         run: node scripts/update-release-docs.mjs
